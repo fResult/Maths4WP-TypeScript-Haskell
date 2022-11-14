@@ -1,3 +1,7 @@
+/*
+ * This file is implemented follow concept in Maths4WP
+ * Day 2: Currying (Slide 421-475)
+ */
 type Cat = string;
 type DbOptions = { where: { id: string } };
 
