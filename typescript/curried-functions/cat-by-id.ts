@@ -4,10 +4,10 @@
  */
 
 type Cat = string
-type DbOptions = { where: { id: string } }
+type QueryOptions = { where: { id: string } }
 
 const myDB = {
-    get(table: string, { where }: DbOptions): Cat {
+    get(table: string, { where }: QueryOptions): Cat {
         return `${table}-${where.id}`
     }
 }
@@ -45,13 +45,14 @@ function catByID(getCatByID: (catID: string) => Cat) {
     }
 }
 
-const cat1 = catByID(getCatFromDB(myDB))('17')
-const cat2 = catByID(getCatFromAPI(myAPI))('13')
-// Of course, it (pointlessly) works with itself
-const cat3 = catByID(catByID(getCatFromAPI(myAPI)))('19')
-const cat4 = catByID(mockGetCat)('21')
+const cat13 = catByID(getCatFromAPI(myAPI))('13')
+const cat17 = catByID(getCatFromDB(myDB))('17')
 
-console.log('From DB', cat1) // From DB cats-17
-console.log('From API', cat2) // From API cats/13
-console.log('From API', cat3) // From API cats/19
-console.log('From Mock', cat4) // From Mock mockGetCat-21
+// Of course, it (pointlessly) works with itself
+const cat19 = catByID(catByID(getCatFromAPI(myAPI)))('19')
+const cat21 = catByID(mockGetCat)('21')
+
+console.log('From API', cat13) // From API cats/13
+console.log('From DB', cat17) // From DB cats-17
+console.log('From API', cat19) // From API cats/19
+console.log('From Mock', cat21) // From Mock mockGetCat-21
