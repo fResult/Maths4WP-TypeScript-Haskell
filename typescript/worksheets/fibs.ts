@@ -4,4 +4,4 @@ function fibs(n: number) {
             return [...acc, i < 2 ? i : acc[i - 2] + acc[i-1]]
         }, [])
 }
-fibs(99) //?
+// fibs(40) //?
