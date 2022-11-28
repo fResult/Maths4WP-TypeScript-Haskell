@@ -4,6 +4,15 @@ export function zip(a: number[], b: number[]) {
     return a.map((x, i) => [x, b[i]])
 }
 
+export function zip$<T, S>([y, ...ys]: S[]) {
+    return function forArr([x, ...xs]: T[]): [T, S][] {
+        if (xs.length === 0 || ys.length === 0) return [[x, y]]
+        return [[x, y], ...zip$(ys)(xs) as [[T, S]]]
+    }
+}
+
+// zip$([1,2,3,4])(['K', 'O', 'R', 'N']) //?
+
 export function tail<T>(arr: T[]) {
     return arr.slice(1)
 }
