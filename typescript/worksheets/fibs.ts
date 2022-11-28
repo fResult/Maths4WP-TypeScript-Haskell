@@ -1,3 +1,5 @@
+import {compose, map, reduce} from 'radash'
+
 function fibs(n: number) {
     return Array.from({ length: n })
         .reduce<number[]>((acc, _, i) => {
@@ -5,3 +7,18 @@ function fibs(n: number) {
         }, [])
 }
 // fibs(40) //?
+
+
+function addOne(x: number) {
+    return x + 1
+}
+function addTwo(x: number) {
+    return x + 2
+}
+
+const composed = compose(
+    addOne,
+    addTwo
+)
+
+composed(1) //?
