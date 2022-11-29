@@ -8,3 +8,9 @@ filterByDivisibleByX x = [y | y <- [1..x], mod x y == 0]
 
 -- isPrime :: Int -> Bool
 -- isPrime x = (filterByDivisibleByX x == [1, x])
+
+sievePrimeToN :: Int -> [Int]
+sievePrimeToN n = sieve [2..n] where
+    sieve [] = []
+    sieve (x:xs) = x : sieve [y | y <- xs, mod y x /= 0]
+
