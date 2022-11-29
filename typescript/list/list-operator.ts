@@ -11,7 +11,7 @@ export function zip$<T, S>([y, ...ys]: S[]) {
     }
 }
 
-// zip$([1,2,3,4])(['K', 'O', 'R', 'N']) //?
+zip$([1,2,3,4])(['K', 'O', 'R', 'N']) //?
 
 export function tail<T>(arr: T[]) {
     return arr.slice(1)
