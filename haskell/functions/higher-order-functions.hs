@@ -17,3 +17,11 @@ filter' predicate xs = [x | x <- xs, predicate x]
 map' :: (a -> b) -> [a] -> [b]
 map' _ [] = []
 map' mapper (x:xs) = mapper x : map' mapper xs
+
+filter'' :: (a -> Bool) -> [a] -> [a]
+filter'' _ [] = []
+filter'' predicate (x:xs)
+    | predicate x = x : filtered
+    | otherwise = filtered
+    where
+        filtered = filter'' predicate xs
