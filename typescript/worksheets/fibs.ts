@@ -28,4 +28,4 @@ const chained: (xs: number[]) => number = chain(
     addTwo
 )
 
-chained([1,2,3,4])//?
+chained([1,2,3,4]) //?
