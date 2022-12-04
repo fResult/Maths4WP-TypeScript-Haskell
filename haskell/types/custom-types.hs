@@ -37,3 +37,6 @@ data Person'' = Person''
     , lastName :: String
     , age :: Int
     } deriving Show
+-- Person'' "Korn" "Zilla" 18                                    -- It's work
+-- Person'' { firstName = "Korn", lastName = "Zilla", age = 18 } -- It's also work
+-- Person'' { age = 42 }                                         -- This of course don't
