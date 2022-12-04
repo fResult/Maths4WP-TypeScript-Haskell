@@ -39,4 +39,5 @@ data Person'' = Person''
     } deriving Show
 -- Person'' "Korn" "Zilla" 18                                    -- It's work
 -- Person'' { firstName = "Korn", lastName = "Zilla", age = 18 } -- It's also work
+-- Person'' 42                                                   -- This of course don't
 -- Person'' { age = 42 }                                         -- This of course don't
