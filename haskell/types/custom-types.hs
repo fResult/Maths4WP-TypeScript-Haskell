@@ -19,3 +19,15 @@ type Area = Float
 area :: Shape -> Area
 area (Circle r) = pi * r * r
 area (Square s) = s * s
+
+-- data Person String String Int
+
+
+data Person = Person String String Age
+    deriving Show
+
+type FirstName = String
+type LastName = String
+type Age = Int
+data Person' = Person' FirstName LastName Age
+    deriving Show
