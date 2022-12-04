@@ -31,3 +31,9 @@ type LastName = String
 type Age = Int
 data Person' = Person' FirstName LastName Age
     deriving Show
+
+data Person'' = Person''
+    { firstName :: String
+    , lastName :: String
+    , age :: Int
+    }
