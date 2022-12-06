@@ -1,2 +1,2 @@
-data Tree a = EmptyTree | Node a (Tree a) (Tree a)
+data BinaryTree a = EmptyTree | Node a (BinaryTree a) (BinaryTree a)
     deriving Show
