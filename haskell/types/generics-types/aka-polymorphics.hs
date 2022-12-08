@@ -23,3 +23,6 @@ tree = foldr treeInsert EmptyTree nums
 
 flatTree :: [Int]
 flatTree = flatten tree
+
+countNodes :: BinaryTree a -> Int
+countNodes t = length . flatten $ t
