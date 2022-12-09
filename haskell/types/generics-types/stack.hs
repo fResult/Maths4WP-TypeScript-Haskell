@@ -10,6 +10,9 @@ pop :: Stack a -> Stack a
 pop (Stack []) = error "Stack underflow!"
 pop (Stack  (_:xs)) = Stack xs
 
+emptyStack :: Stack a
+emptyStack = Stack []
+
 top :: Stack a -> a
 top (Stack []) = error "Stack is empty!"
 top (Stack (x:_)) = x
