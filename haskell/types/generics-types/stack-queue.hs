@@ -1,0 +1,1 @@
+data Stack a = Stack [a]
