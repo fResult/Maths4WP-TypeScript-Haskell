@@ -25,7 +25,7 @@ topStackLeft (StackLeft (x : _)) = x
 data StackRight a = StackRight [a] deriving Show
 
 createStackRight :: [a] -> StackRight a
-createStackRight xs = StackRight xs
+createStackRight xs = StackRight $ reverse xs
 
 pushStackRight :: a -> StackRight a -> StackRight a
 pushStackRight x (StackRight xs) = StackRight (xs ++ [x])
@@ -40,9 +40,9 @@ topStackRight (StackRight xs) = last xs
 
 emptyStackRight :: StackRight a -> StackRight a
 emptyStackRight (StackRight _) = StackRight []
-
 {- StackRight Implementation END -}
 
+{- QueueLeft Implementation START -}
 data QueueLeft a = QueueLeft [a] deriving Show
 
 createQueueLeft :: [a] -> QueueLeft a
@@ -57,5 +57,20 @@ dequeueLeft (QueueLeft (_ : xs)) = QueueLeft xs
 
 emptyQueueLeft :: QueueLeft a -> QueueLeft a
 emptyQueueLeft (QueueLeft _) = QueueLeft []
+{- QueueLeft Implementation END -}
 
+{- QueueRight Implementation START -}
 data QueueRight a = QueueRight [a] deriving Show
+
+createQueueRight :: [a] -> QueueRight a
+createQueueRight xs = QueueRight $ reverse xs
+
+enqueueRight :: a -> QueueRight a -> QueueRight a
+enqueueRight x (QueueRight xs) = QueueRight $ xs ++ [x]
+
+dequeueRight :: (Eq a) => QueueRight a -> QueueRight a
+dequeueRight (QueueRight xs) = QueueRight $ delete (last xs) xs
+
+emptyQueueRight :: QueueRight a -> QueueRight a
+emptyQueueRight (QueueRight _) = QueueRight []
+{- QueueRight Implementation END -}
