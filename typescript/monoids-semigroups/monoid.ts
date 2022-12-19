@@ -1,33 +1,41 @@
-;(function SemiGroupImplementation() {
+;(function MonoidImplementation() {
     type SemiGroup<T = any> = (x: T) => {
         x: T
         concat: (o: ReturnType<SemiGroup<T>>) => ReturnType<SemiGroup<T>>
         toString: () => string
     }
 
-    const Sum: SemiGroup = (x) => ({
+    type Monoid<T = any> = SemiGroup<T> & {
+        empty: () => ReturnType<Monoid<T>>
+    }
+
+    const Sum: Monoid = (x) => ({
         x,
         concat: (other) => Sum(x + other.x),
         toString: () => `Sum(${x})`
     })
+    Sum.empty = () => Sum(0)
 
-    const Product: SemiGroup<number> = (x) => ({
+    const Product: Monoid<number> = (x) => ({
         x,
         concat: (other) => Product(x * other.x),
         toString: () => `Product(${x})`
     })
+    Product.empty = () => Product(1)
 
-    const Any: SemiGroup = (x) => ({
+    const Any: Monoid = (x) => ({
         x,
         concat: (other) => Any(x || other.x),
         toString: () => `Any(${x})`
     })
+    Any.empty = () => Any(false)
 
-    const All: SemiGroup = (x) => ({
+    const All: Monoid = (x) => ({
         x,
         concat: (other) => All(x && other.x),
         toString: () => `All(${x})`
     })
+    All.empty = () => All(true)
 
     // console.log(Sum(3).concat(Sum(2)).toString()) // Sum(5)
     // console.log(Sum(5).toString(), '\n===============') // Same as recent line
@@ -50,4 +58,9 @@
     // console.log(All(false).toString(), '\n===============') // Same as recent line
     // console.log(All(false).concat(All(false)).toString()) // All(false)
     // console.log(All(false).toString(), '\n===============') // Same as recent line
+
+    const resAll = [true, true, true]
+        .map(All)
+        .reduce((acc, n) => acc.concat(n), All.empty())
+    console.log(resAll.toString()) //?
 })()
