@@ -37,30 +37,63 @@
     })
     All.empty = () => All(true)
 
-    // console.log(Sum(3).concat(Sum(2)).toString()) // Sum(5)
-    // console.log(Sum(5).toString(), '\n===============') // Same as recent line
-
-    // console.log(Product(3).concat(Product(4)).toString()) // Sum(12)
-    // console.log(Product(12).toString(), '\n===============') // Same as recent line
-
-    // console.log(Any(false).concat(Any(true)).toString()) // Product(true)
-    // console.log(Any(true).toString(), '\n===============') // Same as recent line
-    // console.log(Any(true).concat(Any(false)).toString()) // Product(true)
-    // console.log(Any(true).toString(), '\n===============') // Same as recent line
-    // console.log(Any(false).concat(Any(false)).toString()) // Product(false)
-    // console.log(Any(false).toString(), '\n===============') // Same as recent line
-
-    // console.log(All(true).concat(All(true)).toString()) // All(true)
-    // console.log(All(true).toString(), '\n===============') // Same as recent line
-    // console.log(All(true).concat(All(false)).toString()) // All(false)
-    // console.log(All(false).toString(), '\n===============') // Same as recent line
-    // console.log(All(false).concat(All(true)).toString()) // All(false)
-    // console.log(All(false).toString(), '\n===============') // Same as recent line
-    // console.log(All(false).concat(All(false)).toString()) // All(false)
-    // console.log(All(false).toString(), '\n===============') // Same as recent line
-
-    const resAll = [true, true, true]
+    // USAGES
+    const resultAll = [true, true, true]
         .map(All)
         .reduce((acc, n) => acc.concat(n), All.empty())
-    console.log(resAll.toString()) //?
+    console.log(resultAll.toString()) //?
+
+    const resultAny = [true, false, true]
+        .map(Any)
+        .reduce((acc, bool) => acc.concat(bool), Any.empty())
+    console.log(resultAny.toString()) //?
+
+    const resultSum = [1, 3, 5, 7, 9]
+        .map(Sum)
+        .reduce((acc, n) => acc.concat(n), Sum.empty())
+    console.log(resultSum.toString()) //?
+
+    // Implement Monoids more
+    const Min: Monoid<number> = (x) => ({
+        x,
+        concat: (other) => x < other.x ? Min(x) : Min(other.x),
+        toString: () => `Min(${x})`
+    })
+    Min.empty = () => Min(Infinity)
+
+    type SemiGroupPair<T = any, S = any> = (x: T, y: S) => {
+        fst: T,
+        snd: S,
+        concat: (o: ReturnType<SemiGroupPair<T, S>>) => ReturnType<SemiGroupPair<T, S>>,
+        toString: () => string
+    }
+    type MonoidPair<T = any, S = any> = SemiGroupPair<T, S> & {
+        empty: () => ReturnType<MonoidPair<T, S>>
+    }
+    const Tuple: MonoidPair = (fst, snd) => ({
+        fst,
+        snd,
+        concat: (other) => Tuple(fst.concat(other.fst), snd.concat(other.snd)),
+        toString: () => `Tuple(${fst}, ${snd})`
+    })
+    Tuple.empty = () => Tuple(null, null)
+
+    // Usages more
+    const resultMin = [5, 3, 4, 2, 7]
+        .map(Min)
+        .reduce((acc, n) => acc.concat(n), Min.empty())
+    console.log(resultMin.toString()) //?
+
+    console.log(
+        Tuple(
+            Sum(1),
+            Product(2)
+        ).concat(
+            Tuple(
+                Sum(5),
+                Product(2)
+            )
+        ).toString()
+    ) //?
+
 })()
