@@ -30,7 +30,11 @@ f :: Int -> Int
 f x = x * 2
 
 test :: [[Int]] -> [Int]
-test = (map f . filter even . concat)
+test = map f . filter even . concat
 -- [[1,2,3,4], [5,6,7], [9, 10, 11, 12]]
 test' :: [[Int]] -> [Int]
 test' = concat . map (map f . filter even)
+
+qsort :: Ord a => [a] -> [a]
+qsort [] = []
+qsort (x:xs) = qsort [y | y <- xs, y < x] ++ [x] ++ qsort [y | y <- xs, y >= x]
