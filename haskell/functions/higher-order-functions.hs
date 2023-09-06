@@ -34,6 +34,14 @@ foldl' :: (b -> a -> b) -> b -> [a] -> b
 foldl' _ b []     = b
 foldl' f b (x:xs) = foldl' f (f b x) xs
 
+-- foldl' (flip (:)) [] [1,2,3] = foldl' (flip (:)) ((flip (:)) [] 1) [2,3]
+--                             = foldl' (flip (:)) [1] [2,3]
+--                             = foldl' (flip (:)) ((flip (:)) [1] 2) [3]
+--                             = foldl' (flip (:)) [2,1] [3]
+--                             = foldl' (flip (:)) ((flip (:)) [2,1] 3) []
+--                             = foldl' (flip (:)) [3,2,1] []
+--                             = [3,2,1]
+
 -- map' (*2) [1..5]
 ---- [2,4,6,8,10]
 
