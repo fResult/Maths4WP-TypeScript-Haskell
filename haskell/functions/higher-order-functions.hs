@@ -25,3 +25,8 @@ filter'' predicate (x:xs)
     | otherwise = filtered
     where
         filtered = filter'' predicate xs
+
+foldr' :: (a -> b -> b) -> b -> [a] -> b
+foldr' _ b []     = b
+foldr' f b (x:xs) = f x (foldr' f b xs)
+-- foldr' (+) 0 [1..10] = 55
