@@ -8,8 +8,15 @@ sumDouble = (double . sum)
 
 sumDouble' :: [Int] -> Int
 sumDouble' = foldr ((+) . double) 0
+-- sumDouble' [1..10]
+---- 110
 
 lengthConcat :: [[Int]] -> Int
 lengthConcat = length . concat
 -- lengthConcat [[1..10], [16..20]]
+---- 15
+
+lengthConcat' :: [[Int]] -> Int
+lengthConcat' = foldr ((+) . length) 0
+-- lengthConcat' [[1..10], [16..20]]
 ---- 15
