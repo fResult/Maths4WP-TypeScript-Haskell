@@ -20,7 +20,6 @@ partial True = True
 notDefined :: Bool -> Bool
 notDefined = undefined
 -- notDefined True
----- notDefined True
 ---- *** Exception: Prelude.undefined
 ------ CallStack (from HasCallStack):
 -------- error, called in base:GHC.Err
@@ -30,3 +29,16 @@ notDefined = undefined
 ---- <interactive>:24:1: error:
 ------ • No instance for (Show (Bool -> Bool))
 ------ • In a stmt of an interactive GHCi command: print it
+
+notDefined2 :: Bool -> (Bool -> Bool)
+notDefined2 = undefined
+-- notDefined2 True
+---- <interactive>:29:1: error:
+------ • No instance for (Show (Bool -> Bool))
+------ • In a stmt of an interactive GHCi command: print it
+
+-- notDefined2 True True
+---- *** Exception: Prelude.undefined
+------ CallStack (from HasCallStack):
+-------- error, called in base:GHC.Err
+-------- undefined, called in main:Incomputable
