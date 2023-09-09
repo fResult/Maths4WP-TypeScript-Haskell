@@ -44,7 +44,18 @@ notDefined2 = undefined
 -------- undefined, called in main:Incomputable
 
 or' :: Bool -> Bool -> Bool
+-- or' _ undefined = error "Not support undefined"
 or' True  _ = True
 or' False b = b
 -- or' True undefined
 ---- True <-- It should be error, so it's unexpected using
+
+--- PROVE incomputable of fusion law ---
+-- f (foldr g a xs) = foldr h b xs
+----- CASE undefined
+-- f (foldr g a undefined) = foldr h b undefined
+--- WHEN we call `foldr g a undefined` ---
+--- What is it evaluated to? ---
+---- *** Exception: Prelude.undefined <-- It's still undefined
+-- So... f (foldr g a undefined) = foldr h b undefined
+--       f undefined             = undefined
