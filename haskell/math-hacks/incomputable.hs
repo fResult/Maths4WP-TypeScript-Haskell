@@ -16,3 +16,17 @@ partial :: Bool -> Bool
 partial True = True
 -- partial False
 ---- *** Exception: Non-exhaustive patterns in function partial
+
+notDefined :: Bool -> Bool
+notDefined = undefined
+-- notDefined True
+---- notDefined True
+---- *** Exception: Prelude.undefined
+------ CallStack (from HasCallStack):
+-------- error, called in base:GHC.Err
+-------- undefined, called in main:Incomputable
+
+-- notDefined
+---- <interactive>:24:1: error:
+------ • No instance for (Show (Bool -> Bool))
+------ • In a stmt of an interactive GHCi command: print it
