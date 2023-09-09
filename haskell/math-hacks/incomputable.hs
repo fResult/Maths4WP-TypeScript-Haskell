@@ -42,3 +42,9 @@ notDefined2 = undefined
 ------ CallStack (from HasCallStack):
 -------- error, called in base:GHC.Err
 -------- undefined, called in main:Incomputable
+
+or' :: Bool -> Bool -> Bool
+or' True  _ = True
+or' False b = b
+-- or' True undefined
+---- True <-- It should be error, so it's unexpected using
