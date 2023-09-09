@@ -1,3 +1,5 @@
+module FusionLaw where
+
 double :: Int -> Int
 double = (*2)
 
@@ -22,7 +24,7 @@ lengthConcat' = foldr ((+) . length) 0
 ---- 15
 
 foldr' :: (a -> b -> b) -> b -> [a] -> b
-foldr' []         = b
+foldr' _ b []     = b
 foldr' f b (x:xs) = f x (foldr' f b xs)
 
 --- PROVE FUSION LAW ---
