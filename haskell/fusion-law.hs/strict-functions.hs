@@ -15,9 +15,13 @@ double = (*2)
 ---- 110
 -- sum . map double $ [1..10]
 ---- 110
+------ double . sum    = sum . map double
+------ 2 * (x + y + z) = 2x + 2y + 2z
+
 -- foldr (+) 0 . map double $ [1..10]
 ---- 110
 -- foldr ((+) . double) 0 $ [1..10]
 ---- 110
 
 -- foldr f a . map g = foldr (f . g) a
+---- ∴  double . sum = foldr ((+) . double) 0
