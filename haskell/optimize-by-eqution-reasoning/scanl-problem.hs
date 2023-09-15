@@ -23,5 +23,10 @@ scanl' f e = (map (foldl f e)) . inits
 --- DO Equational Reasoning of Scanl ---
 ---- CASE []
 ---- scanl f e [] = (map (foldl f e) . inits) []
-----              = map (foldl f e) (inits [])             <-- (g . f) = g (f x)
-----              =
+----              = map (foldl f e) (inits [])             <-- (g . f) x = g (f x)
+----              = map (foldl f e) [[]]                   <-- inits [] = [[]]
+----              = (foldl f e) [] : map (foldl f e) []    <-- map f (x:xs) = f x : map f xs
+----              = (foldl f e) [] : []                    <-- map f []     = []
+----              = [foldl f e []]                         <-- x : [] = [x]
+----              = [e]                                    <-- foldl f b [] = b
+------      ∴ scanl f e [] = [e]      ------
