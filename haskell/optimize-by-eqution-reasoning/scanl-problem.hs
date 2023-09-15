@@ -19,3 +19,9 @@ scanl' f e = (map (foldl f e)) . inits
 -- scanl' (+) 0 [1,2,3] = map (foldl (+) 0) [[], [1], [1,2], [1,2,3]]
 --                      = [0, (0+1), (0+1+2), (0+1+2+3)]
 --                      = [0,1,3,6]
+
+--- DO Equational Reasoning of Scanl ---
+---- CASE []
+---- scanl f e [] = (map (foldl f e) . inits) []
+----              = map (foldl f e) (inits [])             <-- (g . f) = g (f x)
+----              =
