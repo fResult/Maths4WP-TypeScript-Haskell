@@ -41,3 +41,7 @@ scanl' f e = (map (foldl f e)) . inits
 ----                  = e : map (foldl f (f e x)) (inits xs)                   <-- foldl f b . (x:) = foldl f (f b x)
 ----                  = e : scanl f (f e x) xs                                 <-- scanl f e xs = map (foldl f e) (inits xs)
 ------      ∴ scanl f e xs = e : scanl f (f e x) xs
+
+scanl'' :: (b -> a -> b) -> b -> [a] -> [b]
+scanl'' f e []     = [e]
+scanl'' f e (x:xs) = e : scanl f (f e x) xs
