@@ -31,6 +31,13 @@ scanl' f e = (map (foldl f e)) . inits
 ----              = [e]                                    <-- foldl f b [] = b
 ------      ∴ scanl f e [] = [e]      ------
 ---- CASE (x:xs), let's assume...
----- scanl f e xs     = map (foldl f e) . (inits xs)
----- scanl f e (x:xs) = map (foldl f e) . (inits (x:xs))
----- scanl f e (x:xs) = map (foldl f e) . ([] : map (x:) (inits xs))       <-- inits (x:xs) = [] : map (x:) (inits xs)
+-----  ASSUME scanl f e xs = map (foldl f e) (inits xs)                        <-- scanl' f e xs = (map (foldl f e) . inits) xs = map (foldl f e) (inits xs)
+---- scanl f e (x:xs) = map (foldl f e) (inits (x:xs))
+----                  = map (foldl f e) ([] : map (x:) (inits xs))             <-- inits (x:xs) = [] : map (x:) (inits xs)
+----                  = foldl f e [] : map (foldl f e) (map (x:) (inits xs))   <-- map f (x:xs) = f x : map xs
+----                  = e            : xxx                                     <-- foldl f b [] = b
+----                  = e : (map (foldl f e) . map (x:)) (inits xs)            <-- g (f x) = (g . f) x
+----                  = e : map ((foldl f e) . (x:)) (inits xs)                <-- (map g . map f) = map (g . f)
+----                  = e : map (foldl f (f e x)) (inits xs)                   <-- foldl f b . (x:) = foldl f (f b x)
+----                  = e : scanl f (f e x) xs                                 <-- scanl f e xs = map (foldl f e) (inits xs)
+------      ∴ scanl f e xs = e : scanl f (f e x) xs
