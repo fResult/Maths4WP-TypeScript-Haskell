@@ -1,4 +1,5 @@
 module MaximumSumSegmentProblem where
+import Data.List as L (nub)
 
 tails :: [a] -> [[a]]
 tails []       = [[]]
@@ -9,4 +10,4 @@ inits []     = [[]]
 inits (x:xs) = [] : map (x:) (inits xs)
 
 segments :: Eq a => [a] -> [[a]]
-segments = concat . map inits . tails
+segments = nub . concat . map inits . tails
