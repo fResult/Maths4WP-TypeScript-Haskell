@@ -3,6 +3,7 @@
     "concat",
     "foldl",
     "foldr",
+    "Monoid",
     "scanl",
     "scanr"
   ]
