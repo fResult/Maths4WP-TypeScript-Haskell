@@ -33,4 +33,8 @@ maximumSumSegment = maximum . map sum . segments'
 --                   = maximum . map maximum . map ((map sum). inits) . tails           <-- maximum . concat = maximum . map maximum -- FOR non-empty list
 --                   = maximum . map (maximum . (map sum . inits)) . tails              <-- map g . map f = map (g . f) -- Functor Las
 --                   = maximum . map (maximum . (map (foldl (+) 0) . inits)) . tails    <-- sum = foldl (+) 0
---                   = maximum . map (maximum . scanl (+) 0)) . tails                   <-- map (foldl (+) 0) . inits = scanl -- Naive Scanl, but we replace with the more efficient Scanl
+--                   = maximum . map (maximum . scanl (+) 0) . tails                    <-- map (foldl (+) 0) . inits = scanl -- Naive Scanl, but we replace with the more efficient Scanl
+------         ∴  maximum . map sum . concat . map inits . tails = maximum . map (maximum . scanl (+) 0) . tails
+maximumSumSegment' :: [Int] -> Int
+maximumSumSegment' = maximum . map (maximum . scanl (+) 0) . tails'
+
