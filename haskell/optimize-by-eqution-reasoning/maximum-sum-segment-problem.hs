@@ -40,6 +40,8 @@ maximumSumSegment' = maximum . map (maximum . scanl (+) 0) . tails'
 
 --- DO Equational Reasoning for maximumSumSegment' ---
 -- maximumSumSegment' = maximum . map (maximum . scanl (+) 0) . tails
+--                    = maximum . map (maximum . foldr (\x xs -> 0 : map (x+) xs) [0]) . tails   <-- scanl @ e = foldr (\x xs -> e : map (x@) xs) [e]))
+--                    = foldr max . map (maximum . foldr (\x xs -> 0 : map (x+) xs) [0]) . tails <-- maximum = foldr max
 --                    =
 
 --- DO Calculation for Scanl
@@ -56,6 +58,9 @@ maximumSumSegment' = maximum . map (maximum . scanl (+) 0) . tails'
 --                       = 0 : map (x+) [0, y+0, y+z]
 --                       = 0 : [x+0, x+y+0, x+y+z]
 --                       = [0, x+0, x+y+0, x+y+z]
+------         ∴  scanl @ e = foldr f [e]
+------                          where
+------                            f x xs = e : (x@) xs
 
 test1 :: [Int] -> Int
 test1 = maximum . scanl (+) 0
