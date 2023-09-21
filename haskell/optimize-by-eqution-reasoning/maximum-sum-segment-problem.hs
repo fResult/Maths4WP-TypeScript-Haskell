@@ -38,3 +38,29 @@ maximumSumSegment = maximum . map sum . segments'
 maximumSumSegment' :: [Int] -> Int
 maximumSumSegment' = maximum . map (maximum . scanl (+) 0) . tails'
 
+--- DO Equational Reasoning for maximumSumSegment' ---
+-- maximumSumSegment' = maximum . map (maximum . scanl (+) 0) . tails
+--                    =
+
+--- DO Calculation for Scanl
+-- scanl (+) 0 [x, y, z] = [0, 0+x, (0+x)+y, ((0+x)+y)+z]
+--                       = [0, x, x+y, x+y+z]
+--                       = 0 : map (x+) [0, y, y+z]
+--                       = 0 : map (x+) (scanl (+) 0 [y, z])
+--                       = 0 : map (x+) (0 : map (y+) (scanl (+) 0 [z]))
+--                       = 0 : map (x+) (0 : map (y+) (0 : map (z+) (scanl (+) 0 [])))
+--                       = 0 : map (x+) (0 : map (y+) (0 : map (z+) ([0])))
+--                       = 0 : map (x+) (0 : map (y+) (0 : [z]))
+--                       = 0 : map (x+) (0 : map (y+) [0, z])
+--                       = 0 : map (x+) (0 : [y+0, y+z])
+--                       = 0 : map (x+) [0, y+0, y+z]
+--                       = 0 : [x+0, x+y+0, x+y+z]
+--                       = [0, x+0, x+y+0, x+y+z]
+
+test1 :: [Int] -> Int
+test1 = maximum . scanl (+) 0
+
+test2 :: [Int] -> Int
+test2 = maximum . foldr f [0]
+  where
+    f x xs = 0 : map (x+) xs
