@@ -40,8 +40,9 @@ maximumSumSegment' = maximum . map (maximum . scanl (+) 0) . tails'
 
 --- DO Equational Reasoning for maximumSumSegment' ---
 -- maximumSumSegment' = maximum . map (maximum . scanl (+) 0) . tails
---                    = maximum . map (maximum . foldr (\x xs -> 0 : map (x+) xs) [0]) . tails   <-- scanl @ e = foldr (\x xs -> e : map (x@) xs) [e]))
---                    = foldr max . map (maximum . foldr (\x xs -> 0 : map (x+) xs) [0]) . tails <-- maximum = foldr max
+--                    = maximum . map (maximum . foldr (\x xs -> 0 : map (x+) xs) [0]) . tails     <-- scanl @ e = foldr (\x xs -> e : map (x@) xs) [e]))
+--                    = foldr max . map (maximum . foldr (\x xs -> 0 : map (x+) xs) [0]) . tails   <-- maximum = foldr max
+--                    = foldr1 max . map (maximum . foldr (\x xs -> 0 : map (x+) xs) [0]) . tails  <-- foldr = foldr1 -- like foldr but list must have at least one element
 --                    =
 
 --- DO Calculation for Scanl
@@ -61,6 +62,13 @@ maximumSumSegment' = maximum . map (maximum . scanl (+) 0) . tails'
 ------         ∴  scanl @ e = foldr f [e]
 ------                          where
 ------                            f x xs = e : (x@) xs
+
+foldr1 :: (a -> a -> a) -> [a] -> a
+foldr1 f (x:[]) = x
+foldr1 f (x:xs) = f x (foldr1 f xs)
+--- Write it as a Fusion Law
+-- foldr1 # . foldr (\x xs -> e : map (x@) xs) e = foldr h b
+--
 
 test1 :: [Int] -> Int
 test1 = maximum . scanl (+) 0
