@@ -66,9 +66,18 @@ maximumSumSegment' = maximum . map (maximum . scanl (+) 0) . tails'
 foldr1' :: (a -> a -> a) -> [a] -> a
 foldr1' f (x:[]) = x
 foldr1' f (x:xs) = f x (foldr1 f xs)
---- Write it as a Fusion Law (f. foldr f a = foldr h b) ---
+--- Write it as a Fusion Law (f . foldr f a = foldr h b) ---
 -- foldr1 # . foldr (\x xs -> e : map (x@) xs) e = foldr h b
---                                               = foldr h e   <-- CASE [] consideration as below
+--                                               = foldr h e   <-- From CASE [] proving consideration as below
+
+
+--- DO Equational Reasoning for f (g x y) = h x (f y), ∀x, y
+------ We already had foldr1 # . foldr (\x xs -> e : map (x@) xs) e = foldr h e
+--     WE HAVE     f (g x y)  = h x (f y), ∀x, y
+-- foldr1 # (g x y)           = h x (f y)           <-- f     = foldr1 #
+-- foldr1 # (e : map (x@) xs) = h x (f y)           <-- g x y = e : map (x@) y
+-- foldr1 # (e : map (x@) xs) = h x (foldr1 # xs)   <-- f y   =
+
 ---- CASE [], let's consider...
 ---- foldr1 # . foldr (\x [] -> e : map (x@) []) e = [e]       <-- e : map (x@) [] = e : [] = [e]
 ----
