@@ -45,7 +45,7 @@ maximumSumSegment' = maximum . map (maximum . scanl (+) 0) . tails'
 --                    = foldr1 max . map (maximum . foldr (\x xs -> 0 : map (x+) xs) [0]) . tails  <-- foldr = foldr1 -- like foldr but list must have at least one element
 --                    =
 
---- DO Calculation for Scanl
+--- DO Calculation for Scanl ---
 -- scanl (+) 0 [x, y, z] = [0, 0+x, (0+x)+y, ((0+x)+y)+z]
 --                       = [0, x, x+y, x+y+z]
 --                       = 0 : map (x+) [0, y, y+z]
@@ -63,12 +63,15 @@ maximumSumSegment' = maximum . map (maximum . scanl (+) 0) . tails'
 ------                          where
 ------                            f x xs = e : (x@) xs
 
-foldr1 :: (a -> a -> a) -> [a] -> a
-foldr1 f (x:[]) = x
-foldr1 f (x:xs) = f x (foldr1 f xs)
---- Write it as a Fusion Law
+foldr1' :: (a -> a -> a) -> [a] -> a
+foldr1' f (x:[]) = x
+foldr1' f (x:xs) = f x (foldr1 f xs)
+--- Write it as a Fusion Law (f. foldr f a = foldr h b) ---
 -- foldr1 # . foldr (\x xs -> e : map (x@) xs) e = foldr h b
---
+--                                               = foldr h e   <-- CASE [] consideration as below
+---- CASE [], let's consider...
+---- foldr1 # . foldr (\x [] -> e : map (x@) []) e = [e]       <-- e : map (x@) [] = e : [] = [e]
+----
 
 test1 :: [Int] -> Int
 test1 = maximum . scanl (+) 0
