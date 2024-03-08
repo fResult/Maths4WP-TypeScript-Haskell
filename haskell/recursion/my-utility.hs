@@ -8,8 +8,9 @@ length' [] = 0
 length' (_:xs) = 1 + length' xs
 
 reverse' :: [a] -> [a]
-reverse' [] = []
-reverse' (x:xs) = reverse xs ++ [x]
+reverse' = foldl (flip (:)) []
+-- reverse' [] = []
+-- reverse' (x:xs) = reverse xs ++ [x]
 
 zip' :: [a] -> [b] -> [(a, b)]
 zip' [] _ = []
