@@ -36,7 +36,7 @@ class FilledOrder implements Notifiable {
         private _symbol: string,
         private _price: number,
         private _quantity: number,
-        private _status: OrderStatus
+        private _status: OrderStatus,
     ) {}
 
     get id(): number {
@@ -116,12 +116,12 @@ enum OrderStatus {
     PartiallyFilled,
     Filled, // Completed
     Canceled,
-    Rejected
+    Rejected,
 }
 
 enum OrderType {
     Limit,
-    Market
+    Market,
 }
 
 // Data Class (DB Model)
@@ -130,7 +130,7 @@ class Order {
         private _id: number,
         private _status: OrderStatus,
         private _type: OrderType,
-        private _fills?: Record<string, any>[]
+        private _fills?: Record<string, any>[],
     ) {}
 
     get id(): number {
