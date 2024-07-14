@@ -1,6 +1,7 @@
 {
   "cSpell.words": [
     "concat",
+    "Finishable",
     "foldl",
     "foldr",
     "Monoid",
