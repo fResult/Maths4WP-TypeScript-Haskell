@@ -1,0 +1,23 @@
+lockfileVersion: '9.0'
+
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
+
+importers:
+
+  .:
+    dependencies:
+      radash:
+        specifier: ^9.5.0
+        version: 9.5.0
+
+packages:
+
+  radash@9.5.0:
+    resolution: {integrity: sha512-t0s8BJlvrk8YPaOS8X0J2xzqAsBlXAUkDEjoBXwlzaXsXNCpBILjT9OvWlabLa2KB/r4XrhThdXjxMs7SiCyIw==}
+    engines: {node: '>=14.18.0'}
+
+snapshots:
+
+  radash@9.5.0: {}
