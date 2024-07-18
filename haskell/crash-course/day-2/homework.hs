@@ -1,20 +1,17 @@
-newtype Circle = Circle Float
+newtype Circle = Circle Float deriving (Show, Eq)
 
-data Rectangle = Rectangle Float Float
+data Rectangle = Rectangle Float Float deriving (Show, Eq)
 
-newtype Square = Square Float
+newtype Square = Square Float deriving (Show, Eq)
 
 data Shape
   = ShapeCircle Circle
   | ShapeRectangle Rectangle
   | ShapeSquare Square
   | ShapeRectangle2 Rectangle
+  deriving (Show, Eq)
 
 area :: Shape -> Float
 area (ShapeCircle (Circle r)) = pi * r * r
 area (ShapeRectangle (Rectangle l w)) = l * w
 area (ShapeSquare (Square s)) = area (ShapeRectangle (Rectangle s s))
-
--- area $ ShapeCircle $ Circle 10
--- area $ ShapeRectangle $ Rectangle 10 20
--- area $ ShapeSquare $ Square 10
