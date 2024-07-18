@@ -1,17 +1,25 @@
-newtype Circle = Circle Float deriving (Show, Eq)
+{-# LANGUAGE GADTs, StandaloneDeriving #-}
+data Circle
+data Rectangle
+data Square
 
-data Rectangle = Rectangle Float Float deriving (Show, Eq)
+data Shape a where
+  Circle :: Float -> Shape Circle
+  Rectangle :: Float -> Float -> Shape Rectangle
+  Square :: Float -> Shape Rectangle
 
-newtype Square = Square Float deriving (Show, Eq)
+deriving instance Show (Shape a)
+deriving instance Eq (Shape a)
 
-data Shape
-  = ShapeCircle Circle
-  | ShapeRectangle Rectangle
-  | ShapeSquare Square
-  | ShapeRectangle2 Rectangle
-  deriving (Show, Eq)
+area :: Shape a -> Float
+area (Circle r) = pi * r * r
+area (Rectangle h w) = h * w
+area (Square s) = area (Rectangle s s)
 
-area :: Shape -> Float
-area (ShapeCircle (Circle r)) = pi * r * r
-area (ShapeRectangle (Rectangle l w)) = l * w
-area (ShapeSquare (Square s)) = area (ShapeRectangle (Rectangle s s))
+radius :: Shape Circle -> Float
+radius (Circle radius) = radius
+
+perimeter :: Shape a -> Float
+perimeter (Circle r) = 2 * pi * r
+perimeter (Rectangle h w) = h * 2 + w * 2
+perimeter (Square s) = perimeter (Rectangle s s)
