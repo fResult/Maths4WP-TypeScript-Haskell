@@ -23,3 +23,13 @@ perimeter :: Shape a -> Float
 perimeter (Circle r) = 2 * pi * r
 perimeter (Rectangle h w) = h * 2 + w * 2
 perimeter (Square s) = perimeter (Rectangle s s)
+
+-- area (Circle 10) -- 314.15927
+-- area (Rectangle 20 10) -- 200
+-- area (Square 10) -- 100
+
+-- radius(Circle 10) -- 10
+
+-- perimeter (Circle 10) -- 62.831856
+-- perimeter (Rectangle 20 10) -- 60
+-- perimeter (Square 10) -- 40
