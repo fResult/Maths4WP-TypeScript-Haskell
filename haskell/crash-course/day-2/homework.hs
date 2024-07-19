@@ -8,8 +8,6 @@ data Rectangle = Rectangle
   }
   deriving (Show, Eq)
 
--- newtype Circle = Circle Float deriving Show
-
 areaCircle :: Circle -> Float
 areaCircle c = pi * r * r where r = radius c
 
@@ -19,7 +17,11 @@ areaRectangle rect = h * w
     h = height rect
     w = weight rect
 
+areaSquare :: Square -> Float
+areaSquare square = areaRectangle Rectangle {height = s, weight = s}
+  where
+    s = side square
+
 c10 = Circle {radius = 10}
 
-areaTest :: Int -> Int
-areaTest a = a
+sq10 = Square {side = 10}
