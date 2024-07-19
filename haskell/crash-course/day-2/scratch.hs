@@ -1,5 +1,5 @@
 {-# LANGUAGE ExistentialQuantification #-}
-import Text.Read (Lexeme(String))
+
 -- {-# LANGUAGE ExplicitForAll #-}
 -- {-# LANGUAGE StandaloneDeriving #-}
 
