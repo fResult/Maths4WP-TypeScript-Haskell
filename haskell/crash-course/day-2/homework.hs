@@ -28,6 +28,7 @@ areaDonut c1 c2 = abs $ circleArea1 - circleArea2
     circleArea1 = areaCircle c1
     circleArea2 = areaCircle c2
 
+-- Test data
 c5 = Circle { radius =5}
 c10 = Circle {radius = 10}
 c20 = Circle {radius = 20}
