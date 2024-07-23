@@ -22,15 +22,30 @@ type FullName = String
 type NickName = String
 data Person = Person FullName NickName deriving (Show)
 
-type MidtermScore = Int
-type FinalScore = Int
-type HomeworkScore = Int
-type ProjectScore = Int
-data Score = Score MidtermScore FinalScore HomeworkScore ProjectScore
+-- type MidtermScore = Int
+-- type FinalScore = Int
+-- type HomeworkScore = Int
+-- type ProjectScore = Int
+-- data Score = Score MidtermScore FinalScore HomeworkScore ProjectScore
+--   deriving (Show)
+
+-- midtermScore :: Score -> MidtermScore
+-- midtermScore (Score m _ _ _) = m
+
+-- finalScore :: Score -> MidtermScore
+-- finalScore (Score _ f _ _) = f
+
+data Score = Score
+  { midtermScore :: Int
+  , finalScore :: Int
+  , homeworkScore :: Int
+  , projectScore :: Int
+  }
   deriving (Show)
 
-midtermScore :: Score -> MidtermScore
-midtermScore (Score m _ _ _) = m
+totalScore :: Score -> Int
+totalScore s = midtermScore s + finalScore s + homeworkScore s + projectScore s
 
-finalScore :: Score -> MidtermScore
-finalScore (Score _ f _ _) = f
+instance Eq Score where
+  (==) :: Score -> Score -> Bool
+  s1 == s2 = totalScore s1 == totalScore s2
