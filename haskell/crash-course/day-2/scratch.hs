@@ -1,110 +1,80 @@
-{-# LANGUAGE ExistentialQuantification #-}
+import Data.Maybe (isNothing)
 
--- {-# LANGUAGE ExplicitForAll #-}
--- {-# LANGUAGE StandaloneDeriving #-}
+-- models
+newtype Circle = Circle {radius :: Float}
+  deriving (Show, Eq)
 
--- instance Eq Shape where
---   (==) :: Shape -> Shape -> Bool
---   a == b = show a == show b
+newtype Square = Square {side :: Float}
+  deriving (Show, Eq)
 
--- instance Ord Shape where
---   Shape a <= Shape b = (area a) <= (area b)
+data Rectangle = Rectangle {height :: Float, weight :: Float}
+  deriving (Show, Eq)
 
-newtype Circle = Circle Float deriving (Show, Eq)
-
-data Rectangle = Rectangle Float Float deriving (Show, Eq)
-
-newtype Square = Square Float deriving (Show, Eq)
-
-class HasArea a where
-  area :: a -> Float
-
-instance HasArea Circle where
-  area (Circle r) = pi * r * r
-
-instance HasArea Rectangle where
-  area (Rectangle h w) = h * w
-
-instance HasArea Square where
-  area (Square s) = area (Rectangle s s)
-
-data Shape = forall a. (Show a, Eq a, HasArea a) => Shape a
-
--- Remove the invalid deriving instance statement
-
--- data Circle
--- data Rectangle
--- data Square
-
--- data Shape a where
---   Circle :: Float -> Shape Circle
---   Rectangle :: Float -> Float -> Shape Rectangle
---   Square :: Float -> Shape Rectangle
-
--- deriving instance Show (Shape a)
--- deriving instance Eq (Shape a)
-
--- area :: Shape a -> Float
--- area (Circle r) = pi * r * r
--- area (Rectangle h w) = h * w
--- area (Square s) = area (Rectangle s s)
-
--- radius :: Shape Circle -> Float
--- radius (Circle radius) = radius
-
--- perimeter :: Shape a -> Float
--- perimeter (Circle r) = 2 * pi * r
--- perimeter (Rectangle h w) = h * 2 + w * 2
--- perimeter (Square s) = perimeter (Rectangle s s)
-
--- area (Circle 10) -- 314.15927
--- area (Rectangle 20 10) -- 200
--- area (Square 10) -- 100
-
--- radius(Circle 10) -- 10
-
--- perimeter (Circle 10) -- 62.831856
--- perimeter (Rectangle 20 10) -- 60
--- perimeter (Square 10) -- 40
-
--- newtype Circle = Circle Float deriving (Show, Eq)
--- data Rectangle = Rectangle Float Float deriving (Show, Eq)
--- newtype Square = Square Float deriving (Show, Eq)
-
--- data Shape
---   = ShapeCircle Circle
---   | ShapeRectangle Rectangle
---   | ShapeSquare Square
---   | ShapeRectangle2 Rectangle
---   deriving (Show, Eq)
-
--- area :: Shape -> Float
--- area (ShapeCircle (Circle r)) = pi * r * r
--- area (ShapeRectangle (Rectangle l w)) = l * w
--- area (ShapeSquare (Square s)) = area (ShapeRectangle (Rectangle s s))
-
--- area $ ShapeCircle $ Circle 10
--- area $ ShapeRectangle $ Rectangle 10 20
--- area $ ShapeSquare $ Square 10
--- data Shape a where
---     Circle :: Float -> Shape Circle
---     Square :: Float -> Shape Square
---     Rectangle :: Float -> Float -> Shape Rectangle
-
--- deriving instance Show (Shape a)
--- deriving instance Eq (Shape a)
-
--- class Shape a where
---     area :: a -> Circle
---     perimeter :: a -> Circle
-
--- instance Shape Circle where
---     area (Circle r) = pi * r * r
---     perimeter (Circle r) = 2 * pi * r
-
-newtype BaseURL = BaseURL String deriving Show
-newtype APIPath = APIPath String deriving Show
-
-data APIEndpoint = APIEndpoint BaseURL APIPath
+data Shape = Shape
+  { outerShape :: OuterShape
+  , innerShape :: Maybe Shape
+  }
   deriving (Show)
 
+data OuterShape = OuterShape
+  { caseSquare :: Square
+  , innerCircle :: Circle
+  , innerSquare :: Square
+  }
+  deriving (Show)
+
+-- Utilities
+half :: Float -> Float
+half = (/ 2)
+
+-- Functions
+areaCircle :: Circle -> Float
+areaCircle c = pi * r * r
+ where
+  r = radius c
+
+areaRectangle :: Rectangle -> Float
+areaRectangle rect = h * w
+ where
+  h = height rect
+  w = weight rect
+
+areaSquare :: Square -> Float
+areaSquare square = areaRectangle Rectangle{height = s, weight = s}
+ where
+  s = side square
+
+areaDonut :: Circle -> Circle -> Float
+areaDonut c1 c2 = abs $ circleArea1 - circleArea2
+ where
+  circleArea1 = areaCircle c1
+
+  circleArea2 = areaCircle c2
+
+isBaseShape :: Shape -> Bool
+isBaseShape = isNothing . innerShape
+
+isEpsilon :: Float -> Bool
+isEpsilon x = x < epsilon
+  where epsilon = 0.0000000001
+
+-- mkOuterShape :: Int -> OuterShape
+-- mkOuterShape frameSize =
+--   if isEpsilon
+
+-- areaShape :: Shape -> Float
+-- areaShape shape =
+--   if isBaseShape shape
+--     then 0
+--     else 1 -- findMoreInnerShapeAreas
+
+-- Test data
+c5 = Circle{radius = 5}
+
+c10 = Circle{radius = 10}
+
+c20 = Circle{radius = 20}
+
+sq10 = Square{side = 10}
+
+sq20 = Square{side = 20}
