@@ -1,10 +1,10 @@
 sqr :: Float -> Float
 sqr n = n * n
 
-newtype Circle = Circle Float
+newtype Circle = Circle {radius :: Float}
   deriving (Show, Eq)
 
-newtype Square = Square Float
+newtype Square = Square {side :: Float}
   deriving (Show, Eq)
 
 class HasArea a where
@@ -12,15 +12,21 @@ class HasArea a where
 
 instance HasArea Circle where
   area :: Circle -> Float
-  area (Circle r) = pi * sqr r
+  area c = pi * sqr (radius c)
 
 instance HasArea Square where
   area :: Square -> Float
-  area (Square s) = sqr s
+  area s = sqr (side s)
 
-type FullName = String
-type NickName = String
-data Person = Person FullName NickName deriving (Show)
+data HasArea' = Circle' Float | Square' Float deriving (Show)
+
+area' :: HasArea' -> Float
+area' (Circle' r) = pi * sqr r
+area' (Square' s) = sqr s
+
+-- type FullName = String
+-- type NickName = String
+-- data Person = Person FullName NickName deriving (Show)
 
 -- type MidtermScore = Int
 -- type FinalScore = Int
