@@ -21,3 +21,16 @@ instance HasArea Square where
 type FullName = String
 type NickName = String
 data Person = Person FullName NickName deriving (Show)
+
+type MidtermScore = Int
+type FinalScore = Int
+type HomeworkScore = Int
+type ProjectScore = Int
+data Score = Score MidtermScore FinalScore HomeworkScore ProjectScore
+  deriving (Show)
+
+midtermScore :: Score -> MidtermScore
+midtermScore (Score m _ _ _) = m
+
+finalScore :: Score -> MidtermScore
+finalScore (Score _ f _ _) = f
