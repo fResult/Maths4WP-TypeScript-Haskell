@@ -89,7 +89,7 @@ mkOuterShape frameSize =
     , innerSquare = Square{side = sqSide}
     }
  where
-  sqSide = hypotenuseEq frameSize
+  sqSide = hypotenuseEq $ half frameSize
 
 -- areaShape :: Shape -> Float
 -- areaShape shape =
@@ -107,3 +107,10 @@ c20 = Circle{radius = 20}
 sq10 = Square{side = 10}
 
 sq20 = Square{side = 20}
+
+main :: IO ()
+main = do
+  let outerShp = mkOuterShape 100
+  let area = areaOuterShape outerShp
+  print outerShp
+  putStrLn $ "The area is: " ++ show area
