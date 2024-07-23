@@ -27,6 +27,15 @@ data OuterShape = OuterShape
 half :: Float -> Float
 half = (/ 2)
 
+sqr :: Float -> Float
+sqr x = x * x
+
+hypotenuse :: Float -> Float -> Float
+hypotenuse a b = sqrt $ sqr a + sqr b
+
+hypotenuseEq :: Float -> Float
+hypotenuseEq a = hypotenuse a a
+
 -- Functions
 areaCircle :: Circle -> Float
 areaCircle c = pi * r * r
@@ -48,19 +57,39 @@ areaDonut :: Circle -> Circle -> Float
 areaDonut c1 c2 = abs $ circleArea1 - circleArea2
  where
   circleArea1 = areaCircle c1
-
   circleArea2 = areaCircle c2
+
+-- Preparation function
+areaInnerCircle :: Circle -> Float
+areaInnerCircle circle = 0
+
+-- Preparation function
+areaInnerSquare :: Square -> Float
+areaInnerSquare square = 0
+
+areaOuterShape :: OuterShape -> Float
+areaOuterShape shape = areaCircle circle - areaSquare square
+ where
+  circle = innerCircle shape
+  square = innerSquare shape
 
 isBaseShape :: Shape -> Bool
 isBaseShape = isNothing . innerShape
 
 isEpsilon :: Float -> Bool
 isEpsilon x = x < epsilon
-  where epsilon = 0.0000000001
+ where
+  epsilon = 0.0000000001
 
--- mkOuterShape :: Int -> OuterShape
--- mkOuterShape frameSize =
---   if isEpsilon
+mkOuterShape :: Float -> OuterShape
+mkOuterShape frameSize =
+  OuterShape
+    { caseSquare = Square{side = frameSize}
+    , innerCircle = Circle{radius = half frameSize}
+    , innerSquare = Square{side = sqSide}
+    }
+ where
+  sqSide = hypotenuseEq frameSize
 
 -- areaShape :: Shape -> Float
 -- areaShape shape =
