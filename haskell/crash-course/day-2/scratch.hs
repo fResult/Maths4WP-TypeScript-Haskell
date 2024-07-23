@@ -84,10 +84,9 @@ isEpsilon x = x < epsilon
 mkOuterShape :: Float -> OuterShape
 mkOuterShape frameSize =
   OuterShape
-    { caseSquare = Square{side = frameSize}
-    , innerCircle = Circle{radius = half frameSize}
-    , innerSquare = Square{side = sqSide}
-    }
+    Square{side = frameSize}
+    Circle{radius = half frameSize}
+    Square{side = sqSide}
  where
   sqSide = hypotenuseEq $ half frameSize
 
