@@ -74,3 +74,78 @@ instance HasArea FramedFlower where
   area flower
     | flower == EmptyFlower = 0
     | otherwise = area (petal flower) + area (innerFlower flower)
+
+data Shape = forall a. (Show a, Eq a, HasArea a) => Shape {shape :: a}
+deriving instance Show Shape
+
+instance HasArea Shape where
+  area :: Shape -> Float
+  area (Shape a) = area a
+
+instance Eq Shape where
+  (==) :: Shape -> Shape -> Bool
+  a == b = show a == show b
+
+instance Ord Shape where
+  (<=) :: Shape -> Shape -> Bool
+  a <= b = area a <= area b
+
+s1 = Circle 10
+s2 = Square 10
+s3 = Shape $ mkPetal 10
+s4 = Shape $ mkFramedFlower 10
+
+-- Optional re-invent
+data Optional a = Some a | None
+  deriving (Show, Eq)
+
+f :: Int -> Int
+f _ = 7
+
+g :: Int -> Int
+g _ = 9
+
+h :: Int -> Int
+h _ = 17
+
+f' :: Int -> Optional Int
+f' n
+  | n == 17 = None
+  | otherwise = Some n
+
+g' :: Int -> Optional Int
+g' n
+  | even n = None
+  | otherwise = Some n
+
+h' :: Int -> Optional Int
+h' n
+  | even n = Some n
+  | otherwise = None
+
+fog' :: Int -> Optional Int
+fog' n =
+  case g' n of
+    None -> None
+    Some x -> f' x
+
+fogoh' :: Int -> Optional Int
+fogoh' n =
+  case h' n of
+    None -> None
+    Some x -> case g' x of
+      None -> None
+      Some y -> f' y
+
+instance Functor Optional where
+  fmap :: (a -> b) -> Optional a -> Optional b
+  fmap _ None = None
+  fmap f (Some x) = Some $ f x
+
+instance Applicative Optional where
+  pure :: a -> Optional a
+  pure = Some
+
+  (<*>) :: Optional (a -> b) -> Optional a -> Optional b
+  (<*>) (Some f) (Some x) = Some $ f x
+  (<*>) _ _ = None

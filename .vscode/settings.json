@@ -2,6 +2,7 @@
   "cSpell.words": [
     "concat",
     "Finishable",
+    "fmap",
     "foldl",
     "foldr",
     "Monoid",
