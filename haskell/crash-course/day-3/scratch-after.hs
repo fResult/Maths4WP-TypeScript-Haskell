@@ -26,6 +26,7 @@ data Shape = Shape
   { _shpOuterShape :: OuterShape
   , _shpInnerShape :: Maybe Shape
   }
+  deriving Show
 
 data OuterShape = OuterShape
   { _outerShpCaseSquare :: Square
@@ -82,4 +83,19 @@ mkOuterShape frameSize =
   innerSquareSide = hypotenuseEq halfFrameSide
   halfFrameSide = half frameSize
 
+epsilon :: Float
+epsilon = 0.0000000001
+
+isEpsilon :: Float -> Bool
+isEpsilon n = n < epsilon
+
+innerSquareSide :: Float -> Float
+innerSquareSide n = hypotenuseEq $ half n
+
+mkShape :: ShapeFrameSide -> Maybe Shape
+mkShape frameSize
+  | isEpsilon frameSize = Nothing
+  | otherwise = Just $ Shape (mkOuterShape frameSize) (mkShape $ innerSquareSide frameSize)
+
+shp :: OuterShape
 shp = mkOuterShape 100
