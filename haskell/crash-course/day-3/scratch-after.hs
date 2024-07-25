@@ -23,9 +23,14 @@ data Donut = Donut {_donutOuterCircle :: Circle, _donutInnerCircle :: Circle}
   deriving (Show, Eq)
 
 data Shape = Shape
-  { _shapeCaseSquare :: Square
-  , _shapeInnerCircle :: Circle
-  , _shapeInnerSquare :: Square
+  { _shpOuterShape :: OuterShape
+  , _shpInnerShape :: Maybe Shape
+  }
+
+data OuterShape = OuterShape
+  { _outerShpCaseSquare :: Square
+  , _outerShpInnerCircle :: Circle
+  , _outerShpInnerSquare :: Square
   }
   deriving (Show)
 
@@ -53,12 +58,12 @@ instance HasArea Donut where
     outCirc = _donutOuterCircle donut
     inCirc = _donutInnerCircle donut
 
-instance HasArea Shape where
-  area :: Shape -> Float
+instance HasArea OuterShape where
+  area :: OuterShape -> Float
   area shp = area innerCircle - area innerSquare
    where
-    innerCircle = _shapeInnerCircle shp
-    innerSquare = _shapeInnerSquare shp
+    innerCircle = _outerShpInnerCircle shp
+    innerSquare = _outerShpInnerSquare shp
 
 type Radius = Float
 mkDonut :: Radius -> Radius -> Donut
@@ -67,9 +72,9 @@ mkDonut r1 r2
   | otherwise = Donut (Circle r2) (Circle r1)
 
 type ShapeFrameSide = Float
-mkShape :: ShapeFrameSide -> Shape
-mkShape frameSize =
-  Shape
+mkOuterShape :: ShapeFrameSide -> OuterShape
+mkOuterShape frameSize =
+  OuterShape
     (Square frameSize)
     (Circle halfFrameSide)
     (Square innerSquareSide)
@@ -77,4 +82,4 @@ mkShape frameSize =
   innerSquareSide = hypotenuseEq halfFrameSide
   halfFrameSide = half frameSize
 
-shp = mkShape 100
+shp = mkOuterShape 100
