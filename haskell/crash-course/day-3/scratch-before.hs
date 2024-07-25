@@ -7,10 +7,10 @@ sqr n = n * n
 newtype Circle = Circle {radius :: Float}
   deriving (Show, Eq)
 
-newtype Square = Square {side :: Float}
+newtype Square = Square {_squareSide :: Float}
   deriving (Show, Eq)
 
-data Rectangle = Rectangle {weight :: Float, height :: Float}
+data Rectangle = Rectangle {_rectWeight :: Float, _reactHeight :: Float}
   deriving (Show, Eq)
 
 class HasArea a where
@@ -22,7 +22,7 @@ instance HasArea Circle where
 
 instance HasArea Square where
   area :: Square -> Float
-  area s = sqr (side s)
+  area s = sqr (_squareSide s)
 
 data HasArea' = Circle' Float | Square' Float deriving (Show)
 
@@ -31,8 +31,8 @@ area' (Circle' r) = pi * sqr r
 area' (Square' s) = sqr s
 
 data Donut = Donut
-  { outerCircle :: Circle
-  , innerCircle :: Circle
+  { _donutOuterCircle :: Circle
+  , _donutInnerCircle :: Circle
   }
   deriving (Show, Eq)
 
@@ -48,7 +48,7 @@ mkDonut' c1 c2
 
 instance HasArea Donut where
   area :: Donut -> Float
-  area donut = area (outerCircle donut) - area (innerCircle donut)
+  area donut = area (_donutOuterCircle donut) - area (_donutInnerCircle donut)
 
 data Nat = Zero | Succ Nat
   deriving (Show, Eq, Ord)
