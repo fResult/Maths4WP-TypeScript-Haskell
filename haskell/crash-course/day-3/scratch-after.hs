@@ -1,5 +1,6 @@
 -- {-# LANGUAGE FlexibleInstances #-}
 -- {-# LANGUAGE MultiParamTypeClasses #-}
+import Data.Maybe (fromJust, isNothing)
 
 sqr :: Float -> Float
 sqr n = n * n
@@ -66,6 +67,15 @@ instance HasArea OuterShape where
     innerCircle = _outerShpInnerCircle shp
     innerSquare = _outerShpInnerSquare shp
 
+instance HasArea Shape where
+  area :: Shape -> Float
+  area shp
+    | isNothing innerShp = 0
+    | otherwise = area outerShp + area (fromJust innerShp)
+   where
+    outerShp = _shpOuterShape shp
+    innerShp = _shpInnerShape shp
+
 type Radius = Float
 mkDonut :: Radius -> Radius -> Donut
 mkDonut r1 r2
@@ -92,15 +102,13 @@ isEpsilon n = n < epsilon
 innerSquareSide :: Float -> Float
 innerSquareSide n = hypotenuseEq $ half n
 
-mkShape :: ShapeFrameSide -> Maybe Shape
+mkShape :: ShapeFrameSide -> Shape
 mkShape frameSize
-  | isEpsilon frameSize = Nothing
+  | isEpsilon frameSize = Shape (mkOuterShape frameSize) Nothing
   | otherwise =
-      Just
-        ( Shape
-            (mkOuterShape frameSize)
-            (mkShape $ innerSquareSide frameSize)
-        )
+      Shape
+          (mkOuterShape frameSize)
+          (Just (mkShape (innerSquareSide frameSize)))
 
 shp :: OuterShape
 shp = mkOuterShape 100
