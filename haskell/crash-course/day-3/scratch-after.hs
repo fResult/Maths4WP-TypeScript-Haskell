@@ -26,7 +26,7 @@ data Shape = Shape
   { _shpOuterShape :: OuterShape
   , _shpInnerShape :: Maybe Shape
   }
-  deriving Show
+  deriving (Show)
 
 data OuterShape = OuterShape
   { _outerShpCaseSquare :: Square
@@ -95,7 +95,12 @@ innerSquareSide n = hypotenuseEq $ half n
 mkShape :: ShapeFrameSide -> Maybe Shape
 mkShape frameSize
   | isEpsilon frameSize = Nothing
-  | otherwise = Just $ Shape (mkOuterShape frameSize) (mkShape $ innerSquareSide frameSize)
+  | otherwise =
+      Just
+        ( Shape
+            (mkOuterShape frameSize)
+            (mkShape $ innerSquareSide frameSize)
+        )
 
 shp :: OuterShape
 shp = mkOuterShape 100
