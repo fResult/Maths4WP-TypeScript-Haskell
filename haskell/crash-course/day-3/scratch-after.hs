@@ -14,6 +14,15 @@ hypotenuse a b = sqrt $ sqr a + sqr b
 hypotenuseEq :: Float -> Float
 hypotenuseEq a = hypotenuse a a
 
+epsilon :: Float
+epsilon = 0.0000000001
+
+isEpsilon :: Float -> Bool
+isEpsilon n = n < epsilon
+
+innerSquareSide :: Float -> Float
+innerSquareSide n = hypotenuseEq $ half n
+
 newtype Circle = Circle {_circleRadius :: Float} deriving (Show, Eq)
 newtype Square = Square {_squareSide :: Float} deriving (Show, Eq)
 
@@ -92,15 +101,6 @@ mkOuterShape frameSize =
  where
   innerSquareSide = hypotenuseEq halfFrameSide
   halfFrameSide = half frameSize
-
-epsilon :: Float
-epsilon = 0.0000000001
-
-isEpsilon :: Float -> Bool
-isEpsilon n = n < epsilon
-
-innerSquareSide :: Float -> Float
-innerSquareSide n = hypotenuseEq $ half n
 
 mkShape :: ShapeFrameSide -> Shape
 mkShape frameSize
