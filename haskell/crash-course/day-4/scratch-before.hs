@@ -1,3 +1,4 @@
+import GHC.Stack (popCallStack)
 sqr :: Float -> Float
 sqr n = n * n
 
@@ -147,5 +148,59 @@ instance Applicative Optional where
   pure = Some
 
   (<*>) :: Optional (a -> b) -> Optional a -> Optional b
-  (<*>) (Some f) (Some x) = Some $ f x
-  (<*>) _ _ = None
+  _ <*> None = None
+  None <*> (Some x) = None
+  (Some f) <*> (Some x) = Some (f x)
+
+instance Monad Optional where
+  (>>=) :: Optional a -> (a -> Optional b) -> Optional b
+  -- None >>= _ = None
+  -- (Some x) >>= f = f x
+  x >>= f = case x of
+    None -> None
+    Some x -> f x
+
+fogohM :: Int -> Optional Int
+fogohM n = h' n >>= g' >>= f'
+
+-- fogohM n = do
+--   x <- h' n
+--   y <- g' x
+--   f' y
+
+fogohM' :: Int -> Optional Int
+fogohM' n =
+  h' n >>= (\y -> g' y >>= (\z -> f' z))
+
+fogohM'' :: Int -> Optional Int
+fogohM'' n = do
+  y <- h' n
+  z <- g' y
+  return $ f' z
+
+
+type Stack = [Int]
+
+empty :: Stack
+empty = []
+
+pop :: Stack -> (Int, Stack)
+pop [] = error "empty stack"
+pop (x:xs) = (x, xs)
+
+push :: Int -> Stack -> (Int, Stack)
+push a xs = (a, a:xs)
+
+pushS :: Int -> Stack -> Stack
+pushS a xs = a:xs
+
+-- stackManipulation :: Stack Int
+-- stackManipulation s0 = do
+  -- pushS 3
+  -- a <- popS
+  -- pushS 2
+  -- b <- popS
+  -- pushS 10
+  -- pushS (a+b)
+  -- s <- popS
+  -- return s
