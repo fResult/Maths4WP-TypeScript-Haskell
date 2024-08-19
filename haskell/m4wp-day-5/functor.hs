@@ -69,4 +69,4 @@ main3 =
         putStrLn $ show nameLength ++ " becomes " ++ show (nameLength >>= mEven)
         putStrLn $ "Composed " ++ show name ++ " becomes " ++ show (name >>= mLength >>= mEven)
         putStrLn $ "More composed " ++ show name ++ " becomes " ++ show (name >>= mLengthEven)
-        print (noName >>= mLength >>= mEven)
+        putStrLn $ "No Name" ++ show (noName >>= mLength >>= mEven)
