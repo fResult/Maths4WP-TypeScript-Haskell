@@ -8,5 +8,6 @@
     "Monoid",
     "scanl",
     "scanr"
-  ]
+  ],
+  "editor.tabSize": 2
 }
