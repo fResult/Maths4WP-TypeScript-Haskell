@@ -1,5 +1,3 @@
-import Text.PrettyPrint.Annotated.HughesPJClass (Pretty (pPrintList))
-
 -- class Functor f where
 --   fmap :: (a -> b) -> f a -> f b
 --   (<$) :: a -> f b -> f a
@@ -27,7 +25,7 @@ main1 = do
   print $ fmap length (["one", "two", "three", "four", "five"] :: [String])
 
 {--# Some Instances of Functor #--}
--- data [] a = [] | a:[]
+-- data [] a = [] | a : [a]
 -- instance Functor [] where
 --   fmap = map
 -- `[] a` is a Type Constructor
