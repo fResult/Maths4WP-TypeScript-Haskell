@@ -26,3 +26,13 @@ instance Functor Tree where
   fmap f EmptyTree = EmptyTree
   fmap f (Node x tl tr) = Node (f x) (fmap f tl) (fmap f tr)
 
+stkPush :: a -> Stack a -> Stack a
+stkPush x (Stack xs) = Stack (x : xs)
+stkPop :: Stack a -> Stack a
+stkPop (Stack (x : xs)) = Stack xs
+stkPeek :: Stack a -> a
+stkPeek (Stack (x : _)) = x
+stkAsList :: Stack a -> [a]
+stkAsList (Stack xs) = xs
+
+myTree :: Tree Char
