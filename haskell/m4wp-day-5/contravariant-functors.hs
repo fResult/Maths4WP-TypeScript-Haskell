@@ -98,3 +98,12 @@ main =
 
 -- λ > read "False" :: Bool
 ---- False
+
+-- λ > (read :: String -> Int) "123"
+--- 123
+
+-- λ > (read :: String -> String) (show "Korn")
+---- "Korn"
+
+-- λ > (read :: String -> Bool) "True"
+---- True
