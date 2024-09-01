@@ -1,6 +1,17 @@
 import Data.Functor.Contravariant
+import Data.Char (isAlpha)
 import Data.List (init)
 import Data.Text (Text, pack, splitOn, unpack)
+
+main1 :: IO ()
+main1 =
+  let
+    isAlphabet :: Predicate Char
+    isAlphabet = Predicate isAlpha
+  in
+    do
+      putStrLn $ "head of isAlphabet of ['1', 'a']: " ++ show (getPredicate (contramap head (Predicate isAlpha)) ['1', 'a'])
+      putStrLn $ "head of isAlphabet of ['a', '1']: " ++ show (getPredicate (contramap head (Predicate isAlpha)) ['a', '1'])
 
 data Person = Person
   { name :: String
@@ -62,8 +73,8 @@ fromSimplePerson = contramap simplePerson2Tuple fromTuple
 -- λ > mkPerson fromSimplePerson (SimplePerson "Korn" "Zilla" 18)
 ---- Person {name = "Korn", lastName = "Zilla", age = 18}
 
-main :: IO ()
-main =
+main2 :: IO ()
+main2 =
   let
     csvKorn :: String
     csvKorn = "Korn,Zilla,18"
