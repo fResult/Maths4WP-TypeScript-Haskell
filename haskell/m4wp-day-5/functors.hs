@@ -39,7 +39,6 @@ instance Functor' Optional where
 
 class Functor' (f :: * -> *) where
   fmap' :: (a -> b) -> f a -> f b
-
   -- (<<$) :: a -> f b -> f a
   {-# MINIMAL fmap' #-}
 

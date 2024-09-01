@@ -1,5 +1,8 @@
-import Data.Functor.Contravariant
 import Data.Char (isAlpha)
+import Data.Functor.Contravariant (
+  Contravariant (contramap),
+  Predicate (..),
+ )
 import Data.List (init)
 import Data.Text (Text, pack, splitOn, unpack)
 
@@ -8,7 +11,7 @@ main1 =
   let
     isAlphabet :: Predicate Char
     isAlphabet = Predicate isAlpha
-  in
+   in
     do
       putStrLn $ "head of isAlphabet of ['1', 'a']: " ++ show (getPredicate (contramap head (Predicate isAlpha)) ['1', 'a'])
       putStrLn $ "head of isAlphabet of ['a', '1']: " ++ show (getPredicate (contramap head (Predicate isAlpha)) ['a', '1'])
@@ -35,20 +38,20 @@ tuple2Person :: (Name, LastName, Age) -> Person
 tuple2Person (n, ln, a) = Person{name = n, lastName = ln, age = a}
 
 csv2StringTuple :: String -> (String, String, String)
-csv2StringTuple csv = list2Tuple csvAsList :: (String, String, String)
+csv2StringTuple csv = list2Tuple csvAsList
  where
-  -- list2Tuple :: forall {a1} {a2}. (Read a1, Show a2) => a2 -> a1
-  -- list2Tuple xs = read $ "(" ++ (init . tail . show) xs ++ ")"
-  list2Tuple :: (Read a, Show b) => b -> a
-  list2Tuple xs = read $ "(" ++ show xs ++ ")"
+  -- list2Tuple :: (Read a, Show b) => b -> a
+  -- list2Tuple xs = read ("(" ++ (show xs :: String) ++ ")" :: String)
+  list2Tuple :: forall {a1} {a2}. (Read a1, Show a2) => a2 -> a1
+  list2Tuple xs = read $ "(" ++ (init . tail . show) xs ++ ")"
   csvAsList :: [String]
   csvAsList = map unpack $ splitOn (pack ",") (pack csv)
 
-csv2Tuple :: String -> PersonTuple
-csv2Tuple csv = (n, ln, a)
+csv2PersonTuple :: String -> PersonTuple
+csv2PersonTuple csv = (n, ln, a)
  where
-  (n, ln, sa) = csv2StringTuple csv
-  a = read sa :: Age
+  (n, ln, strA) = csv2StringTuple csv
+  a = read strA :: Age
 
 fromTuple :: MkPerson PersonTuple
 fromTuple = MkPerson tuple2Person
@@ -57,7 +60,7 @@ fromTuple = MkPerson tuple2Person
 ---- Person {name = "Korn", lastName = "Zilla", age = 18}
 
 fromCsvString :: MkPerson String
-fromCsvString = contramap csv2Tuple fromTuple
+fromCsvString = contramap csv2PersonTuple fromTuple
 
 -- λ > mkPerson fromCsvString "Korn,Zilla,18"
 ---- Person {name = "Korn", lastName = "Zilla", age = 18}
@@ -89,10 +92,9 @@ main2 =
       putStrLn $ "Tuple Korn: " ++ show tupleKorn
       putStrLn $ "Simple Korn: " ++ show simpleKorn
       print "======= Person from various formats ======="
-      putStrLn $ "Person from CSV: " ++ show (mkPerson fromCsvString csvKorn)
       putStrLn $ "Person from Tuple: " ++ show (mkPerson fromTuple tupleKorn)
-      putStrLn $ "Person from SimplePerson: " ++ show (mkPerson fromSimplePerson (SimplePerson "Korn" "Zilla" 18))
-
+      putStrLn $ "Person from SimplePerson: " ++ show (mkPerson fromSimplePerson simpleKorn)
+      putStrLn $ "Person from CSV: " ++ show (mkPerson fromCsvString csvKorn)
 
 {--@@@@@ POC @@@@@--}
 -- λ > :t read
