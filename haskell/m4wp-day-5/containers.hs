@@ -9,7 +9,7 @@ newtype Stack a = Stack [a] deriving (Show, Eq, Ord)
 
 newtype Queue a = Queue [a] deriving (Show, Eq, Ord)
 
-data Queue' a = Empty | Valua a (Queue a) deriving (Show, Eq, Ord)
+data Queue' a = Empty | Value a (Queue a) deriving (Show, Eq, Ord)
 
 data Tree a = EmptyTree | Node a (Tree a) (Tree a) deriving (Show, Eq, Ord)
 

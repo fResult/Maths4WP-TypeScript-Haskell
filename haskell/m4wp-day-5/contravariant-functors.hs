@@ -23,8 +23,8 @@ data Person = Person
   }
   deriving (Show)
 
+{-- MkPerson Functor --}
 newtype MkPerson a = MkPerson {mkPerson :: a -> Person}
-
 instance Contravariant MkPerson where
   contramap :: (b -> a) -> MkPerson a -> MkPerson b
   contramap f (MkPerson a) = MkPerson (a . f)
@@ -34,15 +34,15 @@ type Name = String
 type LastName = String
 type Age = Int
 
-tuple2Person :: (Name, LastName, Age) -> Person
+tuple2Person :: PersonTuple -> Person
 tuple2Person (n, ln, a) = Person{name = n, lastName = ln, age = a}
 
 csv2StringTuple :: String -> (String, String, String)
 csv2StringTuple csv = list2Tuple csvAsList
  where
-  -- list2Tuple :: (Read a, Show b) => b -> a
+  list2Tuple :: (Read a, Show b) => b -> a
   -- list2Tuple xs = read ("(" ++ (show xs :: String) ++ ")" :: String)
-  list2Tuple :: forall {a1} {a2}. (Read a1, Show a2) => a2 -> a1
+  -- list2Tuple :: forall {a1} {a2}. (Read a1, Show a2) => a2 -> a1
   list2Tuple xs = read $ "(" ++ (init . tail . show) xs ++ ")"
   csvAsList :: [String]
   csvAsList = map unpack $ splitOn (pack ",") (pack csv)
