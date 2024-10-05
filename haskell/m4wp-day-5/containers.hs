@@ -36,3 +36,32 @@ stkAsList :: Stack a -> [a]
 stkAsList (Stack xs) = xs
 
 myTree :: Tree Char
+myTree =
+  Node
+    'a'
+    ( Node
+        'b'
+        ( Node
+            'd'
+            ( Node
+                'h'
+                EmptyTree
+                EmptyTree
+            )
+            EmptyTree
+        )
+        (Node 'e' EmptyTree EmptyTree)
+    )
+    ( Node
+        'c'
+        (Node 'f' EmptyTree EmptyTree)
+        ( Node
+            'g'
+            EmptyTree
+            ( Node
+                'i'
+                EmptyTree
+                EmptyTree
+            )
+        )
+    )
