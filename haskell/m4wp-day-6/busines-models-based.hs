@@ -9,13 +9,13 @@ data Product = Product
 
 data Cart = Cart
   { cartId :: Id
-  , cartItems :: [Product]
+  , cartProducts :: [Product]
   }
   deriving (Show)
 
 data Order = Order
   { orderId :: Id
-  , orderItems :: [Product]
+  , orderProducts :: [Product]
   }
   deriving (Show)
 
@@ -43,7 +43,7 @@ ship (Prepared order) = Shipped order
 mkCart :: [Product] -> Cart
 mkCart = Cart 1
 
--- Test data
+{-- Test data --}
 p1 :: Product
 p1 = Product "sku1" 1
 p2 :: Product
