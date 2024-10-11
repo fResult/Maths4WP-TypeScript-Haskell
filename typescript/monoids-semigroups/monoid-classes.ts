@@ -1,3 +1,6 @@
+// See the definition in the Category Theory 2 slide (Math for Programmers Day 6) - Page 636
+// - SemiGroup is a Set with an Associative Binary Operation (concat)
+// - Monoid is a SemiGroup with an Identity Element
 ;(function MonoidClassesImplementation() {
     abstract class SemiGroup<T> {
         constructor(protected x: T) {}
@@ -10,6 +13,7 @@
         constructor(protected x: T) {
             super(x)
         }
+        // Identity Element
         static empty(): Monoid {
             throw Error("Empty doesn't Implement Error")
         }
