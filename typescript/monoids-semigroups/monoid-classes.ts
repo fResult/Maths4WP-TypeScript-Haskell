@@ -119,29 +119,6 @@
         }
     }
 
-    // List is Monoid under Concatenation is (List[T], concat, [])
-    class List<T = any> extends Monoid<T[]> {
-        private constructor(protected x: T[]) {
-            super(x)
-        }
-
-        public static just<T>(xs: T[]): List<T> {
-            return new List(xs)
-        }
-
-        public concat(other: List<T>): List<T> {
-            return List.just(this.x.concat(other.x))
-        }
-
-        public static empty<T>(): List<T> {
-            return List.just([])
-        }
-
-        public toString(): string {
-            return `${List.name}(${this.x.join(", ")})`
-        }
-    }
-
     // Boolean is Monoid under And is (Bool, &&, True)
     class And extends Monoid<boolean> {
         private constructor(protected x: boolean) {
@@ -188,14 +165,56 @@
         }
     }
 
+    // List is Monoid under Concatenation is (List[T], concat, [])
+    class List<T = any> extends Monoid<T[]> {
+        private constructor(protected x: T[]) {
+            super(x)
+        }
+
+        public static just<T>(xs: T[]): List<T> {
+            return new List(xs)
+        }
+
+        public concat(other: List<T>): List<T> {
+            return List.just(this.x.concat(other.x))
+        }
+
+        public reverse(): List<T> {
+            return List.just(this.x.toReversed())
+        }
+
+        public sort(): List<T> {
+            return List.just(this.x.toSorted())
+        }
+
+        public init(): List<T> {
+            return List.just(this.x.slice(0, -1))
+        }
+
+        public tail(): List<T> {
+            return List.just(this.x.slice(1))
+        }
+
+        public static empty<T>(): List<T> {
+            return List.just([])
+        }
+
+        public toString(): string {
+            return `${List.name}(${this.x.join(", ")})`
+        }
+    }
+
     console.log(Addition.just(1).concat(Addition.just(2)).concat(Addition.just(3)).concat(Addition.empty()).toString())
     console.log(Multiplication.just(12).concat(Multiplication.just(5)).concat(Multiplication.empty()).toString())
 
     console.log(Min.just(12).concat(Min.just(5)).concat(Min.empty()).concat(Min.empty()).toString())
     console.log(Max.just(12).concat(Max.just(5)).concat(Max.just(15)).concat(Max.empty()).toString())
 
-    console.log(List.just(["A", "B"]).concat(List.just(["B", "C"])).concat(List.empty()).concat(List.just(["C", "D"])).toString())
-
     console.log(And.just(false).concat(And.just(false)).concat(And.just(true)).concat(And.empty()).concat(And.just(false)).toString())
     console.log(Or.just(false).concat(Or.just(false)).concat(Or.just(true)).concat(Or.empty()).concat(Or.just(false)).toString())
+
+    console.log(List.just(["A", "B"]).concat(List.just(["B", "C"])).concat(List.empty()).concat(List.just(["C", "D"])).toString())
+    // reverse ∘ sort ∘ tail === (reverse ∘ sort) ∘ tail === reverse ∘ (sort ∘ tail)
+    console.log(List.just([3, 9, 8 ,5, 7, 6, 3]).tail().sort().reverse().toString())
+    console.log(List.just([3, 9, 8 ,5, 7, 6, 3]).sort().tail().reverse().toString())
 })()
