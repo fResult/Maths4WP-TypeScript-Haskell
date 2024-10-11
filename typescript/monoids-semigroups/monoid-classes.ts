@@ -137,9 +137,58 @@
         }
     }
 
+    class And extends Monoid<boolean> {
+        private constructor(protected x: boolean) {
+            super(x)
+        }
+
+        public static just(x: boolean): And {
+            return new And(x)
+        }
+
+        public concat(other: And): And {
+            return And.just(this.x && other.x)
+        }
+
+        public static empty(): And {
+            return And.just(true)
+        }
+
+        public toString(): string {
+            return `${And.name}(${this.x})`
+        }
+    }
+
+    class Or extends Monoid<boolean> {
+        private constructor(protected x: boolean) {
+            super(x)
+        }
+
+        public static just(x: boolean): Or {
+            return new Or(x)
+        }
+
+        public concat(other: Or): Or {
+            return Or.just(this.x || other.x)
+        }
+
+        public static empty(): Or {
+            return Or.just(false)
+        }
+
+        public toString(): string {
+            return `${Or.name}(${this.x})`
+        }
+    }
+
     console.log(Addition.just(1).concat(Addition.just(2)).concat(Addition.just(3)).concat(Addition.empty()).toString())
     console.log(Multiplication.just(12).concat(Multiplication.just(5)).concat(Multiplication.empty()).toString())
+
     console.log(Min.just(12).concat(Min.just(5)).concat(Min.empty()).concat(Min.empty()).toString())
     console.log(Max.just(12).concat(Max.just(5)).concat(Max.just(15)).concat(Max.empty()).toString())
+
     console.log(List.just(["A", "B"]).concat(List.just(["B", "C"])).concat(List.empty()).concat(List.just(["C", "D"])).toString())
+
+    console.log(And.just(false).concat(And.just(false)).concat(And.just(true)).concat(And.empty()).concat(And.just(false)).toString())
+    console.log(Or.just(false).concat(Or.just(false)).concat(Or.just(true)).concat(Or.empty()).concat(Or.just(false)).toString())
 })()
