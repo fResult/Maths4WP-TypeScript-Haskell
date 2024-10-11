@@ -1,6 +1,14 @@
 // See the definition in the Category Theory 2 slide (Math for Programmers Day 6) - Page 636
 // - SemiGroup is a Set with an Associative Binary Operation (concat)
 // - Monoid is a SemiGroup with an Identity Element
+
+// Monoid Object which is a triple (M, c, u) in a Monoidal Category
+// - Monoidal Category (C, ⊗, I) is a Category with a Bifunctor ⊗ and an Identity Object I
+// - M is an Object in the Category
+// - c is a Morphism from M ⊗ M to M (c: M ⊗ M → M)
+// - u is a Morphism from I to M (u: I → M)
+// - I is the Identity Object or the Unit Object in the Category
+// - ⊗ is the Tensor Product or the Monoidal Product
 ;(function MonoidClassesImplementation() {
     abstract class SemiGroup<T> {
         constructor(protected x: T) {}
@@ -19,47 +27,47 @@
         }
     }
 
-    class Add extends Monoid<number> {
+    class Addition extends Monoid<number> {
         private constructor(protected x: number) {
             super(x)
         }
 
-        public static just(x: number): Add {
-            return new Add(x)
+        public static just(x: number): Addition {
+            return new Addition(x)
         }
 
-        public concat(other: Add): Add {
-            return Add.just(this.x + other.x)
+        public concat(other: Addition): Addition {
+            return Addition.just(this.x + other.x)
         }
 
         public static empty() {
-            return Add.just(0)
+            return Addition.just(0)
         }
 
         public toString(): string {
-            return `${Add.name}(${this.x})`
+            return `${Addition.name}(${this.x})`
         }
     }
 
-    class Multiply extends Monoid<number> {
+    class Multiplication extends Monoid<number> {
         private constructor(protected x: number) {
             super(x)
         }
 
-        public static just(x: number): Multiply {
-            return new Multiply(x)
+        public static just(x: number): Multiplication {
+            return new Multiplication(x)
         }
 
-        public concat(other: Multiply): Multiply {
-            return Multiply.just(this.x * other.x)
+        public concat(other: Multiplication): Multiplication {
+            return Multiplication.just(this.x * other.x)
         }
 
         public static empty() {
-            return Multiply.just(1)
+            return Multiplication.just(1)
         }
 
         public toString(): string {
-            return `${Multiply.name}(${this.x})`
+            return `${Multiplication.name}(${this.x})`
         }
     }
 
@@ -129,8 +137,8 @@
         }
     }
 
-    console.log(Add.just(1).concat(Add.just(2)).concat(Add.just(3)).concat(Add.empty()).toString())
-    console.log(Multiply.just(12).concat(Multiply.just(5)).concat(Multiply.empty()).toString())
+    console.log(Addition.just(1).concat(Addition.just(2)).concat(Addition.just(3)).concat(Addition.empty()).toString())
+    console.log(Multiplication.just(12).concat(Multiplication.just(5)).concat(Multiplication.empty()).toString())
     console.log(Min.just(12).concat(Min.just(5)).concat(Min.empty()).concat(Min.empty()).toString())
     console.log(Max.just(12).concat(Max.just(5)).concat(Max.just(15)).concat(Max.empty()).toString())
     console.log(List.just(["A", "B"]).concat(List.just(["B", "C"])).concat(List.empty()).concat(List.just(["C", "D"])).toString())
