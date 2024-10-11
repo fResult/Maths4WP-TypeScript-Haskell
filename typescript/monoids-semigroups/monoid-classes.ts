@@ -1,12 +1,12 @@
 ;(function MonoidClassesImplementation() {
-    abstract class MySemiGroup<T> {
+    abstract class SemiGroup<T> {
         constructor(protected x: T) {}
 
-        public abstract concat(other: MySemiGroup<T>): MySemiGroup<T>
+        public abstract concat(other: SemiGroup<T>): SemiGroup<T>
         public abstract toString(): string
     }
 
-    abstract class Monoid<T = any> extends MySemiGroup<T> {
+    abstract class Monoid<T = any> extends SemiGroup<T> {
         constructor(protected x: T) {
             super(x)
         }
@@ -15,27 +15,27 @@
         }
     }
 
-    class MyMin extends Monoid<number> {
+    class Min extends Monoid<number> {
         private constructor(protected x: number) {
             super(x)
         }
 
-        public static just(x: number): MyMin {
-            return new MyMin(x)
+        public static just(x: number): Min {
+            return new Min(x)
         }
 
         public concat(other: this): Monoid<number> {
             return (this.x < other.x
-                ? new MyMin(this.x)
-                : new MyMin(other.x)) as unknown as Monoid<number>
+                ? new Min(this.x)
+                : new Min(other.x)) as unknown as Monoid<number>
         }
 
         public toString(): string {
-            return `${MyMin.name}(${this.x})`
+            return `${Min.name}(${this.x})`
         }
 
         public static empty() {
-            return MyMin.just(Infinity)
+            return Min.just(Infinity)
         }
     }
 
@@ -55,7 +55,7 @@
         }
 
         public toString(): string {
-            return `${MyMin.name}(${this.x})`
+            return `${Min.name}(${this.x})`
         }
 
         public static empty(): Max {
@@ -63,6 +63,6 @@
         }
     }
 
-    console.log(MyMin.just(12).concat(MyMin.just(5)).concat(MyMin.empty()).concat(MyMin.empty()))
+    console.log(Min.just(12).concat(Min.just(5)).concat(Min.empty()).concat(Min.empty()))
     console.log(Max.just(12).concat(Max.just(5)).concat(Max.just(15)).concat(Max.empty()))
 })()
