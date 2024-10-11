@@ -27,6 +27,7 @@
         }
     }
 
+    // Nat Number is Monoid under Addition is (N, +, 0)
     class Addition extends Monoid<number> {
         private constructor(protected x: number) {
             super(x)
@@ -49,6 +50,7 @@
         }
     }
 
+    // Nat Number is Monoid under Multiplication is (N, ×, 1)
     class Multiplication extends Monoid<number> {
         private constructor(protected x: number) {
             super(x)
@@ -71,6 +73,7 @@
         }
     }
 
+    // Nat Number is Monoid under Min is (N, min, ∞)
     class Min extends Monoid<number> {
         private constructor(protected x: number) {
             super(x)
@@ -93,6 +96,7 @@
         }
     }
 
+    // Nat Number is Monoid under Max is (N, max, -∞)
     class Max extends Monoid<number> {
         private constructor(protected x: number) {
             super(x)
@@ -115,6 +119,7 @@
         }
     }
 
+    // List is Monoid under Concatenation is (List[T], concat, [])
     class List<T = any> extends Monoid<T[]> {
         private constructor(protected x: T[]) {
             super(x)
@@ -137,6 +142,7 @@
         }
     }
 
+    // Boolean is Monoid under And is (Bool, &&, True)
     class And extends Monoid<boolean> {
         private constructor(protected x: boolean) {
             super(x)
@@ -159,6 +165,7 @@
         }
     }
 
+    // Boolean is Monoid under Or is (Bool, ||, False)
     class Or extends Monoid<boolean> {
         private constructor(protected x: boolean) {
             super(x)
