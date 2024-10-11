@@ -56,7 +56,7 @@
     // Implement Monoids more
     const Min: Monoid<number> = (x) => ({
         x,
-        concat: (other) => x < other.x ? Min(x) : Min(other.x),
+        concat: (other) => (x < other.x ? Min(x) : Min(other.x)) as ReturnType<Monoid<number>>,
         toString: () => `Min(${x})`
     })
     Min.empty = () => Min(Infinity)
@@ -95,5 +95,4 @@
             )
         ).toString()
     ) //?
-
 })()
