@@ -13,6 +13,7 @@
     abstract class SemiGroup<T> {
         constructor(protected x: T) {}
 
+        // SemiGroup.concat is a `(<>)` in Haskell
         public abstract concat(other: SemiGroup<T>): SemiGroup<T>
         public abstract toString(): string
     }
@@ -21,7 +22,10 @@
         constructor(protected x: T) {
             super(x)
         }
+        // Monoid.concat is a `mappend` in Haskell
+
         // Identity Element
+        // Monoid.empty is an `mempty` in Haskell
         static empty(): Monoid {
             throw Error("Empty doesn't Implement Error")
         }
@@ -166,6 +170,8 @@
     }
 
     // List is Monoid under Concatenation is (List[T], concat, [])
+    // Endomoprhism is a Monoid under Composition is (T -> T, compose, id)
+    // Endomorphism is not quite clear for this example
     class List<T = any> extends Monoid<T[]> {
         private constructor(protected x: T[]) {
             super(x)
