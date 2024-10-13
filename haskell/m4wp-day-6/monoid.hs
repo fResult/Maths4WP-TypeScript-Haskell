@@ -1,5 +1,5 @@
-{-# LANGUAGE UndecidableInstances #-}
-{-# OPTIONS_GHC -Wno-noncanonical-monoid-instances #-}
+import Data.List
+import Data.Char
 
 newtype Sum a = Sum {getSum :: a} deriving (Show)
 
@@ -10,22 +10,30 @@ newtype Sum a = Sum {getSum :: a} deriving (Show)
 newtype Any = Any {getAny :: Bool} deriving (Show)
 instance Semigroup Any where
   (<>) :: Any -> Any -> Any
-  (<>) = mappend
+  (<>) (Any x) (Any y) = Any (x || y)
 instance Monoid Any where
   mempty :: Any
   mempty = Any False
   mappend :: Any -> Any -> Any
-  mappend (Any x) (Any y) = Any (x || y)
+  mappend = (<>)
 
 newtype All = All {getAll :: Bool} deriving (Show)
 instance Semigroup All where
   (<>) :: All -> All -> All
-  (<>) = mappend
+  (<>) (All x) (All y) = All (x && y)
 instance Monoid All where
   mempty :: All
   mempty = All True
   mappend :: All -> All -> All
-  mappend (All x) (All y) = All (x && y)
+  mappend = (<>)
 
-test :: Maybe Integer
-test = Just 1 >>= \x -> Just 2 >>= \y -> return (x + y)
+passAnyOf :: [a -> Bool] -> a -> Bool
+passAnyOf preds x = getAny $ foldMap (Any .) preds x
+-- ideal should be `passAnyOf = getAny . foldMap (Any .)
+
+passAllOf :: [a -> Bool] -> a -> Bool
+passAllOf preds x = getAll $ foldMap (All .) preds x
+-- ideal should be `passAllOf = getAny . foldMap (Any .)
+
+testBinding :: Maybe Int
+testBinding = Just 1 >>= \x -> Just 2 >>= \y -> return (x + y)
