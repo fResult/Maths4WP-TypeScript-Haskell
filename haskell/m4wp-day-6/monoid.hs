@@ -35,5 +35,20 @@ passAllOf :: [a -> Bool] -> a -> Bool
 passAllOf preds x = getAll $ foldMap (All .) preds x
 -- ideal should be `passAllOf = getAny . foldMap (Any .)
 
-testBinding :: Maybe Int
-testBinding = Just 1 >>= \x -> Just 2 >>= \y -> return (x + y)
+isSpecialCharacter :: Char -> Bool
+isSpecialCharacter c = not $ isAlpha c
+
+isForbidden :: String -> Bool
+isForbidden = passAnyOf [any isSpace, any isSpecialCharacter]
+
+isAllowed :: String -> Bool
+isAllowed = passAllOf [any isAlpha, any isDigit]
+
+main1 :: IO ()
+main1 = do
+  putStrLn $ "'MyPass' is forbidden?: " ++ show (isForbidden "MyPass")
+  putStrLn $ "'MyPass' is allowed?: " ++ show (isAllowed "MyPass")
+  putStrLn $ "'MyPass🌍' is forbidden?: " ++ show (isForbidden "MyPass🌍")
+  putStrLn $ "'MyPass🌍' is allowed?: " ++ show (isAllowed "MyPass🌍")
+  putStrLn $ "'MyPass1' is forbidden?: " ++ show (isForbidden "MyPass1")
+  putStrLn $ "'MyPass1' is allowed?: " ++ show (isAllowed "MyPass1")
