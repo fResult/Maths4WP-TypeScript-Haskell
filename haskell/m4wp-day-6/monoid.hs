@@ -14,12 +14,20 @@ instance Monoid Sum where
 newtype Product = Product {getProduct :: Int} deriving (Show)
 instance Semigroup Product where
   (<>) :: Product -> Product -> Product
-  (<>) (Product x) (Product y) = Product (x + y)
+  (<>) (Product x) (Product y) = Product (x * y)
 instance Monoid Product where
   mempty :: Product
   mempty = Product 1
   mappend :: Product -> Product -> Product
   mappend = (<>)
+
+main1 :: IO ()
+main1 = do
+  putStrLn $ "Sum 1 `mappend` Sum 2: " ++ show (getSum $ mappend (Sum 2) (Sum 3))
+  putStrLn $ "mconcat $ map Sum [1..5]: " ++ show (getSum . mconcat $ map Sum [1..5])
+  putStrLn $ "Product 1 `mappend` Product 2: " ++ show (getProduct $ Product 2 `mappend` Product 3)
+  putStrLn $ "mconcat $ map Product [1..5]: " ++ show (getProduct . mconcat $ map Product [1..5])
+
 
 newtype Any = Any {getAny :: Bool} deriving (Show)
 instance Semigroup Any where
@@ -60,8 +68,8 @@ isForbidden = passAnyOf [any isSpace, any isSpecialCharacter]
 isAllowed :: String -> Bool
 isAllowed = passAllOf [any isAlpha, any isDigit]
 
-main1 :: IO ()
-main1 = do
+main2 :: IO ()
+main2 = do
   putStrLn $ "'MyPass' is forbidden?: " ++ show (isForbidden "MyPass")
   putStrLn $ "'MyPass' is allowed?: " ++ show (isAllowed "MyPass")
   putStrLn $ "'MyPass🌍' is forbidden?: " ++ show (isForbidden "MyPass🌍")
@@ -69,5 +77,24 @@ main1 = do
   putStrLn $ "'MyPass1' is forbidden?: " ++ show (isForbidden "MyPass1")
   putStrLn $ "'MyPass1' is allowed?: " ++ show (isAllowed "MyPass1")
 
-charPreds :: [Char -> Bool]
-charPreds = [isAlpha, isUpper]
+pass :: (Monoid c) => (b -> c) -> [a -> b] -> a -> c
+pass mcb = mconcat . map (mcb .)
+
+passAllOf' :: [String -> Bool] -> String -> Bool
+passAllOf' preds = getAll . pass All preds
+
+passAnyOf' :: [String -> Bool] -> String -> Bool
+passAnyOf' preds = getAny . pass Any preds
+
+isForbidden' :: String -> Bool
+isForbidden' = passAnyOf' [any isSpace, any isSpecialCharacter]
+
+isAllowed' :: String -> Bool
+isAllowed' = passAllOf' [any isAlpha, any isUpper]
+
+main3 :: IO ()
+main3 = do
+  putStrLn $ "'Korn' is forbidden?: " ++ show (isForbidden' "Korn")
+  putStrLn $ "'Korn' is allowed?: " ++ show (isAllowed' "Korn")
+  putStrLn $ "'Korn🌍' is forbidden?: " ++ show (isForbidden "Korn🌍")
+  putStrLn $ "'Korn🌍' is allowed?: " ++ show (isAllowed "Korn🌍")
