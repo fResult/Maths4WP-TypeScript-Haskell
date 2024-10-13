@@ -94,7 +94,11 @@ isAllowed' = passAllOf' [any isAlpha, any isUpper]
 
 main3 :: IO ()
 main3 = do
+  putStrLn $ "'Korn' is alpha and upper: " ++ show (getAll $ (mconcat . map (All .) $ [any isAlpha, any isUpper]) ("Korn"::String))
   putStrLn $ "'Korn' is forbidden?: " ++ show (isForbidden' "Korn")
   putStrLn $ "'Korn' is allowed?: " ++ show (isAllowed' "Korn")
   putStrLn $ "'Korn🌍' is forbidden?: " ++ show (isForbidden "Korn🌍")
   putStrLn $ "'Korn🌍' is allowed?: " ++ show (isAllowed "Korn🌍")
+
+charPreds :: [String -> Bool]
+charPreds = [any isAlpha, any isUpper]
