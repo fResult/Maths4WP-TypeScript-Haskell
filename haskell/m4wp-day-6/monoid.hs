@@ -80,11 +80,17 @@ main2 = do
 pass :: (Monoid c) => (b -> c) -> [a -> b] -> a -> c
 pass mcb = mconcat . map (mcb .)
 
-passAllOf' :: [String -> Bool] -> String -> Bool
-passAllOf' preds = getAll . pass All preds
+passAll' :: [a -> Bool] -> a -> All
+passAll' = pass All
 
-passAnyOf' :: [String -> Bool] -> String -> Bool
-passAnyOf' preds = getAny . pass Any preds
+passAny' :: [a -> Bool] -> a -> Any
+passAny' = pass Any
+
+passAllOf' :: [a -> Bool] -> a -> Bool
+passAllOf' preds = getAll . passAll' preds
+
+passAnyOf' :: [a -> Bool] -> a -> Bool
+passAnyOf' preds = getAny . passAny' preds
 
 isForbidden' :: String -> Bool
 isForbidden' = passAnyOf' [any isSpace, any isSpecialCharacter]
@@ -102,3 +108,9 @@ main3 = do
 
 charPreds :: [String -> Bool]
 charPreds = [any isAlpha, any isUpper]
+
+sumNumbers :: [Int] -> Int
+sumNumbers = getSum . mconcat . map Sum
+
+
+
