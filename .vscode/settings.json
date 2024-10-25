@@ -2,11 +2,16 @@
   "cSpell.words": [
     "Bifunctor",
     "concat",
+    "Endomoprhism",
     "Finishable",
     "fmap",
     "foldl",
     "foldr",
+    "mappend",
+    "mempty",
     "Monoid",
+    "Monoidal",
+    "Morphism",
     "scanl",
     "scanr"
   ],
