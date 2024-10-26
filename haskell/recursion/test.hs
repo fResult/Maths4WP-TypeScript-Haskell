@@ -8,8 +8,8 @@ primeToN n = [x | x <- [1..n], isPrime x] where
 filterByDivisibleByX :: Int -> [Int]
 filterByDivisibleByX x = [y | y <- [1..x], mod x y == 0]
 
--- isPrime :: Int -> Bool
--- isPrime x = (filterByDivisibleByX x == [1, x])
+isPrime :: Int -> Bool
+isPrime x = filterByDivisibleByX x == [1, x]
 
 sievePrimeToN :: Int -> [Int]
 sievePrimeToN n = sieve [2..n] where
