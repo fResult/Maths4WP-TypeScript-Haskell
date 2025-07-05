@@ -29,7 +29,7 @@ data GameStatus = WonBy Player | Playing
   deriving (Eq, Show)
 
 applyMove :: Game -> PlayerMove -> Game
-applyMove game@(SnakeLadder board playerPositions gameStatus) playerMove@(PlayerMove movingPlayer steps)
+applyMove game@(SnakeLadder board playerPositions gameStatus) playerMove@(PlayerMove movingPlayer _)
   | gameStatus /= Playing = game -- Game already ended
   | otherwise =
     let updatedPlayers = map (updatePlayerIfMatch board playerMove) playerPositions
@@ -65,14 +65,20 @@ sampleBoard = Board { goal = 100
                     , portals = [(3, 22), (5, 8), (11, 26), (20, 29), (27, 1), (21, 9), (17, 4)]
                     }
 
+player1 :: Player
+player1 = Player 1
+
+player2 :: Player
+player2 = Player 2
+
 samplePlayers :: [Player]
-samplePlayers = [Player 1, Player 2]
+samplePlayers = [player1, player2]
 
 game0 :: Game
 game0 = initialGame sampleBoard samplePlayers
 
 game1 :: Game
-game1 = applyMove game0 (PlayerMove (Player 1) 3) -- lands on 3 -> portal to 22
+game1 = applyMove game0 (PlayerMove player1 3) -- lands on 3 -> portal to 22
 
 game2 :: Game
-game2 = applyMove game1 (PlayerMove (Player 2) 5) -- lands on 5 -> portal to 8
+game2 = applyMove game1 (PlayerMove player2 5) -- lands on 5 -> portal to 8
