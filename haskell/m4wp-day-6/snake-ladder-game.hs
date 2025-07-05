@@ -36,7 +36,10 @@ applyMove game@(SnakeLadder board playerPositions gameStatus) playerMove@(Player
         newStatus = if hasPlayerWon board updatedPlayers movingPlayer
                     then WonBy movingPlayer
                     else Playing
-     in SnakeLadder board updatedPlayers newStatus
+     in SnakeLadder { board = board
+                    , players = updatedPlayers
+                    , status = newStatus
+                    }
 
 updatePlayerIfMatch :: Board -> PlayerMove -> PlayerPosition -> PlayerPosition
 updatePlayerIfMatch board (PlayerMove targetPlayer steps) (currentPlayer, currentPos)
