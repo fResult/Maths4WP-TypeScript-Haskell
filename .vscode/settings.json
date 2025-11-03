@@ -15,5 +15,8 @@
     "scanl",
     "scanr"
   ],
-  "editor.tabSize": 2
+  "editor.tabSize": 2,
+  "haskell.serverExecutablePath": "/Users/fresult/.ghcup/bin/haskell-language-server-wrapper",
+  "haskell.manageHLS": "PATH",
+  "haskell.trace.server": "messages"
 }
