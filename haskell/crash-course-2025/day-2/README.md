@@ -157,3 +157,35 @@ But infinite, in Haskell, lists will not be evaluated until needed:
 λ> take 10 ns
 [1,2,3,4,5,6,7,8,9,10]
 ```
+
+### List Comprehensions
+
+A way to make new lists by describing what we want.
+
+Syntax:
+
+```hs
+[ expression | element <- list, condition ]
+```
+
+It is read as: "Make a list of `expression` for each `element` which is a member of (`<-`/`∈`) `list` (set), where `condition` is true."
+
+Basic example:
+
+```hs
+-- x is member of the set 1-10 where x is even, and we double it
+λ> [ x * 2 | x <- [1..10], even x ]
+[4,8,12,16,20]
+
+-- x is member of the set 1-100 where x squared is less than 50
+λ> [ x | x <- [1..100], x * x < 50 ]
+[1,1,2,3,4,5,6,7]
+
+-- x is member of the set 1-10 where x squared is less than 50, and we double it
+λ> [x * 2 | x <- [1..10], x * x < 50]
+[2,4,6,8,10,12,14]
+
+-- w is member of the words in the given string where length of w is at least 3
+λ> [w | w <- words "this is a cat this is a bat that is a rat", length w >= 3]
+["this","cat","this","bat","that","rat"]
+```
