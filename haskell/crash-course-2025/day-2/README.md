@@ -102,3 +102,58 @@ Or buttoning two lists together like shirts.
 λ> zip [1..10] ['a'..'j']
 [(1,'a'),(2,'b'),(3,'c'),(4,'d'),(5,'e'),(6,'f'),(7,'g'),(8,'h'),(9,'i'),(10,'j')]
 ```
+
+### The `ZipWith` Function
+
+`zipWith` is like `zip`, but it combines the elements using a function you provide.
+
+```hs
+λ> zipWith (+) [1,2,3] [4,5,6]
+[5,7,9]
+
+λ> zipWith (++) ["Hello ", "Good "] ["World", "Day"]
+["Hello World","Good Day"]
+```
+
+### List Ranges
+
+Create lists with a range of values.
+
+```hs
+λ> [1..10]
+[1,2,3,4,5,6,7,8,9,10]
+
+λ> ['a'..'z']
+"abcdefghijklmnopqrstuvwxyz"
+
+λ> [1..]
+[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,... -- infinite list
+```
+
+With ranges, we can also specify steps:
+
+```hs
+λ> [1,3..20]
+[1,3,5,7,9,11,13,15,17,19]
+
+λ> [20,18..1]
+[20,18,16,14,12,10,8,6,4,2]
+
+-- For infinite list with steps:
+λ> [2,4..]
+[2,4,6,8,10,12,14,16,18,...
+```
+
+But infinite, in Haskell, lists will not be evaluated until needed:
+
+```hs
+λ> ns = [1..]
+
+λ> ns
+[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,... -- infinite list
+
+-- We can take the first 10 elements like this:
+```hs
+λ> take 10 ns
+[1,2,3,4,5,6,7,8,9,10]
+```
