@@ -81,3 +81,24 @@ Then we need a function to add pairs together:
 λ> take 30 fzbz
 ["","","Fizz","","Buzz","Fizz","","","Fizz","Buzz","","Fizz","","","FizzBuzz","","","Fizz","","Buzz","Fizz","","","Fizz","Buzz","","Fizz","","","FizzBuzz"]
 ```
+
+## Concepts Used
+
+### The `cycle` Function
+
+Create an infinite list by repeating a pattern forever.
+
+```hs
+λ> cycle [1,2,3]
+[1,2,3,1,2,3,1,2,3,...]
+```
+
+### The `Zip` Function
+
+Think about zipping two lists together like a zipper on clothes.\
+Or buttoning two lists together like shirts.
+
+```hs
+λ> zip [1..10] ['a'..'j']
+[(1,'a'),(2,'b'),(3,'c'),(4,'d'),(5,'e'),(6,'f'),(7,'g'),(8,'h'),(9,'i'),(10,'j')]
+```
