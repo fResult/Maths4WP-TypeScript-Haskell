@@ -9,7 +9,9 @@ For numbers from 1 to infinity:
 - Print "FizzBuzz" when the number can be divided by both 3 and 5
 
 > [!info]
-> This is not the fastest way, but it shows how to think in a another functional way.
+> This is not the fastest way, but it shows another way to think in Functional Programming.
+
+### Building the Solution
 
 We build the answer step by step from smaller parts.
 
@@ -40,4 +42,42 @@ ns       = 1  2  3  4  5  6  7  8  9 10 11 12 13 14 15  ...
 ```
 Replace empty positions with actual numbers.
 
+### Implementation
+
+#### Creating infinite lists
+
 We will create infinite lists for Fizz and Buzz using `cycle`.
+
+```hs
+λ> fizz = cycle ["", "", "Fizz"]
+
+λ> buzz = cycle ["", "", "", "", "Buzz"]
+```
+
+#### Combining Fizz and Buzz
+
+First, let's zip (connect) them together:
+
+```hs
+λ> zippedFizzBuzz = zip (take 30 fizz) (take 30 buzz)
+```
+
+Then we need a function to add pairs together:
+
+```hs
+λ> :{
+λ| addPair :: (String, String) -> String
+λ| addPair (a, b) = a ++ b
+λ> :}
+
+λ> map addPair zipped
+["","","Fizz","","Buzz","Fizz","","","Fizz","Buzz","","Fizz","","","FizzBuzz","","","Fizz","","Buzz","Fizz","","","Fizz","Buzz","","Fizz","","","FizzBuzz"]
+```
+
+**Simpler way, using `zipWith`**:
+
+```hs
+λ> fzbz = zipWith (++) fizz buzz
+λ> take 30 fzbz
+["","","Fizz","","Buzz","Fizz","","","Fizz","Buzz","","Fizz","","","FizzBuzz","","","Fizz","","Buzz","Fizz","","","Fizz","Buzz","","Fizz","","","FizzBuzz"]
+```
