@@ -8,7 +8,7 @@ For numbers from 1 to infinity:
 - Print "Buzz" when the number can be divided by 5
 - Print "FizzBuzz" when the number can be divided by both 3 and 5
 
-> [!info]
+> [!warning]
 > This is not the fastest way, but it shows another way to think in Functional Programming.
 
 ### Building the Solution
@@ -292,6 +292,41 @@ flip delete :: Eq a => [a] -> a -> [a]
 [1,2,4,5]
 ```
 
-> [!info]
-> "List of 1 to 5, without 3!"
+> [!note]
+> "List of 1 to 5, without 3!"\
 > See how naturally it reads?
+
+### The `map` Function
+
+How to create a `map` function that applies a function to each element of a list?
+
+```hs
+-- From Pattern Matching
+λ> map' :: (a -> b) -> [a] -> [b]
+λ> map' _ []     = []
+λ> map' f (x:xs) = f x : map'' f xs
+
+-- From List Comprehensions
+λ> map'' :: (a -> b) -> [a] -> [b]
+λ> map'' f xs = [ f x | x <- xs ]
+```
+
+Usage:
+```hs
+λ> :{
+λ| sqr :: Int -> Int -> Int
+λ| sqr x = x * x
+λ> :}
+
+λ> map' sqr [1..10]
+[1,4,9,16,25,36,49,64,81,100]
+
+λ> map'' sqr [1..10]
+[1,4,9,16,25,36,49,64,81,100]
+
+-- Using built-in map
+```hs
+λ> import Data.List (map)
+λ> map sqr [1..10]
+[1,4,9,16,25,36,49,64,81,100]
+```
