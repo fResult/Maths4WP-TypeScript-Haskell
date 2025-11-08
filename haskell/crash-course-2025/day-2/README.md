@@ -238,3 +238,60 @@ Behind the scenes, it is implemented by `succ` (Successor) function to get the n
 λ> succ 'z'
 '{'
 ```
+
+### Infix Functions
+
+In Haskell, every operator is actually a function.\
+For example, `(+)` is a function that adds two numbers.
+
+```hs
+λ> 2 + 3
+5
+```
+
+We can also use it in prefix form by enclosing it in parentheses:
+```hs
+λ> (+) 2 3
+5
+```
+
+**Why is this useful?**
+Because we can make them read more naturally by defining our own infix functions.
+
+```hs
+λ> import Data.List (delete)
+
+λ> :type delete
+delete :: Eq a => a -> [a] -> [a]
+
+λ> delete 3 [1..5]
+[1,2,4,5]
+```
+
+We can use it as an infix operator by surrounding it with backticks:
+
+```hs
+λ> 3 `delete` [1..5]
+[1,2,4,5]
+```
+
+**Making our own infix functions:**
+
+```hs
+λ> import Data.Function (flip)
+
+λ> :type flip
+flip :: (a -> b -> c) -> b -> a -> c
+
+λ> :type flip delete
+flip delete :: Eq a => [a] -> a -> [a]
+
+λ> without = flip delete
+
+λ> [1..5] `without` 3
+[1,2,4,5]
+```
+
+> [!info]
+> "List of 1 to 5, without 3!"
+> See how naturally it reads?
