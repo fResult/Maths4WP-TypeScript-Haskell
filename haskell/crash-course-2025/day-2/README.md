@@ -173,19 +173,39 @@ It is read as: "Make a list of `expression` for each `element` which is a member
 Basic example:
 
 ```hs
--- x is member of the set 1-10 where x is even, and we double it
+-- x is member of the set 1-10 where x is even, and we double it (see <1> below)
 λ> [ x * 2 | x <- [1..10], even x ]
 [4,8,12,16,20]
 
--- x is member of the set 1-100 where x squared is less than 50
+-- x is member of the set 1-100 where x squared is less than 50 (see <2> below)
 λ> [ x | x <- [1..100], x * x < 50 ]
 [1,1,2,3,4,5,6,7]
 
--- x is member of the set 1-10 where x squared is less than 50, and we double it
+-- x is member of the set 1-10 where x squared is less than 50, and we double it (see <3> below)
 λ> [x * 2 | x <- [1..10], x * x < 50]
 [2,4,6,8,10,12,14]
 
--- w is member of the words in the given string where length of w is at least 3
+-- w is member of the words in the given string where length of w is at least 3 (see <4> below)
+```hs
 λ> [w | w <- words "this is a cat this is a bat that is a rat", length w >= 3]
 ["this","cat","this","bat","that","rat"]
 ```
+
+1) The *set* of `X` that `x` is member of `[1..10]` where x is even, and we double it can be expressed mathematically as:
+  $$X = \{ 2x \mid x \in \mathbb{N}, 1 \leq x \leq 10, x \mod 2 = 0 \}$$
+
+2) The *set* of `X` that x is member of [1..100] where x squared is less than 50 can be expressed mathematically as:
+  $$X = \{ x \mid x \in \mathbb{N}, 1 \leq x \leq 100, x^2 < 50 \}$$
+
+3) The *set* of `X` that x is member of [1..10] where x squared is less than 50, and we double it can be expressed mathematically as:
+  $$X = \{ 2x \mid x \in \mathbb{N}, 1 \leq x \leq 10, x^2 < 50 \}$$
+
+4) The *list* of `W` where `w` is a member of the words in the given string and the length of `w` is at least `3` can be expressed mathematically as:
+  $$
+  \begin{align}
+  W &= \langle w \mid w \in \text{Words}(\text{"this is a cat this is a bat that is a rat"}), |w| \geq 3 \rangle \\
+    &= \langle w \mid w \in \langle\text{``this"}, \text{``is"}, \text{``a"}, \text{``cat"}, \text{``this"}, \text{``is"}, \text{``a"}, \text{``bat"}, \text{``that"}, \text{``is"}, \text{``a"},  \text{``rat"}, \rangle|w| \geq 3 \rangle
+    &= \langle \text{``this"}, \text{``cat"}, \text{``this"}, \text{``bat"}, \text{``that"}, \text{``rat"} \rangle \\
+  \end{align}
+  $$
+
