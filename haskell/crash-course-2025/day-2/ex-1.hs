@@ -36,12 +36,13 @@ filter'' f xs = [ x | x <- xs, f x ]
 -- https://hackage.haskell.org/package/base-4.21.0.0/docs/Data-List.html#v:head
 head' :: [a] -> a
 head' []     = error "head': empty list"
-head' (x:xs) = x
+head' (x:_) = x
 
 -- <6>
 -- https://hackage.haskell.org/package/base-4.21.0.0/docs/Data-List.html#v:tail
 tail' :: [a] -> [a]
-tail' = undefined
+tail' []     = error "tail': empty list"
+tail' (_:xs) = xs
 
 -- <7>
 -- https://hackage.haskell.org/package/base-4.21.0.0/docs/Data-List.html#v:init
