@@ -1,5 +1,5 @@
 -- Exercise 1: Self-implementation of Data.List functions
-import Data.Foldable (notElem)
+import Data.Foldable (elem, notElem)
 
 -- <1>
 -- https://hackage.haskell.org/package/base-4.21.0.0/docs/Data-List.html#v:length
@@ -87,17 +87,31 @@ all' = undefined
 -- <15>
 -- https://hackage.haskell.org/package/base-4.21.0.0/docs/Data-List.html#v:and
 and' :: [Bool] -> Bool
-and' = undefined
+and' [] = True
+and' (x:xs)
+  | not x      = False
+  | otherwise  = and' xs
+
+and'' :: [Bool] -> Bool
+and'' = notElem False
 
 -- <16>
 -- https://hackage.haskell.org/package/base-4.21.0.0/docs/Data-List.html#v:or
 or' :: [Bool] -> Bool
-or' = undefined
+or' [] = False
+or' (x:xs)
+  | x = True
+  | otherwise = or' xs
+
+or'' :: [Bool] -> Bool
+or'' = elem True
 
 -- <17>
 -- https://hackage.haskell.org/package/base-4.21.0.0/docs/Data-List.html#v:sum
 sum' :: Num a => [a] -> a
-sum' = undefined
+sum' []     = 0
+sum' [x]    = x
+sum' (x:xs) = x + sum' xs
 
 -- <18>
 -- https://hackage.haskell.org/package/base-4.21.0.0/docs/Data-List.html#v:product
