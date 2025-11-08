@@ -1,4 +1,5 @@
 -- Exercise 1: Self-implementation of Data.List functions
+import Data.Foldable (notElem)
 
 -- <1>
 -- https://hackage.haskell.org/package/base-4.21.0.0/docs/Data-List.html#v:length
@@ -14,7 +15,11 @@ group' = undefined
 -- <3>
 -- https://hackage.haskell.org/package/base-4.21.0.0/docs/Data-List.html#v:nub
 nub' :: Eq a => [a] -> [a]
-nub' = undefined
+nub' [] = []
+nub' (x:xs)
+  | x `isNotIn` xs = x : nub' xs
+  | otherwise      = nub' xs
+    where isNotIn = notElem
 
 -- <4>
 -- https://hackage.haskell.org/package/base-4.21.0.0/docs/Data-List.html#v:filter
