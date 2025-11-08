@@ -209,3 +209,32 @@ Basic example:
   \end{align}
   $$
 
+## Related and Another Concepts
+
+### Generator
+
+The syntax `[1..10]` creates a list from 1 to 10, and `['a'..'z']` creates a list from 'a' to 'z'.
+
+```hs
+λ> [1..10]
+[1,2,3,4,5,6,7,8,9,10]
+
+λ> ['a'..'z']
+"abcdefghijklmnopqrstuvwxyz"
+```
+
+Behind the scenes, it is implemented by `succ` (Successor) function to get the next item.
+
+```hs
+λ> succ 1
+2
+
+λ> succ 9999
+10000
+
+λ> succ 'a'
+'b'
+
+λ> succ 'z'
+'{'
+```
