@@ -24,7 +24,10 @@ nub' (x:xs)
 -- <4>
 -- https://hackage.haskell.org/package/base-4.21.0.0/docs/Data-List.html#v:filter
 filter' :: (a -> Bool) -> [a] -> [a]
-filter' = undefined
+filter' _ [] = []
+filter' f (x:xs)
+  | f x       = x : filter f xs
+  | otherwise = filter f xs
 
 -- <5>
 -- https://hackage.haskell.org/package/base-4.21.0.0/docs/Data-List.html#v:head
