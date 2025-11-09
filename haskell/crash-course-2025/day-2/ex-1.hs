@@ -143,6 +143,15 @@ maximum' (x:y:xs)
   | x > y     = maximum' (x:xs)
   | otherwise = maximum' (y:xs)
 
+maximum'' :: Ord a => [a] -> a
+maximum'' [] = error "maximum'': empty list"
+maximum'' [x] = x
+maximum'' (x:xs) = max' x (maximum'' xs)
+  where
+    max' y z
+      | y > z     = y
+      | otherwise = z
+
 -- <20>
 -- https://hackage.haskell.org/package/base-4.21.0.0/docs/Data-List.html#v:minimum
 minimum' :: Ord a => [a] -> a
@@ -151,6 +160,15 @@ minimum' [x] = x
 minimum' (x:y:xs)
   | x < y     = minimum' (x:xs)
   | otherwise = minimum' (y:xs)
+
+minimum'' :: Ord a => [a] -> a
+minimum'' []     = error "minimum'': empty list"
+minimum'' [x]    = x
+minimum'' (x:xs) = min' x (minimum'' xs)
+  where
+    min' y z
+      | y < z     = y
+      | otherwise = z
 
 -- <21>
 -- https://hackage.haskell.org/package/base-4.21.0.0/docs/Data-List.html#v:iterate
