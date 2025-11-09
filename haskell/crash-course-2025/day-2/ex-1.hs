@@ -206,7 +206,10 @@ take' n (x:xs)
 -- <26>
 -- https://hackage.haskell.org/package/base-4.21.0.0/docs/Data-List.html#v:drop
 drop' :: Int -> [a] -> [a]
-drop' = undefined
+drop' _ [] = []
+drop' n (x:xs)
+  | n <= 0 = x:xs
+  | otherwise = drop' (n - 1) xs
 
 -- <27>
 -- https://hackage.haskell.org/package/base-4.21.0.0/docs/Data-List.html#v:takeWhile
