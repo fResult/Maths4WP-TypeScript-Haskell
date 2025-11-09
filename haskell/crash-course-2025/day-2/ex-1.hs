@@ -193,7 +193,7 @@ replicate'' n x = x : replicate'' (n - 1) x
 -- <24>
 -- https://hackage.haskell.org/package/base-4.21.0.0/docs/Data-List.html#v:cycle
 cycle' :: [a] -> [a]
-cycle' = undefined
+cycle' xs = xs ++ cycle' xs
 
 -- <25>
 -- https://hackage.haskell.org/package/base-4.21.0.0/docs/Data-List.html#v:take
