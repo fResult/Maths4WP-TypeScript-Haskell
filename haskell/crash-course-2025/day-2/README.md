@@ -20,20 +20,20 @@ We build the answer step by step from smaller parts.
 ```
 Fizz     = _  _  F  _  _  F  _  _  F  _  _  F  _  _  F  ...
 ```
-Every 3rd position shows "F" (for Fizz), other positions are empty.
+**Every 3rd position** shows "F" (for Fizz), other positions are empty.
 
 **Step 2: Make the pattern for Buzz**
 
 ```
 Buzz     = _  _  _  _  B  _  _  _  _  B  _  _  _  _  B  ...
 ```
-Every 5th position shows "B" (for Buzz), other positions are empty.
+**Every 5th position** shows "B" (for Buzz), other positions are empty.
 
 **Step 3: Put Fizz and Buzz together**
 ```
 FzBz     = _  _  F  _  B  F  _  _  F  B  _  F  _  _ FB  ...
 ```
-When we combine them, position 15 shows "FB" (FizzBuzz) because it's both 3rd and 5th.
+When we combine them, position 15 shows "FB" (FizzBuzz) because it's **both 3rd and 5th**.
 
 **Step 4: Mix with numbers to get the final result**
 ```
@@ -93,7 +93,7 @@ Create an infinite list by repeating a pattern forever.
 [1,2,3,1,2,3,1,2,3,...]
 ```
 
-### The `Zip` Function
+### The `zip` Function
 
 Think about zipping two lists together like a zipper on clothes.\
 Or buttoning two lists together like shirts.
@@ -103,7 +103,7 @@ Or buttoning two lists together like shirts.
 [(1,'a'),(2,'b'),(3,'c'),(4,'d'),(5,'e'),(6,'f'),(7,'g'),(8,'h'),(9,'i'),(10,'j')]
 ```
 
-### The `ZipWith` Function
+### The `zipWith` Function
 
 `zipWith` is like `zip`, but it combines the elements using a function you provide.
 
@@ -329,4 +329,35 @@ Usage:
 λ> import Data.List (map)
 λ> map sqr [1..10]
 [1,4,9,16,25,36,49,64,81,100]
+```
+
+### The `it` Variable
+
+In GHCi, we have useful variable `it` that holds the result of the last evaluated expression.
+It allows us to do trial and error.
+
+In GHCi, we have a special variable called `it`.\
+This variable saves the result of the last thing you typed.
+
+It helps us able to trial and error step-by-step.
+
+```hs
+λ> "this cat this bat this rat"
+"this cat this bat this rat"
+λ> it
+"this cat this bat this rat"
+
+λ> words it
+["this","cat","this","bat","this","rat"]
+
+λ> nub it
+["this","cat","bat","rat"]
+
+λ> length it
+4
+
+-- First we use `words `it`, then `nub it`, then `length it`...
+-- Now we know how to put these functions together: `length . nub . words`
+λ> (length . nub . words) "this cat this rat this bat"
+4
 ```
