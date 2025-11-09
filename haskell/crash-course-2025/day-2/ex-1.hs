@@ -259,7 +259,13 @@ unzip'' ((x,y):xs) = bimap (x:) (y:) unzipped
 -- <33>
 -- https://hackage.haskell.org/package/base-4.21.0.0/docs/Data-List.html#v:delete
 delete' :: Eq a => a -> [a] -> [a]
-delete' = undefined
+delete' _ []     = []
+delete' y (x:xs)
+  | y == x    = delete' y xs
+  | otherwise = x : delete' y xs
+
+delete'' :: Eq a => a -> [a] -> [a]
+delete'' x = filter' (/= x)
 
 -- <34>
 -- https://hackage.haskell.org/package/base-4.21.0.0/docs/Data-List.html#v:intersect
