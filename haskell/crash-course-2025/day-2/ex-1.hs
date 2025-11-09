@@ -179,7 +179,7 @@ iterate' f x = x : iterate' f step
 -- <22>
 -- https://hackage.haskell.org/package/base-4.21.0.0/docs/Data-List.html#v:repeat
 repeat' :: a -> [a]
-repeat' = undefined
+repeat' x = x : repeat' x
 
 -- <23>
 -- https://hackage.haskell.org/package/base-4.21.0.0/docs/Data-List.html#v:replicate
