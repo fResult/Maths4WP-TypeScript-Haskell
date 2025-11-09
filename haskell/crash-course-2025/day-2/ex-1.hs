@@ -69,7 +69,11 @@ concat' (x:xs) = x ++ concat' xs
 -- <11>
 -- https://hackage.haskell.org/package/base-4.21.0.0/docs/Data-List.html#v:map
 map' :: (a -> b) -> [a] -> [b]
-map' = undefined
+map' _ [] = []
+map' f (x:xs) = f x : map' f xs
+
+map'' :: (a -> b) -> [a] -> [b]
+map'' f xs = [ f x | x <- xs ]
 
 -- <12>
 -- https://hackage.haskell.org/package/base-4.21.0.0/docs/Data-List.html#v:concatMap
