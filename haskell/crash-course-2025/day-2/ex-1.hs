@@ -1,5 +1,5 @@
 -- Exercise 1: Self-implementation of Data.List functions
-import Data.Foldable (elem, notElem)
+import Data.Foldable (elem, notElem, foldr)
 
 -- <1>
 -- https://hackage.haskell.org/package/base-4.21.0.0/docs/Data-List.html#v:length
@@ -121,12 +121,18 @@ sum' []     = 0
 sum' [x]    = x
 sum' (x:xs) = x + sum' xs
 
+sum'' :: Num a => [a] -> a
+sum'' = foldr (+) 0
+
 -- <18>
 -- https://hackage.haskell.org/package/base-4.21.0.0/docs/Data-List.html#v:product
 product' :: Num a => [a] -> a
 product' [] = 1
 product' [x] = x
 product' (x:xs) = x * product' xs
+
+product'' :: Num a => [a] -> a
+product'' = foldr (*) 1
 
 -- <19>
 -- https://hackage.haskell.org/package/base-4.21.0.0/docs/Data-List.html#v:maximum
