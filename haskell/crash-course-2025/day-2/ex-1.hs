@@ -63,7 +63,8 @@ reverse' (x:xs) = reverse' xs ++ [x]
 -- <10>
 -- https://hackage.haskell.org/package/base-4.21.0.0/docs/Data-List.html#v:concat
 concat' :: [[a]] -> [a]
-concat' = undefined
+concat' []     = []
+concat' (x:xs) = x ++ concat' xs
 
 -- <11>
 -- https://hackage.haskell.org/package/base-4.21.0.0/docs/Data-List.html#v:map
