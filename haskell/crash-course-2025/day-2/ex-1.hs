@@ -206,9 +206,9 @@ take' n (x:xs)
 -- <26>
 -- https://hackage.haskell.org/package/base-4.21.0.0/docs/Data-List.html#v:drop
 drop' :: Int -> [a] -> [a]
-drop' _ [] = []
+drop' _ []    = []
 drop' n (x:xs)
-  | n <= 0 = x:xs
+  | n <= 0    = x:xs
   | otherwise = drop' (n - 1) xs
 
 -- <27>
@@ -222,7 +222,8 @@ takeWhile' f (x:xs)
 -- <28>
 -- https://hackage.haskell.org/package/base-4.21.0.0/docs/Data-List.html#v:dropWhile
 dropWhile' :: (a -> Bool) -> [a] -> [a]
-dropWhile' = undefined
+dropWhile' _ []     = []
+dropWhile' f (x:xs) = if f x then dropWhile' f xs else x:xs
 
 -- <29>
 -- https://hackage.haskell.org/package/base-4.21.0.0/docs/Data-List.html#v:span
