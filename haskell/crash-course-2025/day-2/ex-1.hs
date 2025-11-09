@@ -57,7 +57,8 @@ last' = undefined
 -- <9>
 -- https://hackage.haskell.org/package/base-4.21.0.0/docs/Data-List.html#v:reverse
 reverse' :: [a] -> [a]
-reverse' = undefined
+reverse' []     = []
+reverse' (x:xs) = reverse' xs ++ [x]
 
 -- <10>
 -- https://hackage.haskell.org/package/base-4.21.0.0/docs/Data-List.html#v:concat
