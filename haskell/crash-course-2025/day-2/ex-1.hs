@@ -214,7 +214,10 @@ drop' n (x:xs)
 -- <27>
 -- https://hackage.haskell.org/package/base-4.21.0.0/docs/Data-List.html#v:takeWhile
 takeWhile' :: (a -> Bool) -> [a] -> [a]
-takeWhile' = undefined
+takeWhile' _ [] = []
+takeWhile' f (x:xs)
+  | f x         = x : takeWhile' f xs
+  | otherwise   = []
 
 -- <28>
 -- https://hackage.haskell.org/package/base-4.21.0.0/docs/Data-List.html#v:dropWhile
