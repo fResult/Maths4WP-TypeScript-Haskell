@@ -83,12 +83,14 @@ concatMap' = undefined
 -- <13>
 -- https://hackage.haskell.org/package/base-4.21.0.0/docs/Data-List.html#v:any
 any' :: (a -> Bool) -> [a] -> Bool
-any' = undefined
+any' _ []     = False
+any' f (x:xs) = f x || any' f xs
 
 -- <14>
 -- https://hackage.haskell.org/package/base-4.21.0.0/docs/Data-List.html#v:all
 all' :: (a -> Bool) -> [a] -> Bool
-all' = undefined
+all' _ []     = True
+all' f (x:xs) = f x && all' f xs
 
 -- <15>
 -- https://hackage.haskell.org/package/base-4.21.0.0/docs/Data-List.html#v:and
