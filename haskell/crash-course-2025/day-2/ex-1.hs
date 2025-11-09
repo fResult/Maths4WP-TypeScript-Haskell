@@ -1,5 +1,6 @@
 -- Exercise 1: Self-implementation of Data.List functions
 import Data.Foldable (elem, notElem, foldr)
+import Data.Bifunctor (bimap)
 
 -- <1>
 -- https://hackage.haskell.org/package/base-4.21.0.0/docs/Data-List.html#v:length
@@ -228,7 +229,8 @@ dropWhile' f (x:xs) = if f x then dropWhile' f xs else x:xs
 -- <29>
 -- https://hackage.haskell.org/package/base-4.21.0.0/docs/Data-List.html#v:span
 span' :: (a -> Bool) -> [a] -> ([a], [a])
-span' = undefined
+span' _ [] = ([], [])
+span' f xs = (takeWhile' f xs, dropWhile' f xs)
 
 -- <30>
 -- https://hackage.haskell.org/package/base-4.21.0.0/docs/Data-List.html#v:elem
@@ -238,12 +240,21 @@ elem' = undefined
 -- <31>
 -- https://hackage.haskell.org/package/base-4.21.0.0/docs/Data-List.html#v:zip
 zip' :: [a] -> [b] -> [(a, b)]
-zip' = undefined
+zip' [] _          = []
+zip' _ []          = []
+zip' (x:xs) (y:ys) = (x, y) : zip' xs ys
 
 -- <32>
 -- https://hackage.haskell.org/package/base-4.21.0.0/docs/Data-List.html#v:unzip
 unzip' :: [(a, b)] -> ([a], [b])
-unzip' = undefined
+unzip' [] = ([], [])
+unzip'  ((x,y):xs) = (x:fst unzipped, y:snd unzipped)
+  where unzipped = unzip' xs
+
+unzip'' :: [(a, b)] -> ([a], [b])
+unzip'' [] = ([], [])
+unzip'' ((x,y):xs) = bimap (x:) (y:) unzipped
+  where unzipped = unzip' xs
 
 -- <33>
 -- https://hackage.haskell.org/package/base-4.21.0.0/docs/Data-List.html#v:delete
