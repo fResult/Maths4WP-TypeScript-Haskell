@@ -1,6 +1,7 @@
 -- Exercise 1: Self-implementation of Data.List functions
 import Data.Foldable (elem, notElem, foldr)
 import Data.Bifunctor (bimap)
+import qualified Data.Map as Map (fromList, member, lookup)
 
 -- <1>
 -- https://hackage.haskell.org/package/base-4.21.0.0/docs/Data-List.html#v:length
@@ -269,8 +270,12 @@ delete'' x = filter' (/= x)
 
 -- <34>
 -- https://hackage.haskell.org/package/base-4.21.0.0/docs/Data-List.html#v:intersect
-intersect' :: Eq a => [a] -> [a] -> [a]
-intersect' = undefined
+intersect' :: (Eq a, Ord a) => [a] -> [a] -> [a]
+intersect' _ [] = []
+intersect' [] _ = []
+intersect' xs ys = filter' (`Map.member` hashMap) ys
+  where
+    hashMap = Map.fromList $ map' (,True) xs
 
 -- <35>
 -- https://hackage.haskell.org/package/base-4.21.0.0/docs/Data-List.html#v:intersperse
