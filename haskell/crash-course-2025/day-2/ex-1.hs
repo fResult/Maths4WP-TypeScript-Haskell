@@ -124,7 +124,9 @@ sum' (x:xs) = x + sum' xs
 -- <18>
 -- https://hackage.haskell.org/package/base-4.21.0.0/docs/Data-List.html#v:product
 product' :: Num a => [a] -> a
-product' = undefined
+product' [] = 1
+product' [x] = x
+product' (x:xs) = x * product' xs
 
 -- <19>
 -- https://hackage.haskell.org/package/base-4.21.0.0/docs/Data-List.html#v:maximum
