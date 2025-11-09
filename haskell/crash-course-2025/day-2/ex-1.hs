@@ -184,7 +184,7 @@ repeat' x = x : repeat' x
 -- <23>
 -- https://hackage.haskell.org/package/base-4.21.0.0/docs/Data-List.html#v:replicate
 replicate' :: Int -> a -> [a]
-replicate' n x = take n $ repeat' x
+replicate' n x = take' n $ repeat' x
 
 replicate'' :: Int -> a -> [a]
 replicate'' 0 _ = []
@@ -198,7 +198,10 @@ cycle' xs = xs ++ cycle' xs
 -- <25>
 -- https://hackage.haskell.org/package/base-4.21.0.0/docs/Data-List.html#v:take
 take' :: Int -> [a] -> [a]
-take' = undefined
+take' _ []    = []
+take' n (x:xs)
+  | n <= 0    = []
+  | otherwise = x : take' (n - 1) xs
 
 -- <26>
 -- https://hackage.haskell.org/package/base-4.21.0.0/docs/Data-List.html#v:drop
