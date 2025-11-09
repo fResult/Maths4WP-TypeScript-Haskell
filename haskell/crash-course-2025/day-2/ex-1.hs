@@ -173,7 +173,8 @@ minimum'' (x:xs) = min' x (minimum'' xs)
 -- <21>
 -- https://hackage.haskell.org/package/base-4.21.0.0/docs/Data-List.html#v:iterate
 iterate' :: (a -> a) -> a -> [a]
-iterate' = undefined
+iterate' f x = x : iterate' f step
+  where step = f x
 
 -- <22>
 -- https://hackage.haskell.org/package/base-4.21.0.0/docs/Data-List.html#v:repeat
