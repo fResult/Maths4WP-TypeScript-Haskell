@@ -356,8 +356,13 @@ It helps us able to trial and error step-by-step.
 λ> length it
 4
 
--- First we use `words `it`, then `nub it`, then `length it`...
+-- First we use `words `it`, then `nub it`, then `length it`... This means `length` after `nub` after `words`
 -- Now we know how to put these functions together: `length . nub . words`
 λ> (length . nub . words) "this cat this rat this bat"
 4
+
+λ> countUniqueWords = length . nub . words
+λ> countUniqueWords "this cat this rat this bat"
+```
+
 ```
