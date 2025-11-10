@@ -236,7 +236,12 @@ span' f xs = (takeWhile' f xs, dropWhile' f xs)
 -- <30>
 -- https://hackage.haskell.org/package/base-4.21.0.0/docs/Data-List.html#v:elem
 elem' :: Eq a => a -> [a] -> Bool
-elem' = undefined
+elem' _ []       = False
+elem' e (x:xs) = x == e || elem' e xs
+
+elem'' :: Eq a => a -> [a] -> Bool
+elem'' e xs = or' $ map' isEqualE xs
+  where isEqualE x = e == x
 
 -- <31>
 -- https://hackage.haskell.org/package/base-4.21.0.0/docs/Data-List.html#v:zip
