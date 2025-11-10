@@ -82,6 +82,60 @@ Then we need a function to add pairs together:
 ["","","Fizz","","Buzz","Fizz","","","Fizz","Buzz","","Fizz","","","FizzBuzz","","","Fizz","","Buzz","Fizz","","","Fizz","Buzz","","Fizz","","","FizzBuzz"]
 ```
 
+#### Combining Fizz, Buzz, and Numbers
+
+We need to turn numbers into strings so we can combine them with FizzBuzz text:
+
+```hs
+λ> ns = map show [1..]
+
+λ> take 30 ns
+["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24","25","26","27","28","29","30"]
+```
+
+**Combine with our FizzBuzz pattern**
+
+```hs
+λ> fizzBuzz = zip ns fzbz
+
+λ> take 30 fizzBuzz
+[("1",""),("2",""),("3","Fizz"),("4",""),("5","Buzz"),("6","Fizz"),("7",""),("8",""),("9","Fizz"),("10","Buzz"),("11",""),("12","Fizz"),("13",""),("14",""),("15","FizzBuzz"),("16",""),("17",""),("18","Fizz"),("19",""),("20","Buzz"),("21","Fizz"),("22",""),("23",""),("24","Fizz"),("25","Buzz"),("26",""),("27","Fizz"),("28",""),("29",""),("30","FizzBuzz")]
+```
+
+**Method 1: Create a max function for pairs**
+
+```hs
+λ> :{
+λ| maxPair :: (Ord a) => (a, a) -> a
+λ| maxPair (x,y) = max x y
+λ| :}
+```
+
+**Use maxPair with map**
+
+```hs
+λ> take 30 $ map maxPair fizzBuzz
+["1","2","Fizz","4","Buzz","Fizz","7","8","Fizz","Buzz","11","Fizz","13","14","FizzBuzz","16","17","Fizz","19","Buzz","Fizz","22","23","Fizz","Buzz","26","Fizz","28","29","FizzBuzz"]
+```
+
+**Method 2: Use zipWith directly**
+
+Actually, we can make this even simpler:
+
+```hs
+λ> take 30 $ zipWith max fzbz ns
+["1","2","Fizz","4","Buzz","Fizz","7","8","Fizz","Buzz","11","Fizz","13","14","FizzBuzz","16","17","Fizz","19","Buzz","Fizz","22","23","Fizz","Buzz","26","Fizz","28","29","FizzBuzz"]
+```
+
+> [!tip]
+> **Why `max` works?**\
+> In Haskell, strings are compared alphabetically:
+>
+> - Empty string `""` comes before any non-empty string
+> - So `max "" "1"` gives `"1"` (the number)
+> - And `max "" "Fizz"` gives `"Fizz"` (the FizzBuzz text)
+> - This automatically chooses the right thing for us!
+
 ## Concepts Used
 
 ### The `cycle` Function
