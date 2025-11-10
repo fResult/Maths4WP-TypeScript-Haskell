@@ -365,4 +365,89 @@ It helps us able to trial and error step-by-step.
 λ> countUniqueWords "this cat this rat this bat"
 ```
 
+### Higher-Order functions
+
+A high-order function is a function that can:
+
+- Take other functions as input
+- Return a new function as output
+
+Let's look at `zipWith` to understand this better.
+
+#### Using `zipWith`
+
+We can use `zipWith` to combine two lists using a function:
+
+```hs
+λ> zipWith (+) [1..10] [10,9..1]
+[11,11,11,11,11,11,11,11,11,11]
 ```
+
+#### Understanding the Type
+
+```hs
+λ> :type zipWith
+zipWith :: (a -> b -> c) -> [a] -> [b] -> [c]
+```
+
+> [!note]
+> Breaking down the type of `zipWith`:
+>
+> - `a -> b -> c` means: a function that takes `a` and `b`, returns `c`
+> - `[a] -> [b] -> [c]` means: takes list of `a`, then list of `b`, returns list of `c`
+> - Function arrows `->` are right-associative: `a -> b -> c` = `a -> (b -> c)`
+
+#### How zipWith Works with `+`
+
+First, let's see the type of `+`:
+
+```hs
+λ> :type (+)
+(+) :: Num a => a -> a -> a
+```
+
+When we give `+` to `zipWith`:
+
+```hs
+λ> :type zipWith (+)
+zipWith (+) :: Num c => [c] -> [c] -> [c]
+```
+
+This gives us a NEW function that adds two lists!
+
+#### Creating New Functions
+
+We can use the result of `zipWith (+)` directly:
+
+```hs
+λ> zipWith (+) [1..] [10,9..1]
+[11,11,11,11,11,11,11,11,11,11]
+```
+
+Or with parentheses (same thing):
+
+```hs
+λ> (zipWith (+)) [1..] [10,9..1]
+[11,11,11,11,11,11,11,11,11,11]
+```
+
+#### Naming Our New Function
+
+We can give this new function a name:
+
+```hs
+λ> zipAndAdd = zipWith (+)
+
+λ> zipAndAdd [1..] [10,9..1]
+[11,11,11,11,11,11,11,11,11,11]
+```
+
+Now `zipAndAdd` is a function that adds two lists element by element!
+
+#### Why This Matters
+
+This shows how high-order functions let us:
+
+- **Create new functions** from existing ones
+- **Reuse functions** in different ways
+- **Write less code** by combining functions
