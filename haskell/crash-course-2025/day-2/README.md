@@ -263,6 +263,28 @@ Basic example:
   \end{align}
   $$
 
+### The `show` function
+
+Show function is a useful function to make everything (which is Show instance) to a string
+
+Why `show`, not `toString`?
+It doesn't make sense now, but it will make sense later.
+
+```hs
+λ> show 10
+"10"
+
+λ> show 23701
+"23701"
+```
+
+The type:
+
+```hs
+λ> :type show
+show :: Show a => a -> String
+```
+
 ## Related and Another Concepts
 
 ### Generator
