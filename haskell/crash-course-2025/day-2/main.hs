@@ -25,4 +25,13 @@ count (x:xs) = 1 + count xs
 -- λ> count [isSpace, isDigit, isLetter]
 -- λ> 3
 
+{-- Guard --}
+-- grade :: (Ord a, Num a) => a -> Char
+grade :: Int -> Char
+grade score
+  | score > 90 = 'A'
+  | score > 80 = 'B'
+  | score > 70 = 'C'
+  | otherwise  = 'F'
+
 
