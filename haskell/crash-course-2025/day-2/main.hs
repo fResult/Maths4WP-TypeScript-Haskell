@@ -1,3 +1,5 @@
+import Data.List (nub, delete)
+
 manutdLegend :: Int -> String
 manutdLegend 7 = "Eric Cantona"
 manutdLegend 11 = "Ryan Giggs"
@@ -61,4 +63,9 @@ factorial''' n = case n of
   0 -> 1
   _ -> n * factorial''' (n - 1)
 
+countUniqueWords :: String -> Int
+countUniqueWords = count . unique . words
+  where
+    unique = nub
+    count  = length
 
