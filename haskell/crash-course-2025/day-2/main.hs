@@ -4,6 +4,11 @@ manutdLegend 11 = "Ryan Giggs"
 manutdLegend 1 = "Edwin van der Saar"
 manutdLegend _ = "No Legend"
 
+-- factorial :: (Eq t, Num t) => t -> t
+factorial :: Int -> Int
+factorial 0 = 1
+factorial n = n * factorial (n - 1)
+
 -- sum' :: Num a => [a] -> a
 sum' :: [Int] -> Int
 sum' []     = 0
@@ -33,5 +38,27 @@ grade score
   | score > 80 = 'B'
   | score > 70 = 'C'
   | otherwise  = 'F'
+
+-- factorial' :: (Eq t, Num t) => t -> t
+factorial' :: Int -> Int
+factorial' n
+  | n > 0     = n * factorial' (n - 1)
+  | n == 0    = 1
+  | otherwise = error "factorial': n >= 0 only"
+
+{-- If-Then-Else --}
+-- factorial'' :: (Eq t, Num t) => t -> t
+factorial'' :: Int -> Int
+factorial'' n =
+  if n == 0
+    then 1
+    else n * factorial'' (n - 1)
+
+{-- Case ... of --}
+-- factorial''' :: (Eq t, Num t) => t -> t
+factorial''' :: Int -> Int
+factorial''' n = case n of
+  0 -> 1
+  _ -> n * factorial''' (n - 1)
 
 
