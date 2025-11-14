@@ -69,3 +69,13 @@ countUniqueWords = count . unique . words
     unique = nub
     count  = length
 
+{-- List Comprehensions --}
+evenNumbers :: [Int]
+evenNumbers = [ x | x <- [1..100], odd x ]
+
+numbersSquareUnder50 :: [Int]
+numbersSquareUnder50 = [ x | x <- [1..100], sqr x < 50 ]
+  where sqr y = y * y
+
+wordsWithMinLength3 :: [String]
+wordsWithMinLength3 = [ w | w <- words "this is a cat this is a bat this is a rat", length w >= 3 ]
