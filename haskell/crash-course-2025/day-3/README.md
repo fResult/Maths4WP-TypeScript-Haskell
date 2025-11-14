@@ -59,3 +59,67 @@ Also, type `a` must be an instance of `Eq`.
       In an equation for 'it': it = (==) 'x' 9
 ```
 
+## Permutations
+
+### Recursive algorithm
+
+A permutation is a rearrangement of a list.\
+For example, permutations of `['a', 'b', 'c']` are:
+
+```
+abc
+acb
+bac
+bca
+cab
+cba
+```
+
+- For `abc` and `acb`, `a` is the first element.\
+  The remaining permutations are from `['b', 'c']`: `bc` and `cb`.
+- For `bac` and `bca`, `b` is the first element.\
+  The remaining permutations are from `['a', 'c']`: `ac` and `ca`.
+- For `cab` and `cba`, `c` is the first element.\
+  The remaining permutations are from `['a', 'b']`: `ab` and `ba`.
+
+We can see the pattern: remove each element `x` from list `xs`, then add `x` to the front of each permutation of the remaining elements.
+
+$$
+\text{permute}(xs) = {x : ys \mid \forall x \in xs, \forall ys \in \text{permute}(xs \setminus {x})}
+$$
+
+We can implement the `permute` function in Haskell:
+
+```hs
+λ> import Data.List (delete)
+
+λ> permute :: Eq a => [a] -> [[a]]
+λ> permute [] = []
+λ> permute xs = [ x:ys | x <- xs, ys <- permute (delete x xs) ]
+```
+
+### Interleaving algorithm
+
+Another way to create permutations is to use interleaving.
+
+How does this work?\
+Let's find permutations of `[1, 2, 3]` and add a new element `4`.
+
+We can think of `[1, 2, 3, 4]` as inserting `4` at the front of each permutation of `[1, 2, 3]`.
+
+```hs
+4 : permute [1, 2, 3]
+```
+
+How can we insert `4` into all positions of `[1, 2, 3]`?\
+It can be `4123`, `1423`, `1243`, or `1234`.
+
+```
+4 1   2   3
+  1 4 2   3
+  1   2 4 3
+  1   2   3 4
+```
+
+> [!note]
+> This is called the "interleaving" technique.
