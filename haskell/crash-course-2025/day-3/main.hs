@@ -47,3 +47,8 @@ applyTo n f = f n
 
 applyTo5 :: (Int -> a) -> a
 applyTo5 = applyTo 5
+
+-- Manual implementation of map (from Day 2 exercise)
+map' :: (a -> b) -> [a] -> [b]
+map' _ []     = []
+map' f (x:xs) = f x : map f xs
