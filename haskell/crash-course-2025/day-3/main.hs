@@ -28,8 +28,8 @@ primeTo' n = sieve' [2..n]
 
 -- Permutation algorithms (from Day 2 exercises)
 permute :: Eq a => [a] -> [[a]]
-permute [] = []
-permute xs = [ x:ys | x <- xs, ys <- permute $ delete x xs ]
+permute [] = [[]]
+permute xs = [ x:ys | x <- xs, ys <- permute (delete x xs) ]
 
 -- Alternative permutation with interleaving
 permute' :: Eq a => [a] -> [[a]]
@@ -71,6 +71,16 @@ compress :: String -> String
 compress = concat . compressAll . group
   where
     compressAll  = map compressUnit
+    compressUnit s = head s : show (length s)
+
+compress' :: String -> String
+compress' str = concatMap compressUnit (group str)
+  where compressUnit s = head s : show (length s)
+
+compress'' :: String -> String
+compress'' = concat . compressAll . group
+  where
+    compressAll    = map compressUnit
     compressUnit s = head s : show (length s)
 
 -- Test data

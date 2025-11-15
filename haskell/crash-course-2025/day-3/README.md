@@ -420,7 +420,8 @@ Or we can use function composition `(.)` to chain functions.\
 λ> :{
 λ| compress'' = concat . compressAll . group
 λ|   where
-λ|     compressAll = map compressUnit
+λ|     compressAll    = map compressUnit
+λ|     compressUnit s = head s : show (length s)
 λ| :}
 λ> compress'' input
 "A7B5X5B7A6"
