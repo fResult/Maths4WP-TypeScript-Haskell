@@ -1,4 +1,4 @@
-import Data.List (delete, concatMap)
+import Data.List (delete, concatMap, group)
 
 -- Sorting algorithms
 qsort :: (Ord a) => [a] -> [a]
@@ -65,3 +65,16 @@ addPair = uncurry add
 
 add' :: Int -> Int -> Int
 add' = curry addPair
+
+-- String compression (from Day 2 exercise)
+compress :: String -> String
+compress = concat . compressAll . group
+  where
+    compressAll  = map compressUnit
+    compressUnit s = head s : show (length s)
+
+-- Test data
+input :: String
+input = "AAAAAAABBBBBXXXXXBBBBBBBAAAAAA"
+---- λ> compress input
+---- "A7B5X5B7A6"
