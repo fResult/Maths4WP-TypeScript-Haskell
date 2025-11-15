@@ -1,52 +1,154 @@
-# Day 2
+# Day 2 - FizzBuzz and Core Haskell Concepts
 
-## FizzBuzz with infinite lists
-
-We will make FizzBuzz in Haskell using functional programming.\
-For numbers from 1 to infinity:
-- Print "Fizz" when the number can be divided by 3
-- Print "Buzz" when the number can be divided by 5
-- Print "FizzBuzz" when the number can be divided by both 3 and 5
+This guide shows a fun way to make FizzBuzz in Haskell.
 
 > [!warning]
-> This is not the fastest way, but it shows another way to think in Functional Programming.
+> This is not the fastest way to make FizzBuzz.\
+> It just shows another way to think in Functional Programming
+
+## The FizzBuzz Challenge
+
+Here is our goal.\
+We want to print numbers from 1 to infinity.
+
+- If a number divides by 3, print "Fizz".
+- If a number divides by 5, print "Buzz".
+- If a number divides by 3 AND 5, print "FizzBuzz".
+- If none of those, just print the number.
 
 ### Building the Solution
 
-We build the answer step by step from smaller parts.
+We will build the answer in small steps.
 
-**Step 1: Make the pattern for Fizz**
+**Step 1: Make the 'Fizz' pattern.**
+
+We put "F" (Fizz) in every 3rd spot.
 
 ```
 Fizz     = _  _  F  _  _  F  _  _  F  _  _  F  _  _  F  ...
 ```
-**Every 3rd position** shows "F" (for Fizz), other positions are empty.
 
-**Step 2: Make the pattern for Buzz**
+**Step 2: Make the 'Buzz' pattern.**
+
+We put "B" (Buzz) in every 5th spot.
 
 ```
 Buzz     = _  _  _  _  B  _  _  _  _  B  _  _  _  _  B  ...
 ```
-**Every 5th position** shows "B" (for Buzz), other positions are empty.
 
 **Step 3: Put Fizz and Buzz together**
+
 ```
 FzBz     = _  _  F  _  B  F  _  _  F  B  _  F  _  _ FB  ...
 ```
-When we combine them, position 15 shows "FB" (FizzBuzz) because it's **both 3rd and 5th**.
+Look! Spot 15 gets "FB" (FizzBuzz).
 
-**Step 4: Mix with numbers to get the final result**
+**Step 4: Mix with numbers.**
+
+We replace the empty spots (`_`) with the real number.
+
 ```
 ns       = 1  2  3  4  5  6  7  8  9 10 11 12 13 14 15  ...
-         = 1  2  F  4  B  F  7  8  F  B 11  F 13 14 FB  ...
+Result   = 1  2  F  4  B  F  7  8  F  B 11  F 13 14 FB  ...
 ```
 Replace empty positions with actual numbers.
 
-### Implementation
+---
 
-#### Creating infinite lists
+## Basic Tools for the Job
 
-We will create infinite lists for Fizz and Buzz using `cycle`.
+### List Ranges (and Infinite Lists)
+
+Haskell is **lazy**.\
+This is a very important idea.\
+It means Haskell only does work when it needs to.
+
+If we make a list `[1..]`, it is an infinite list.\
+The computer does not crash.
+
+**Why?**\
+Because Haskell waits.\
+If we say `take 10 [1..]`, Haskell gets the first 10 items and then stops.\
+It is very efficient.
+
+```hs
+λ> [1..10]
+[1,2,3,4,5,6,7,8,9,10]
+
+λ> [1,3..20]
+[1,3,5,7,9,11,13,15,17,19]
+
+λ> [20,18..1]
+[20,18,16,14,12,10,8,6,4,2]
+
+λ> [1..]
+[1,2,3,4,5,6,7,8,9,10,11,12,... -- goes forever
+
+λ> take 10 [1..]
+[1,2,3,4,5,6,7,8,9,10]
+```
+
+### The `cycle` Function
+
+`cycle` makes an infinite list.\
+It repeats a small list forever.
+
+```hs
+λ> cycle [1,2,3]
+[1,2,3,1,2,3,1,2,3,...]
+```
+
+### The `show` function
+
+`show` is a helper function.\
+It turns a number into a string.\
+(A string is just text).
+
+
+```hs
+λ> show 10
+"10"
+```
+
+### The `map` Function
+
+`map` takes a function.\
+It applies that function to *every* item in a list.
+
+```hs
+λ> map show [1,2,3]
+["1","2","3"]
+```
+
+### The `zip` Function
+
+`zip` is like a zipper on a jacket. It joins two lists together, item by item. It makes a list of pairs (called tuples).
+
+```hs
+λ> zip [1,2,3] ['a','b','c']
+[(1,'a'),(2,'b'),(3,'c')]
+```
+
+### The `zipWith` Function
+
+`zipWith` is like `zip`, but smarter. You give it a function (like `+` or `max`). It uses that function to join the two lists.
+
+```hs
+λ> zipWith (+) [1,2,3] [4,5,6]
+[5,7,9]
+-- (1+4=5), (2+5=7), (3+6=9)
+```
+
+---
+
+## Assembling FizzBuzz
+
+Now let's use our tools to build the solution.
+
+### Step 1: Create infinite Fizz and Buzz lists
+
+We use `cycle` to make our repeating patterns.\
+`""` is just an empty string.
 
 ```hs
 λ> fizz = cycle ["", "", "Fizz"]
@@ -54,304 +156,173 @@ We will create infinite lists for Fizz and Buzz using `cycle`.
 λ> buzz = cycle ["", "", "", "", "Buzz"]
 ```
 
-#### Combining Fizz and Buzz
+### Step 2: Combine Fizz and Buzz patterns
 
-First, let's zip (connect) them together:
-
-```hs
-λ> zippedFizzBuzz = zip (take 30 fizz) (take 30 buzz)
-```
-
-Then we need a function to add pairs together:
-
-```hs
-λ> :{
-λ| addPair :: (String, String) -> String
-λ| addPair (a, b) = a ++ b
-λ> :}
-
-λ> map addPair zipped
-["","","Fizz","","Buzz","Fizz","","","Fizz","Buzz","","Fizz","","","FizzBuzz","","","Fizz","","Buzz","Fizz","","","Fizz","Buzz","","Fizz","","","FizzBuzz"]
-```
-
-**Simpler way, using `zipWith`**:
+We use `zipWith` to join `fizz` and `buzz`.\
+The function `(++)` joins two strings.
 
 ```hs
 λ> fzbz = zipWith (++) fizz buzz
-λ> take 30 fzbz
-["","","Fizz","","Buzz","Fizz","","","Fizz","Buzz","","Fizz","","","FizzBuzz","","","Fizz","","Buzz","Fizz","","","Fizz","Buzz","","Fizz","","","FizzBuzz"]
+
+λ> take 15 fzbz
+["","","Fizz","","Buzz","Fizz","","","Fizz","Buzz","","Fizz","","","FizzBuzz"]
 ```
 
-#### Combining Fizz, Buzz, and Numbers
+### Step 3: Create the infinite list of numbers (as strings)
 
-We need to turn numbers into strings so we can combine them with FizzBuzz text:
+We need a list of all numbers, but as strings.\
+We use `map` and `show` on our infinite list `[1..]`.
 
 ```hs
 λ> ns = map show [1..]
 
-λ> take 30 ns
-["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24","25","26","27","28","29","30"]
+λ> take 15 ns
+["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15"]
 ```
 
-**Combine with our FizzBuzz pattern**
+### Step 4: Combine patterns and numbers for the final result
+
+This is the magic step.\
+We use `zipWith` one last time with the `max` function.
 
 ```hs
-λ> fizzBuzz = zip ns fzbz
+λ> fizzBuzzResult = zipWith max fzbz ns
 
-λ> take 30 fizzBuzz
-[("1",""),("2",""),("3","Fizz"),("4",""),("5","Buzz"),("6","Fizz"),("7",""),("8",""),("9","Fizz"),("10","Buzz"),("11",""),("12","Fizz"),("13",""),("14",""),("15","FizzBuzz"),("16",""),("17",""),("18","Fizz"),("19",""),("20","Buzz"),("21","Fizz"),("22",""),("23",""),("24","Fizz"),("25","Buzz"),("26",""),("27","Fizz"),("28",""),("29",""),("30","FizzBuzz")]
-```
-
-**Method 1: Create a max function for pairs**
-
-```hs
-λ> :{
-λ| maxPair :: (Ord a) => (a, a) -> a
-λ| maxPair (x,y) = max x y
-λ| :}
-```
-
-**Use maxPair with map**
-
-```hs
-λ> take 30 $ map maxPair fizzBuzz
-["1","2","Fizz","4","Buzz","Fizz","7","8","Fizz","Buzz","11","Fizz","13","14","FizzBuzz","16","17","Fizz","19","Buzz","Fizz","22","23","Fizz","Buzz","26","Fizz","28","29","FizzBuzz"]
-```
-
-**Method 2: Use zipWith directly**
-
-Actually, we can make this even simpler:
-
-```hs
-λ> take 30 $ zipWith max fzbz ns
-["1","2","Fizz","4","Buzz","Fizz","7","8","Fizz","Buzz","11","Fizz","13","14","FizzBuzz","16","17","Fizz","19","Buzz","Fizz","22","23","Fizz","Buzz","26","Fizz","28","29","FizzBuzz"]
+λ> take 15 fizzBuzzResult
+["1","2","Fizz","4","Buzz","Fizz","7","8","Fizz","Buzz","11","Fizz","13","14","FizzBuzz"]
 ```
 
 > [!tip]
-> **Why `max` works?**\
-> In Haskell, strings are compared alphabetically:
+> **Why does `max` work?**\
+> `max` picks the "bigger" of two strings.\
+> Strings are sorted by alphabet.
 >
-> - Empty string `""` comes before any non-empty string
-> - So `max "" "1"` gives `"1"` (the number)
-> - And `max "" "Fizz"` gives `"Fizz"` (the FizzBuzz text)
-> - This automatically chooses the right thing for us!
+> - `max "" "1"` -> returns `"1"` (The number string is "bigger" than an empty string)
+> - `max "Fizz" "3"` -> returns `"Fizz"` ('F' comes *after* '3' in the alphabet, so "Fizz" is "bigger")
+> - `max "FizzBuzz" "15"` -> returns `"FizzBuzz"` ('F' comes *after* '1')
+>
+> This automatically picks the right word or number for us!
 
-## Concepts Used
+---
 
-### The `cycle` Function
+## The Theory (Why this is so cool)
 
-Create an infinite list by repeating a pattern forever.
+Why can we give functions like `(+)` or `max` to *other* functions?\
+This is because of two big ideas in Haskell.
+
+### Higher-Order Functions (HOFs)
+
+A **Higher-Order Function** (HOF) is a function that can:
+
+1. Take another function as an input.
+2. Return a function as an output.
+
+`map` and `zipWith` are HOFs.
+
+- We give `map` the `show` function.
+- We give `zipWith` the `(++)` or `max` function.
+
+This lets us build small tools (like `max`) and use them in bigger tools (like `zipWith`).
+
+#### Understanding the Type
+
+The "type" of `zipWith` looks scary, but it is simple.\
+`zipWith :: (a -> b -> c) -> [a] -> [b] -> [c]`
+
+Let's read this:
+
+- `(a -> b -> c)`: The first input is a function. This function must take two things (`a` and `b`) and give one thing back (`c`).
+- `[a]`: The second input is a list of type `a`.
+- `[b]`: The third input is a list of type `b`.
+- `[c]`: The final output is a list of type `c`.
+
+When we give `zipWith` the `(+)` function, we "fill in" the first part.\
+Haskell gives us back a *new* function.\
+`zipWith (+)` is a new function that is still waiting for two lists.
 
 ```hs
-λ> cycle [1,2,3]
-[1,2,3,1,2,3,1,2,3,...]
+λ> zipAndAdd = zipWith (+)
+λ> zipAndAdd [1,2,3] [10,20,30]
+[11,22,33]
 ```
 
-### The `zip` Function
+### Currying
 
-Think about zipping two lists together like a zipper on clothes.\
-Or buttoning two lists together like shirts.
+This idea has a name: **Currying**.\
+It is named after a smart man, Haskell Curry.\
+(Yes, like the language!)
 
-```hs
-λ> zip [1..10] ['a'..'j']
-[(1,'a'),(2,'b'),(3,'c'),(4,'d'),(5,'e'),(6,'f'),(7,'g'),(8,'h'),(9,'i'),(10,'j')]
-```
+**The Main Rule of Currying:** In Haskell, all functions *really* only take one input.
 
-### The `zipWith` Function
+"Wait," you say. "`add x y` looks like two inputs!"
 
-`zipWith` is like `zip`, but it combines the elements using a function you provide.
+Here is the secret: `add` takes one input, `x`.\
+It then *returns a new function*.\
+That new function then takes one input, `y`.
 
-```hs
-λ> zipWith (+) [1,2,3] [4,5,6]
-[5,7,9]
+`add 3 5` is really two steps:
 
-λ> zipWith (++) ["Hello ", "Good "] ["World", "Day"]
-["Hello World","Good Day"]
-```
+1. `(add 3)`: This runs first.\
+  It returns a *new function* that "adds 3 to anything".
+2. `5`: We give `5` to that new function.
+3. The result is `8`.
 
-### List Ranges
+This is why `zipWith (+)` works.\
+We give `zipWith` just *one* input: the `(+)` function.\
+`zipWith` returns a new function (`zipAndAdd`) that is waiting for the two lists.\
+This idea is extremely powerful.
 
-Create lists with a range of values.
+---
 
-```hs
-λ> [1..10]
-[1,2,3,4,5,6,7,8,9,10]
+## Other Cool Haskell Ideas
 
-λ> ['a'..'z']
-"abcdefghijklmnopqrstuvwxyz"
-
-λ> [1..]
-[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,... -- infinite list
-```
-
-With ranges, we can also specify steps:
-
-```hs
-λ> [1,3..20]
-[1,3,5,7,9,11,13,15,17,19]
-
-λ> [20,18..1]
-[20,18,16,14,12,10,8,6,4,2]
-
--- For infinite list with steps:
-λ> [2,4..]
-[2,4,6,8,10,12,14,16,18,...
-```
-
-But infinite, in Haskell, lists will not be evaluated until needed:
-
-```hs
-λ> ns = [1..]
-
-λ> ns
-[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,... -- infinite list
-
--- We can take the first 10 elements like this:
-```hs
-λ> take 10 ns
-[1,2,3,4,5,6,7,8,9,10]
-```
-
+Here are other useful ideas from the class.
 ### List Comprehensions
 
-A way to make new lists by describing what we want.
+This is a different way to make new lists.\
+It looks like math.
 
-Syntax:
-
-```hs
-[ expression | element <- list, condition ]
+```
+[ output | input <- list, condition ]
 ```
 
-It is read as: "Make a list of `expression` for each `element` which is a member of (`<-`/`∈`) `list` (set), where `condition` is true."
+**Example:** `[ x * 2 | x <- [1..10], even x ]`
 
-Basic example:
+**How to read this:**
 
-```hs
--- x is member of the set 1-10 where x is even, and we double it (see <1> below)
-λ> [ x * 2 | x <- [1..10], even x ]
-[4,8,12,16,20]
+- "Get `x * 2`..."
+- "...where `x` comes from the list `[1..10]`..."
+- "...and only if `even x` is true."
 
--- x is member of the set 1-100 where x squared is less than 50 (see <2> below)
-λ> [ x | x <- [1..100], x * x < 50 ]
-[1,1,2,3,4,5,6,7]
+The result is `[4,8,12,16,20]`.
 
--- x is member of the set 1-10 where x squared is less than 50, and we double it (see <3> below)
-λ> [x * 2 | x <- [1..10], x * x < 50]
-[2,4,6,8,10,12,14]
-
--- w is member of the words in the given string where length of w is at least 3 (see <4> below)
-```hs
-λ> [w | w <- words "this is a cat this is a bat that is a rat", length w >= 3]
-["this","cat","this","bat","that","rat"]
-```
-
-1) The *set* of `X` that `x` is member of `[1..10]` where x is even, and we double it can be expressed mathematically as:
-  $$X = \{ 2x \mid x \in \mathbb{N}, 1 \leq x \leq 10, x \mod 2 = 0 \}$$
-
-2) The *set* of `X` that x is member of [1..100] where x squared is less than 50 can be expressed mathematically as:
-  $$X = \{ x \mid x \in \mathbb{N}, 1 \leq x \leq 100, x^2 < 50 \}$$
-
-3) The *set* of `X` that x is member of [1..10] where x squared is less than 50, and we double it can be expressed mathematically as:
-  $$X = \{ 2x \mid x \in \mathbb{N}, 1 \leq x \leq 10, x^2 < 50 \}$$
-
-4) The *list* of `W` where `w` is a member of the words in the given string and the length of `w` is at least `3` can be expressed mathematically as:
-  $$
-  \begin{align}
-  W &= \langle w \mid w \in \text{Words}(\text{"this is a cat this is a bat that is a rat"}), |w| \geq 3 \rangle \\
-    &= \langle w \mid w \in \langle\text{``this"}, \text{``is"}, \text{``a"}, \text{``cat"}, \text{``this"}, \text{``is"}, \text{``a"}, \text{``bat"}, \text{``that"}, \text{``is"}, \text{``a"},  \text{``rat"}, \rangle|w| \geq 3 \rangle
-    &= \langle \text{``this"}, \text{``cat"}, \text{``this"}, \text{``bat"}, \text{``that"}, \text{``rat"} \rangle \\
-  \end{align}
-  $$
-
-### The `show` function
-
-Show function is a useful function to make everything (which is Show instance) to a string
-
-Why `show`, not `toString`?
-It doesn't make sense now, but it will make sense later.
-
-```hs
-λ> show 10
-"10"
-
-λ> show 23701
-"23701"
-```
-
-The type:
-
-```hs
-λ> :type show
-show :: Show a => a -> String
-```
-
-## Related and Another Concepts
-
-### Generator
-
-The syntax `[1..10]` creates a list from 1 to 10, and `['a'..'z']` creates a list from 'a' to 'z'.
-
-```hs
-λ> [1..10]
-[1,2,3,4,5,6,7,8,9,10]
-
-λ> ['a'..'z']
-"abcdefghijklmnopqrstuvwxyz"
-```
-
-Behind the scenes, it is implemented by `succ` (Successor) function to get the next item.
-
-```hs
-λ> succ 1
-2
-
-λ> succ 9999
-10000
-
-λ> succ 'a'
-'b'
-
-λ> succ 'z'
-'{'
-```
+---
 
 ### Infix Functions
 
-In Haskell, every operator is actually a function.\
-For example, `(+)` is a function that adds two numbers.
+An operator like `+` is just a function.\
+`2 + 3` is the "infix" way (in the middle).\
+`(+) 2 3` is the "prefix" way (at the front).\
+They do the same thing.
+
+You can make *any* function infix by using backticks (\`):\
+(The key near the `1` on our keyboard).
 
 ```hs
-λ> 2 + 3
-5
-```
+λ> delete 3 [1,2,3,4,5]
+[1,2,4,5]
 
-We can also use it in prefix form by enclosing it in parentheses:
-```hs
-λ> (+) 2 3
-5
-```
-
-**Why is this useful?**
-Because we can make them read more naturally by defining our own infix functions.
-
-```hs
-λ> import Data.List (delete)
-
-λ> :type delete
-delete :: Eq a => a -> [a] -> [a]
-
-λ> delete 3 [1..5]
+-- Same command, but "infix":
+λ> 3 `delete` [1,2,3,4,5]
 [1,2,4,5]
 ```
 
-We can use it as an infix operator by surrounding it with backticks:
+Sometimes, this makes your code easier to read.
 
-```hs
-λ> 3 `delete` [1..5]
-[1,2,4,5]
-```
+**More example:**
 
-**Making our own infix functions:**
+`flip` is a function that *flips* the order of inputs for another function.\
+Then, we can use it to make `delete` infix more easily.
 
 ```hs
 λ> import Data.Function (flip)
@@ -368,162 +339,55 @@ flip delete :: Eq a => [a] -> a -> [a]
 [1,2,4,5]
 ```
 
-> [!note]
-> "List of 1 to 5, without 3!"\
-> See how naturally it reads?
+Very easier to read, right?
 
-### The `map` Function
+---
 
-How to create a `map` function that applies a function to each element of a list?
+## Appendix
+
+### Generator (`succ`)
+
+The syntax `[1..10]` (from [List Ranges and Infinite Lists](#list-ranges-and-infinite-lists) section) creates a list from 1 to 10.\
+Behind the scenes, it is implemented by `succ` (Successor) function to get the next item.
 
 ```hs
--- From Pattern Matching
-λ> map' :: (a -> b) -> [a] -> [b]
-λ> map' _ []     = []
-λ> map' f (x:xs) = f x : map'' f xs
+λ> succ 1
+2
 
--- From List Comprehensions
-λ> map'' :: (a -> b) -> [a] -> [b]
-λ> map'' f xs = [ f x | x <- xs ]
-```
+λ> succ 9999
+10000
 
-Usage:
-```hs
-λ> :{
-λ| sqr :: Int -> Int -> Int
-λ| sqr x = x * x
-λ> :}
-
-λ> map' sqr [1..10]
-[1,4,9,16,25,36,49,64,81,100]
-
-λ> map'' sqr [1..10]
-[1,4,9,16,25,36,49,64,81,100]
-
--- Using built-in map
-```hs
-λ> import Data.List (map)
-λ> map sqr [1..10]
-[1,4,9,16,25,36,49,64,81,100]
+λ> succ 'a'
+'b'
 ```
 
 ### The `it` Variable
 
-In GHCi, we have useful variable `it` that holds the result of the last evaluated expression.
-It allows us to do trial and error.
-
-In GHCi, we have a special variable called `it`.\
-This variable saves the result of the last thing you typed.
-
-It helps us able to trial and error step-by-step.
+GHCi (the Haskell program) has a helper variable: `it`.\
+`it` always holds the result of the last thing you did.\
+This is great for testing step-by-step.
 
 ```hs
-λ> "this cat this bat this rat"
-"this cat this bat this rat"
+λ> "this is a test sentence"
+"this is a test sentence"
+
 λ> it
-"this cat this bat this rat"
+"this is a test sentence"
 
 λ> words it
-["this","cat","this","bat","this","rat"]
-
-λ> nub it
-["this","cat","bat","rat"]
+["this","is","a","test","sentence"]
 
 λ> length it
-4
+5
+```
 
--- First we use `words `it`, then `nub it`, then `length it`... This means `length` after `nub` after `words`
--- Now we know how to put these functions together: `length . nub . words`
+Then, we can compose these functions together:
+
+```hs
 λ> (length . nub . words) "this cat this rat this bat"
 4
 
 λ> countUniqueWords = length . nub . words
 λ> countUniqueWords "this cat this rat this bat"
+4
 ```
-
-### Higher-Order functions
-
-A high-order function is a function that can:
-
-- Take other functions as input
-- Return a new function as output
-
-Let's look at `zipWith` to understand this better.
-
-#### Using `zipWith`
-
-We can use `zipWith` to combine two lists using a function:
-
-```hs
-λ> zipWith (+) [1..10] [10,9..1]
-[11,11,11,11,11,11,11,11,11,11]
-```
-
-#### Understanding the Type
-
-```hs
-λ> :type zipWith
-zipWith :: (a -> b -> c) -> [a] -> [b] -> [c]
-```
-
-> [!note]
-> Breaking down the type of `zipWith`:
->
-> - `a -> b -> c` means: a function that takes `a` and `b`, returns `c`
-> - `[a] -> [b] -> [c]` means: takes list of `a`, then list of `b`, returns list of `c`
-> - Function arrows `->` are right-associative: `a -> b -> c` = `a -> (b -> c)`
-
-#### How zipWith Works with `+`
-
-First, let's see the type of `+`:
-
-```hs
-λ> :type (+)
-(+) :: Num a => a -> a -> a
-```
-
-When we give `+` to `zipWith`:
-
-```hs
-λ> :type zipWith (+)
-zipWith (+) :: Num c => [c] -> [c] -> [c]
-```
-
-This gives us a NEW function that adds two lists!
-
-#### Creating New Functions
-
-We can use the result of `zipWith (+)` directly:
-
-```hs
-λ> zipWith (+) [1..] [10,9..1]
-[11,11,11,11,11,11,11,11,11,11]
-```
-
-Or with parentheses (same thing):
-
-```hs
-λ> (zipWith (+)) [1..] [10,9..1]
-[11,11,11,11,11,11,11,11,11,11]
-```
-
-#### Naming Our New Function
-
-We can give this new function a name:
-
-```hs
-λ> zipAndAdd = zipWith (+)
-
-λ> zipAndAdd [1..] [10,9..1]
-[11,11,11,11,11,11,11,11,11,11]
-```
-
-Now `zipAndAdd` is a function that adds two lists element by element!
-
-#### Why This Matters
-
-This shows how high-order functions let us:
-
-- **Create new functions** from existing ones
-- **Reuse functions** in different ways
-- **Write less code** by combining functions
