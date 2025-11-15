@@ -40,3 +40,10 @@ permute' (x:xs) = concatMap (interleave x) (permute' xs)
 interleave :: a -> [a] -> [[a]]
 interleave x [] = [[x]]
 interleave x (y:ys) = (x:y:ys) : map (y:) (interleave x ys)
+
+-- Partial application examples (add to README?)
+applyTo :: a -> (a -> b) -> b
+applyTo n f = f n
+
+applyTo5 :: (Int -> a) -> a
+applyTo5 = applyTo 5
