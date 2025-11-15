@@ -52,3 +52,16 @@ applyTo5 = applyTo 5
 map' :: (a -> b) -> [a] -> [b]
 map' _ []     = []
 map' f (x:xs) = f x : map f xs
+
+-- Currying examples (from README)
+add5 :: Int -> Int
+add5 = add 5
+
+add :: Int -> Int -> Int
+add x y = x + y
+
+addPair :: (Int, Int) -> Int
+addPair = uncurry add
+
+add' :: Int -> Int -> Int
+add' = curry addPair
