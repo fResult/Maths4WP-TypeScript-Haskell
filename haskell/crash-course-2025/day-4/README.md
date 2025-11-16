@@ -51,8 +51,23 @@ It *works* (it runs and gives a result).
 This is the second, most important step.\
 We must check if our "Work" version is **logically correct**.
 
-What is the 100% correct definition of `isPrime`?\
-`isPrime n` is true *if and only if* its factors are `[1, n]`.\
+What does "Right" really mean?
+
+It means our code must match the "ideal" mathematical goal of a function, $f: A \to B$.
+
+Our goal is to make our code work for all possible inputs in set $A$.
+
+The math ideal is:
+
+$$(\forall a \in A) \to \exists f(a) \in B$$
+
+This means: "For **every** input `a` in the set of all inputs $A$, our function `f` **must** give a correct result `f(a)` that is in the set of outputs $B$."
+
+Now, let's apply this to our `isPrime` problem.
+
+What is the 100% correct definition (our ideal)?
+
+`isPrime n` is `True` if and only if its factors are `[1, n]`.
 
 Let's write that logic:
 
@@ -60,11 +75,17 @@ Let's write that logic:
 isPrime n = factors n == [1, n]
 ```
 
-Now, we check: Does our "Work" function (`factors`) make this logic correct?\
-Yes! Our simple `factors` function perfectly matches the mathematical definition.
+Now, we check: Does our "Work" function (factors) make this logic correct for all numbers in set $A$?\
+**Yes!** Our simple factors function perfectly matches this mathematical definition.
 
-So, in this lucky case, our "Work" version *is already* "Right".\
-(This is not always true! Sometimes our first "Work" version is logically wrong, like the "chiba" search example.)
+We must always try (drive for) this "for all" ($\forall$) goal.
+
+We can't always guarantee 100% coverage for every problem (especially complex problems, like the "chiba" search example, which are probabilistic).\
+The only way to be 100% sure is if we can prove our algorithm.
+
+But in this lucky, simple case, our logic is provable.
+
+So, our "Work" version is already "Right".
 
 #### 3. Make it Fast
 
