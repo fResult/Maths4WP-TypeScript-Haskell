@@ -32,4 +32,9 @@ instance Eq Boolean where
   No  == No  = True
   _ == _  = False
 
+instance Show Boolean where
+  show :: Boolean -> String
+  show Yes = "Yes"
+  show No  = "No"
+
 data Boolean' = Yes' | No' deriving (Eq)
