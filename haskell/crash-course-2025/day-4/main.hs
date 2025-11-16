@@ -22,3 +22,12 @@ m10    = m1 * 10
 m100   = m10 * 10
 m1000  = m100 * 10
 m10000 = m1000 * 10
+
+{-- Define Our Own Types --}
+data Boolean = Yes | No
+
+instance Eq Boolean where
+  (==) :: Boolean -> Boolean -> Bool
+  Yes == Yes = True
+  No  == No  = True
+  _ == _  = False
