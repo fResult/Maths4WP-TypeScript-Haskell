@@ -551,3 +551,101 @@ True
 λ> Yes' /= No'
 True
 ```
+
+### Next Step: `Ord` (Order)
+
+We fixed `Eq` (Equality) and `Show` (Printing).\
+But what if we want to `sort` our `Boolean` type?\
+We would need to add the `Ord` characteristic.
+
+How can we define Order (`Ord`)?\
+Let's see the `Ord` information:
+
+```hs
+λ> :info Ord
+type Ord :: * -> Constraint
+class Eq a => Ord a where
+  compare :: a -> a -> Ordering
+  (<) :: a -> a -> Bool
+  (<=) :: a -> a -> Bool
+  (>) :: a -> a -> Bool
+  (>=) :: a -> a -> Bool
+  max :: a -> a -> a
+  min :: a -> a -> a
+  {-# MINIMAL compare | (<=) #-}
+```
+
+This looks like a lot of functions.\
+But, just like `Eq`, we can look at the `MINIMAL` tag.\
+It says we only need to write **one** function: either `compare` or `<=`.\
+If we write one of them, the compiler will automatically write all the others (`<`, `>`, `max`, `min`, etc.) for us.
+
+Now, does it make sense to `sort` our `Boolean` type?\
+Is `Yes` greater than `No`?
+Maybe, but it's not a great example.\
+Let's use a new type where order is very clear: days of the week.
+
+We will call it `Day`, and we'll `derive` `Eq` and `Show` like we learned.
+
+```hs
+λ> :{
+λ| data Day = Mon | Tue | Wed | Thu | Fri | Sat | Sun
+λ|   deriving (Eq, Show)
+λ| :}
+```
+
+We can print it and check its type:
+
+```hs
+λ> Mon
+Mon
+λ> :type Mon
+Mon :: Day
+```
+
+Now, let's try to `sort` a list of days.
+
+```hs
+λ> days = [Mon, Wed, Tue, Fri, Thu]
+λ> sort days
+<interactive>:583:1: error: [GHC-39999]
+    • No instance for 'Ord Day'
+    ...
+```
+
+As we expected, it fails!\
+The `Day` type doesn't have the `Ord` (Order) characteristic yet.
+
+We *could* write the `instance` by hand.\
+But we would have to tell Haskell that `Mon <= Tue`, `Mon <= Wed`, `Mon <= Thu`, `Tue <= Wed`, `Tue <= Thu`...\
+That is a *lot* of work, even for only 7 values!\
+I bet you don't wanna imagine to a ton of possible values, or even infinite values, right!?
+
+Fortunately, Haskell knows how to `derive` `Ord` for us.\
+It will use the order that we wrote in the `data` definition (`Mon`, then `Tue`, then `Wed`...).
+
+```hs
+λ> :{
+λ| data Day = Mon | Tue | Wed | Thu | Fri | Sat | Sun
+λ|   deriving (Eq, Ord, Show)
+λ| :}
+```
+
+We just added `Ord` to the `deriving` list.\
+Now, let's try to sort again.
+
+```hs
+λ> days = [Mon, Wed, Tue, Fri, Thu]
+
+λ> sort days
+[Mon,Tue,Wed,Thu,Fri]
+```
+
+It works perfectly!
+
+> [!warning]
+> The compiler can write `deriving` code for us, but it's not magic.\
+> This only works for simple types.\
+> It doesn't mean the compiler can do this for *every* situation.
+
+We will learn more about those other cases soon.
