@@ -38,3 +38,8 @@ instance Show Boolean where
   show No  = "No"
 
 data Boolean' = Yes' | No' deriving (Eq, Show)
+
+not' :: Boolean -> Boolean
+not' Yes = No
+not' No  = Yes
+
