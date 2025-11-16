@@ -161,8 +161,10 @@ Just 22.67s for 10 trillion!\
 That's a huge improvement from 4 minutes for 1 billion.\
 We have successfully made it fast!
 
+### Our Final `isPrime` Function
 
-Right now, we have a factors' function for prime number checking that we can be satisfied with.
+Now we have a helper function, `factors'`, that is both **Right** and **Fast**.\
+We can finally build our `isPrime` function and trust it.
 
 ```hs
 λ> factors' 17
@@ -172,7 +174,7 @@ Right now, we have a factors' function for prime number checking that we can be 
 We can see that 17 has only two factors: 1 and 17 itself.\
 Thus, 17 is a prime number.
 
-Let's say we will have very stupid prime number checker:
+Let's build our prime number checker:
 
 ```hs
 λ> isPrime :: Int -> Bool
@@ -181,3 +183,22 @@ Let's say we will have very stupid prime number checker:
 λ> isPrime 17
 True
 ```
+### Why is this "Stupid"? (A Final Thought)
+
+We call this function "stupid" (or "inefficient") for one reason:
+
+> [!important]
+> **It does too much work.**
+
+Our goal is just a `True` or `False` answer.\
+But our isPrime function asks `factors'` to build a complete list of all factors first.
+
+- To check `isPrime 100`, our code first builds the *full list*: `[1, 2, 4, 5, 10, 20, 25, 50, 100]`
+- *Then*, it checks if that list equals `[1, 100]` (it doesn't)
+
+This is wasted work!\
+A *truly* smart `isPrime` function would **stop** (or "short-circuit") the moment it finds the first factor, `2`.\
+It would return `False` right away and not bother finding `4, 5, 10, 20...` etc.
+
+But for our crash course, our version is good enough.\
+It clearly follows our "Work $\to$ Right $\to$ Fast" logic.
