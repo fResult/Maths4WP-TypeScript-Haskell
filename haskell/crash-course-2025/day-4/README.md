@@ -223,3 +223,307 @@ It would return `False` right away and not bother finding `4, 5, 10, 20...` etc.
 
 But for our crash course, our version is good enough.\
 It clearly follows our "Work $\to$ Right $\to$ Fast" logic.
+
+---
+
+## There is No Function without a Set
+
+We learned before that a function maps from one set $A$ to another set $B$.
+
+$$f: A \to B$$
+
+Haskell gives us many built-in sets (Types) like `Bool`, `Int`, and `Char`.
+
+But what if we want a more complex set, like `Color`, `Customer`, or `Order`?
+
+If we say **"a Type is a Set"**, then we must be able to define new types.
+
+Let's start with the easiest one.\
+We will make our own `Boolean` type.
+
+### Create Our Own Type
+
+Haskell has `Bool` (with `True`/`False`).\
+We will make `Boolean` (with `Yes`/`No`) for learning.
+
+```hs
+λ> data Boolean = No | Yes
+```
+
+We just created a new type (a new set).
+
+### Inspecting Our New Type
+
+Let's ask Haskell about our new type using `:info`.
+
+```hs
+λ> :info Boolean
+type Boolean :: *
+data Boolean = No | Yes
+```
+
+**What is that `*`?**
+
+`*` is called a "Kind".\
+It means this is a **concrete type**.\
+A concrete type is a type that holds real values.
+
+- `Int` is a concrete type.
+- `Char` is a concrete type.
+- `Boolean` is a concrete type.
+
+Now look at a List type:
+
+```hs
+λ> :kind []
+[] :: * -> *
+```
+
+This is **not** a concrete type.\
+It means "I need one concrete type (`*`) to *give you* a concrete type (`*`)."\
+It's like a machine waiting for parts.
+
+```hs
+λ> :kind [String]
+[String] :: *
+```
+
+Now it's a concrete type (a list of strings).
+
+`Maybe` (Optional) is the same:
+
+```hs
+λ> :kind Maybe
+Maybe :: * -> *
+λ> :kind Maybe Int
+Maybe Int :: *
+```
+
+What about `Either`?
+
+```hs
+λ> :kind Either
+Either :: * -> * -> *
+```
+
+This machine needs *two* concrete types (e.g., one for an error, one for a result) to give us *one* final concrete type.
+
+### Our New Type Fails: The "Show" Error
+
+Let's try to *use* our new `Boolean` type.
+
+```hs
+λ> No
+<interactive>:477:1: error: [GHC-39999]
+    • No instance for ‘Show Boolean’ arising from a use of ‘print’
+    ...
+```
+
+It fails! Why?\
+Haskell doesn't know how to **show** (print) our `Boolean` as a string.\
+It says: "I have `No instance for 'Show'`."
+
+But the compiler _does_ know the type:
+
+```hs
+λ> :type No
+No :: Boolean
+
+λ> bool = No
+-- No error
+```
+
+The problem is not the type.\
+The problem is **printing**.\
+The `print` function needs its input to have the `Show` characteristic.
+
+```hs
+λ> :type print
+print :: Show a => a -> IO ()
+```
+
+Our `Boolean` does not have this `Show` ability yet.
+
+### Our New Type Fails: The "Eq" Error
+
+Let's try to compare our new values.
+
+```hs
+λ> No == No
+<interactive>:75:4: error: [GHC-39999]
+    • No instance for ‘Eq Boolean’ arising from a use of ‘==’
+    ...
+```
+
+It fails again!\
+Haskell says: "I have `No instance for 'Eq'`.\
+`Eq` (Equality) is the "characteristic" of being comparable.\
+Our `Boolean` doesn't have this ability either.
+
+### Typeclasses: A "Characteristic" is a Rule
+
+This brings us to the most important idea in Haskell: **Typeclasses**.
+
+A Typeclass is **a rule that a type must follow.**\
+It asks: "Does this type have a certain ability? Yes or No?"
+
+Let's use our teacher's `sort` example.\
+We have a function $sort :: [A] \to [A]$.\
+Is this definition correct?
+
+> **NO!**
+
+Why?\
+Because the set `A` is too *general*.\
+We can't sort everything in the real world:
+
+```hs
+[Flower, Door, Jug, Soil, Sand, Big Tree]
+```
+
+In Haskell, we cannot sort a list of functions:
+
+```hs
+[isAlpha, isDigit, isSpace]
+```
+
+This means our math rule is **wrong**:
+
+$$sort: \forall l \in [A] \to [A]$$
+
+This is NOT true "for all" `A`.
+
+We need a *constraint*.\
+`A` must have the characteristic of **Order**.
+
+The correct type for `sort` is:
+
+$$sort: \text{Ord }A \implies [A] \to [A]$$
+
+
+> [!note]
+> This reads: "If type A has the Ord characteristic, then sort can turn a `[A]` into a `[A]`."
+
+The same is true for `unique` (in Haskell, `nub`).\
+`nub` doesn't need "Order" (it doesn't care if `A < B`).\
+It only needs "Equality" (does A == B?).
+
+$$unique: \text{Eq }A \implies [A] \to [A]$$
+
+That is why we see these types in GHCi:
+
+```hs
+λ> :type sort
+sort :: Ord a => [a] -> [a]
+
+λ> :type nub
+nub :: Eq a => [a] -> [a]
+```
+
+#### Why we can't compare functions
+
+Why can't our list of functions `[isAlpha, isDigit, isSpace]` have Eq?\
+To know if two functions $f$ and $f'$ are equal, we must prove:
+
+$$f = f' \implies \forall x, f(x) = f'(x)$$
+
+This means we must test **every possible input `x`** (which could be infinite!).\
+We saw how long it took to test 1 billion numbers for `factors`.\
+It is impossible to test an infinite set.\
+That is why, in a computer, functions cannot have an `Eq` characteristic.
+
+> [!tip]
+> (When we talk about this, we must shift our mindset from the "value-level" to the "type-level".)
+
+#### `Eq` is the Foundation for `Ord`
+
+`Eq` and `Ord` are related.
+- `Eq` (Equality) just has one job: `==`
+- `Ord` (Order) has jobs like `<` or `<=`
+
+But think about this: $A \le B$ is just $(A < B) \lor (A = B)$.\
+The $=$ is a sub-problem of $\le$.\
+This means "Equality" is a foundation for "Order".\
+A type that can be Ordered must *first* be able to be Equaled.\
+The Eq set is a "superset" of the Ord set.
+
+### The Solution: Fixing Our `Boolean` Type
+
+Now we know *why* our `Boolean` failed.\
+It needs `Show` and `Eq`.\
+Let's give them to it.
+
+#### Method 1: The Hard Way (Manual Instance)
+
+We can "prove" to Haskell that `Boolean` follows the rules.
+
+**1. Fixing `Eq`:** The `Eq` type class requires a function `==` or `/=`.\
+We will write `==`.
+
+```
+λ> :{
+λ| instance Eq Boolean where
+λ|   (==) :: Boolean -> Boolean -> Bool
+λ|   Yes == Yes = True
+λ|   No  == No  = True
+λ|   _   == _   = False
+λ| :}
+```
+
+Now, it works!
+
+```
+λ> No == No
+True
+
+λ> No /= Yes
+True
+```
+
+**2. Fixing `Show`:** The `Show` type class requires a function `show`.
+
+```
+λ> :{
+λ| instance Show Boolean where
+λ|   show :: Boolean -> String
+λ|   show Yes = "Yes"
+λ|   show No  = "No"
+λ| :}
+```
+
+Now, it prints!
+
+```hs
+λ> Yes
+Yes
+
+λ> No
+No
+```
+
+#### Method 2: The Easy Way (`deriving`)
+
+That was a lot of work.\
+For simple types like `Eq` and `Show`, we can just ask the compiler to write that code for us using `deriving`.
+
+```hs
+λ> data Boolean' = Yes' | No' deriving (Eq, Show)
+```
+
+That's it!\
+Just one line.\
+Now, it works perfectly.
+
+```hs
+λ> Yes'
+Yes'
+
+λ> No'
+No'
+
+λ> Yes' == Yes'
+True
+
+λ> Yes' /= No'
+True
+```
