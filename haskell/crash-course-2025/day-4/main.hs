@@ -31,3 +31,5 @@ instance Eq Boolean where
   Yes == Yes = True
   No  == No  = True
   _ == _  = False
+
+data Boolean' = Yes' | No' deriving (Eq)
