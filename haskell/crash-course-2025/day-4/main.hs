@@ -1,0 +1,24 @@
+import Data.List (sort)
+
+factors :: Int -> [Int]
+factors n = [ i | i <- [1..n], n `mod` i == 0 ]
+
+factors' :: Int -> [Int]
+factors' n =  sort (mods ++ divs)
+  where
+    mods = [ i | i <- [1..(floor . sqrt . fromIntegral) n], n `mod` i == 0 ]
+    divs = [ d | i <- mods, let d = n `div` i, i /= d ]
+
+-- Very stupid prime number checker
+isPrime :: Int -> Bool
+isPrime n = factors' n == [1, n]
+
+
+-- Test data
+-- To have profiler, use `:set +s` in GHCi
+m1, m10, m100, m1000, m10000 :: Int
+m1     = 1_000_000
+m10    = m1 * 10
+m100   = m10 * 10
+m1000  = m100 * 10
+m10000 = m1000 * 10
