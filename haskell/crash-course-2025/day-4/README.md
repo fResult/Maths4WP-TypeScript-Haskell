@@ -360,11 +360,34 @@ Haskell says: "I have `No instance for 'Eq'`.\
 `Eq` (Equality) is the "characteristic" of being comparable.\
 Our `Boolean` doesn't have this ability either.
 
-### Typeclasses: A "Characteristic" is a Rule
+Let's ask Haskell *what* the `Eq` rule is:
 
-This brings us to the most important idea in Haskell: **Typeclasses**.
+```hs
+λ> :info Eq
+type Eq :: * -> Constraint
+class Eq a where
+  (==) :: a -> a -> Bool
+  (/=) :: a -> a -> Bool
+  {-# MINIMAL (==) | (/=) #-}
+```
 
-A Typeclass is **a rule that a type must follow.**\
+This tells us everything we need to know:
+
+- `class Eq a where`: This defines the "Equality" rule
+- It has two functions: `==` (equals) and `/=` (not equals)
+- `{-# MINIMAL (==) | (/=) #-}`: This is the important part.\
+  It means, "To follow this rule, you **must** implement *at least one* of these functions (either `==` or `/=`)"
+
+If you write `==`, the compiler will automatically write `/=` for you.\
+If you write `/=`, the compiler will write `==` for you.
+
+Our `Boolean` type doesn't follow this rule yet, so Haskell doesn't know how to compare `No == No`.
+
+### Type Classes: A "Characteristic" is a Rule
+
+This brings us to the most important idea in Haskell: **Type Classes**.
+
+A Type Class is **a rule that a type must follow.**\
 It asks: "Does this type have a certain ability? Yes or No?"
 
 Let's use our teacher's `sort` example.\
@@ -438,6 +461,7 @@ That is why, in a computer, functions cannot have an `Eq` characteristic.
 #### `Eq` is the Foundation for `Ord`
 
 `Eq` and `Ord` are related.
+
 - `Eq` (Equality) just has one job: `==`
 - `Ord` (Order) has jobs like `<` or `<=`
 
