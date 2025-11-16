@@ -37,4 +37,4 @@ instance Show Boolean where
   show Yes = "Yes"
   show No  = "No"
 
-data Boolean' = Yes' | No' deriving (Eq)
+data Boolean' = Yes' | No' deriving (Eq, Show)
