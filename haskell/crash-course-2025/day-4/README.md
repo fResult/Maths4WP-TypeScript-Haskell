@@ -552,7 +552,7 @@ True
 True
 ```
 
-### Next Step: `Ord` (Order)
+### The `Ord` (Order) Type Class
 
 We fixed `Eq` (Equality) and `Show` (Printing).\
 But what if we want to `sort` our `Boolean` type?\
@@ -649,3 +649,86 @@ It works perfectly!
 > It doesn't mean the compiler can do this for *every* situation.
 
 We will learn more about those other cases soon.
+
+## Creating Our Own Type Classes
+
+We know about built-in Type Classes like `Show`, `Eq`, and `Ord`.\
+But what if we want to define our *own* characteristic?
+
+Let's start with some shapes.
+
+### 1. Defining `Circle` and `Square`
+
+We can define a `Circle` that holds a radius (`Float`).\
+And a `Square` that holds a side length (`Float`).
+
+```hs
+λ> newtype Circle = Circle Float deriving (Eq, Show)
+λ> newtype Square = Square Float deriving (Eq, Show)
+```
+
+We can create them easily:
+
+```hs
+λ> c = Circle 10.0
+λ> s = Square 10.0
+```
+
+### 2. The Problem: Name Collision
+
+We want to calculate the **area** for both shapes.\
+Let's try to write an `area` function for each.
+
+```hs
+-- This will FAIL!
+area :: Circle -> Float
+area (Circle r) = pi * r * r
+
+area :: Square -> Float
+area (Square s) = s * s
+```
+
+**Error!** Haskell says:\
+"Multiple declarations of 'area'".\
+We cannot have two functions with the same name.\
+Haskell does not support "Function Overloading" like Java or C++.
+
+### 3. The Solution: Make a Type Class
+
+Instead of overloading, we define a **Generic Type**.\
+We create a new "characteristic" called `HasArea`.
+
+```hs
+λ> :{
+λ| class HasArea a where
+λ|   area :: a -> Float
+λ| :}
+```
+
+This reads: "A type `a` has the `HasArea` characteristic *if* it has a function `area` that turns `a` into a `Float`."
+
+Now we can implement this rule for our shapes:
+
+```hs
+λ> :{
+λ| instance HasArea Circle where
+λ|   area (Circle r) = pi * r * r
+λ|
+λ| instance HasArea Square where
+λ|   area (Square s) = s * s
+λ| :}
+```
+
+Now, we can use `area` on both types!
+
+```hs
+λ> area (Circle 10)
+314.15927
+
+λ> area (Square 10)
+100.0
+```
+
+This is the power of Type Classes.\
+We can use the same function name (`area`) for different types, as long as they share the same characteristic (`HasArea`).
+
