@@ -48,3 +48,8 @@ data Day = Mon | Tue | Wed | Thu | Fri | Sat | Sun
 -- It is able to sort:
 ---- λ> sort [Mon, Wed, Tue, Fri, Thu]
 ---- [Mon,Tue,Wed,Thu,Fri]
+
+{-- More Complex Type --}
+newtype Circle = Circle Float deriving (Eq, Show)
+
+newtype Square = Square Float deriving (Eq, Show)
