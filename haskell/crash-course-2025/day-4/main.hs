@@ -43,3 +43,8 @@ not' :: Boolean -> Boolean
 not' Yes = No
 not' No  = Yes
 
+data Day = Mon | Tue | Wed | Thu | Fri | Sat | Sun
+  deriving (Eq, Ord, Show)
+-- It is able to sort:
+---- λ> sort [Mon, Wed, Tue, Fri, Thu]
+---- [Mon,Tue,Wed,Thu,Fri]
