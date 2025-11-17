@@ -732,3 +732,104 @@ Now, we can use `area` on both types!
 This is the power of Type Classes.\
 We can use the same function name (`area`) for different types, as long as they share the same characteristic (`HasArea`).
 
+## Making Data Clearer: Record Syntax
+
+Let's look at another problem with complex data types.
+
+### The Mystery Data Problem
+
+Imagine we have an API Endpoint type with 2 strings.
+
+```hs
+data ApiEndpoint = ApiEndpoint String String deriving (Show)
+```
+
+When we use it:
+
+```hs
+ApiEndpoint "https://base-api.com" "/api/v1/users"
+-- or --
+ApiEndpoint "GET" "api/v1/users"
+```
+
+Which string is which?\
+Is the first one the Method or the URL?\
+It is hard to know.
+
+It gets worse with more fields.\
+Imagine a `Score` type:
+
+```hs
+data Score = Score Int Int [Int] [Int] deriving (Show)
+```
+
+If we see: `Score 78 81 [10, 20] [5, 5]`.
+
+- What is 78? (Midterm?)
+- What is 81? (Final?)
+- What are the lists? (Homeworks? Projects?)
+
+We can't guess.\
+This is confusing.
+
+### Solution 1: Accessor Functions
+
+The way to be able to let us know is creating accessor functions to extract them:
+
+```hs
+λ> :{
+λ| midterm :: Score -> Int
+λ| midterm (Score m _ _ _) = m
+λ|
+λ| final :: Score -> Int
+λ| final (Score _ f _ _) = f
+λ|
+λ| projects :: Score -> [Int]
+λ| projects (Score _ _ ps _) = ps
+λ|
+λ| homeworks :: Score -> [Int]
+λ| homeworks (Score _ _ _ hs) = hs
+λ| :}
+```
+
+But this way is very exhausted.\
+Let’s see another solution.
+
+### Solution 2: Record Syntax
+
+Haskell has a feature called **Record Syntax**.\
+It lets us name each field.
+
+Haskell
+
+```
+λ> :{
+λ| data Score = Score
+λ|   { midterm   :: Int
+λ|   , final     :: Int
+λ|   , projects  :: [Int]
+λ|   , homeworks :: [Int]
+λ|   } deriving (Show)
+λ| :}
+```
+
+Now, when we print it, we see the names!
+
+```hs
+λ> Score 78 81 [10, 20] [5, 5]
+Score {midterm = 78, final = 81, projects = [10,20], homeworks = [5,5]}
+```
+
+And the best part? Haskell automatically creates **accessor functions** for us.
+
+```hs
+λ> score = Score 78 81 [10, 20] [5, 5]
+
+λ> midterm score
+78
+
+λ> homeworks score
+[5,5]
+```
+
+This makes our code much easier to read and use.
