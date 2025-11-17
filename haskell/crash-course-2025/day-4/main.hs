@@ -63,3 +63,14 @@ instance HasArea Circle where
 instance HasArea Square where
   area :: Square -> Float
   area (Square s) = s * s
+
+class HasPerimeter a where
+  perimeter :: a -> Float
+
+instance HasPerimeter Circle where
+  perimeter :: Circle -> Float
+  perimeter (Circle r) = pi * r * 2
+
+instance HasPerimeter Square where
+  perimeter :: Square -> Float
+  perimeter (Square s) = s * 4
