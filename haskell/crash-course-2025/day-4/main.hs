@@ -51,5 +51,15 @@ data Day = Mon | Tue | Wed | Thu | Fri | Sat | Sun
 
 {-- More Complex Type --}
 newtype Circle = Circle Float deriving (Eq, Show)
-
 newtype Square = Square Float deriving (Eq, Show)
+
+class HasArea a where
+  area :: a -> Float
+
+instance HasArea Circle where
+  area :: Circle -> Float
+  area (Circle r) = pi * r * r
+
+instance HasArea Square where
+  area :: Square -> Float
+  area (Square s) = s * s
