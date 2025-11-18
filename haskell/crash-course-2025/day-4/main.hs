@@ -95,3 +95,25 @@ data Nat = Zero | Succ Nat deriving (Eq, Ord, Show)
 add :: Nat -> Nat -> Nat
 m `add` Zero = m
 m `add` (Succ n) = Succ (m `add` n)
+
+data List a = EmptyList | Cons a (List a)
+  deriving (Eq, Show)
+
+instance Functor List where
+  fmap :: (a -> b) -> List a -> List b
+  fmap _ EmptyList   = EmptyList
+  fmap f (Cons x xs) = Cons (f x) (fmap f xs)
+
+double :: Int -> Int
+double = (*2)
+
+mapDouble :: Functor f => f Int -> f Int
+mapDouble = fmap double
+-- λ> mapDouble [1..10]
+-- [2,4,6,8,10,12,14,16,18,20]
+-- λ> mapDouble (Just 10)
+-- Just 20
+-- λ> mapDouble (Right 10)
+-- Right 20
+-- λ> mapDouble $ Cons 100 (Cons 20 (Cons 18 (Cons 17 EmptyList)))
+-- Cons 200 (Cons 40 (Cons 36 (Cons 34 EmptyList)))
