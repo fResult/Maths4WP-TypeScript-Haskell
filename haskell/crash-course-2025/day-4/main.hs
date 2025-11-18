@@ -130,6 +130,12 @@ instance Functor Stack where
   fmap f (Stack (x:xs)) = pushStack (f x) (Stack (fmap f xs))
   -- fmap f (Stack xs) = Stack (fmap f xs)
 
+stackMap :: (a -> b) -> Stack a -> Stack b
+stackMap _ (Stack []) = Stack []
+stackMap f (Stack (x:xs)) = Stack (f x : rest)
+  where
+    Stack rest = stackMap f (Stack xs)
+
 data Optional a = None | Some a deriving (Eq, Show, Functor)
 -- λ> mapDouble $ Some 12
 -- Some 24
