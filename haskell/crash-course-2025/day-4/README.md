@@ -1,4 +1,4 @@
-# Day 4
+# Day 4 - Type Classes, Functors, and Recursive Structures
 
 ## Is Prime Number?
 
@@ -650,6 +650,8 @@ It works perfectly!
 
 We will learn more about those other cases soon.
 
+---
+
 ## Creating Our Own Type Classes
 
 We know about built-in Type Classes like `Show`, `Eq`, and `Ord`.\
@@ -731,6 +733,8 @@ Now, we can use `area` on both types!
 
 This is the power of Type Classes.\
 We can use the same function name (`area`) for different types, as long as they share the same characteristic (`HasArea`).
+
+---
 
 ## Making Data Clearer: Record Syntax
 
@@ -833,3 +837,121 @@ And the best part? Haskell automatically creates **accessor functions** for us.
 ```
 
 This makes our code much easier to read and use.
+
+---
+
+## Recursive Type: Functor and The Generalized Container
+
+### 1. Building Natural Numbers (`Nat`)
+
+We can build natural numbers using two parts:
+
+- **`Zero`**: The number 0.
+- **`Succ Nat`**: The successor (next number) of another `Nat`.
+
+```hs
+data Nat = Zero | Succ Nat deriving (Eq, Ord, Show)
+```
+
+| **`Nat` Value**    | **Means** |
+| ------------------ |:---------:|
+| `Zero`             | 0         |
+| `Succ Zero`        | 1         |
+| `Succ (Succ Zero)` | 2         |
+
+We must write our own math functions like `add` because Haskell cannot automatically give the `Num` (Number) ability to our custom `Nat` type.
+
+```hs
+λ> :{
+λ| add :: Nat -> Nat -> Nat
+λ| m `add` Zero = m
+λ| m `add` (Succ n) = Succ (m `add` n)
+λ| :}
+```
+
+This way, we prove how addition works for our new type.
+
+### 2. Building Our Own List (`List a`)
+
+The built-in list (`[a]`) is also a recursive type.\
+We can make our own version:
+
+```hs
+data List a = EmptyList | Cons a (List a)
+```
+
+- **`EmptyList`**: The list is empty (`[]`)
+- **`Cons a (List a)`**: Put a value `a` at the front, attached to the rest of the list (`List a`)
+
+`Cons` is just like the `(:)` operator used to connect elements in Haskell's built-in lists.
+
+---
+
+## The Power of Functors
+
+We often want to **change the values** inside a structure (like a list) without changing the structure itself.\
+For a list, we use `map`.
+
+But `map` only works for the built-in list type (`[a]`).
+
+### What is a Functor?
+
+A **Functor** is a **Type Class** (a set of rules) that describes any structure that can be **"mapped over"**.\
+It is a way to generalize the `map` function.
+
+- The key function is **`fmap`**.
+
+```hs
+λ> :type fmap
+fmap :: Functor f => (a -> b) -> f a -> f b
+```
+
+This means: If you have a function that changes `a` to `b` (`a -> b`), `fmap` can use it to change an entire **Functor of `a`** (`f a`) into a **Functor of `b`** (`f b`).
+
+It works for:
+
+- Built-in Lists (`[]`)
+- Optional values (`Maybe`)
+- Our own `List a`
+- And many other types!
+
+### Implementing Functor for Our `List`
+
+To let `fmap` work on our custom `List a`, we must tell Haskell how to do it:
+
+```hs
+λ> :{
+λ| instance Functor List where
+λ|   fmap _ EmptyList   = EmptyList
+λ|   fmap f (Cons x xs) = Cons (f x) (fmap f xs)
+λ| :}
+```
+
+1. If the list is `EmptyList`, the result is `EmptyList`
+2. If it's `Cons x xs`, apply the function `f` to the first item (`x`), then call `fmap` on the rest of the list (`xs`)
+
+Now, we can use `fmap` to double the numbers in our custom list:
+
+```hs
+λ> fmap (*2) (Cons 100 (Cons 20 EmptyList))
+Cons 200 (Cons 40 EmptyList)
+```
+
+### Functors are General
+
+The best part is that once you define a function using `fmap`, it works on **any Functor**:
+
+```hs
+λ> mapDouble = fmap (*2)
+
+λ> mapDouble [1..5]     -- Built-in List
+[2,4,6,8,10]
+
+λ> mapDouble (Just 10)  -- Maybe (Optional)
+Just 20
+
+λ> mapDouble $ Cons 10 (Cons 20 EmptyList) -- Our custom List
+Cons 20 (Cons 40 EmptyList)
+```
+
+For simple types like `Optional a`, the compiler can even write the `fmap` code for you using `deriving Functor`.
