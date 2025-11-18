@@ -74,3 +74,18 @@ instance HasPerimeter Circle where
 instance HasPerimeter Square where
   perimeter :: Square -> Float
   perimeter (Square s) = s * 4
+
+radius :: Circle -> Float
+radius (Circle r) = r
+
+
+side :: Square -> Float
+side (Square s) = s
+
+data Score = Score
+  { midterm :: Int
+  , final :: Int
+  , projects :: [Int]
+  , homeworks :: [Int]
+  }
+  deriving (Show, Eq)
