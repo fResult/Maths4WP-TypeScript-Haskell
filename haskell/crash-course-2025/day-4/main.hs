@@ -89,3 +89,9 @@ data Score = Score
   , homeworks :: [Int]
   }
   deriving (Show, Eq)
+
+data Nat = Zero | Succ Nat deriving (Eq, Ord, Show)
+
+add :: Nat -> Nat -> Nat
+m `add` Zero = m
+m `add` (Succ n) = Succ (m `add` n)
