@@ -120,9 +120,25 @@ mapDouble = fmap double
 
 newtype Stack a = Stack [a] deriving (Eq, Show)
 
+mkStack :: a -> Stack a
+mkStack x = Stack [x]
+
+emptyStack :: Stack a
+emptyStack = Stack []
+
+pushStack :: a -> Stack a -> Stack a
+pushStack x (Stack xs) = Stack (x:xs)
+
+popStack :: Stack a -> Stack a
+popStack (Stack [])     = error "popStack: empty stack"
+popStack (Stack (_:xs)) = Stack xs
+
 peekStack :: Stack a -> a
 peekStack (Stack [])    = error "peekStack: empty stack"
 peekStack (Stack (x:_)) = x
+
+isEmptyStack :: Stack a -> Bool
+isEmptyStack (Stack xs) = null xs
 
 instance Functor Stack where
   fmap :: (a -> b) -> Stack a -> Stack b
