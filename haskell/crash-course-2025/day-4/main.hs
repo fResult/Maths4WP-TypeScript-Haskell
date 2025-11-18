@@ -117,3 +117,7 @@ mapDouble = fmap double
 -- Right 20
 -- λ> mapDouble $ Cons 100 (Cons 20 (Cons 18 (Cons 17 EmptyList)))
 -- Cons 200 (Cons 40 (Cons 36 (Cons 34 EmptyList)))
+
+data Optional a = None | Some a deriving (Eq, Show, Functor)
+-- λ> mapDouble $ Some 12
+-- Some 24
