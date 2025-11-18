@@ -118,6 +118,18 @@ mapDouble = fmap double
 -- λ> mapDouble $ Cons 100 (Cons 20 (Cons 18 (Cons 17 EmptyList)))
 -- Cons 200 (Cons 40 (Cons 36 (Cons 34 EmptyList)))
 
+newtype Stack a = Stack [a] deriving (Eq, Show)
+
+peekStack :: Stack a -> a
+peekStack (Stack [])    = error "peekStack: empty stack"
+peekStack (Stack (x:_)) = x
+
+instance Functor Stack where
+  fmap :: (a -> b) -> Stack a -> Stack b
+  fmap _ (Stack [])     = Stack []
+  fmap f (Stack (x:xs)) = pushStack (f x) (Stack (fmap f xs))
+  -- fmap f (Stack xs) = Stack (fmap f xs)
+
 data Optional a = None | Some a deriving (Eq, Show, Functor)
 -- λ> mapDouble $ Some 12
 -- Some 24
