@@ -119,6 +119,8 @@ mapDouble = fmap double
 -- Cons 200 (Cons 40 (Cons 36 (Cons 34 EmptyList)))
 
 newtype Stack a = Stack [a] deriving (Eq, Show)
+-- λ> mapDouble $ Stack [1..10]
+-- Stack [2,4,6,8,10,12,14,16,18,20]
 
 mkStack :: a -> Stack a
 mkStack x = Stack [x]
@@ -155,3 +157,43 @@ stackMap f (Stack (x:xs)) = Stack (f x : rest)
 data Optional a = None | Some a deriving (Eq, Show, Functor)
 -- λ> mapDouble $ Some 12
 -- Some 24
+
+data BinaryTree a = EmptyTree
+  | Node
+    { value :: a
+    , left  :: BinaryTree a
+    , right :: BinaryTree a
+    }
+  deriving (Eq, Show)
+
+instance Functor BinaryTree where
+  fmap :: (a -> b) -> BinaryTree a -> BinaryTree b
+  fmap _ EmptyTree      = EmptyTree
+  fmap f (Node x lt rt) = Node (f x)(fmap f lt) (fmap f rt)
+
+instance Foldable BinaryTree where
+  foldr :: (a -> b -> b) -> b -> BinaryTree a -> b
+  foldr _ e EmptyTree              = e
+  foldr f e (Node x lt rt) = foldr f (f x (foldr f e rt)) lt
+
+singleNodeTree :: a -> BinaryTree a
+singleNodeTree x = Node x EmptyTree EmptyTree
+
+-- Assume this is Binary Search Tree which doesn't allow duplication
+insertTree :: (Ord a) => a -> BinaryTree a -> BinaryTree a
+insertTree x EmptyTree      = singleNodeTree x
+insertTree x (Node val lt rt)
+  | x == val = Node val lt rt
+  | x < val  = Node val (insertTree x lt) rt
+  | x > val  = Node val lt (insertTree x rt)
+
+mkTree :: (Ord a) => [a] -> BinaryTree a
+mkTree = foldr insertTree EmptyTree
+
+toList :: BinaryTree a -> [a]
+toList EmptyTree      = []
+toList (Node x lt rt) = [x] ++ toList lt ++ toList rt
+
+countElem :: BinaryTree a -> Int
+countElem EmptyTree      = 0
+countElem (Node _ lt rt) = 1 + countElem lt + countElem rt
