@@ -955,3 +955,212 @@ Cons 20 (Cons 40 EmptyList)
 ```
 
 For simple types like `Optional a`, the compiler can even write the `fmap` code for you using `deriving Functor`.
+
+---
+
+## Binary Tree: Another Recursive Type
+
+We can apply the same recursive logic to a **Binary Tree**.
+
+[[Binary Search Tree Structure Image]]
+
+A Binary Tree is recursive because a "Branch" of a tree is just another small tree.
+
+```hs
+λ> :{
+λ| data BinaryTree a = EmptyTree
+λ|   | Node
+λ|     { value :: a
+λ|     , left  :: BinaryTree a
+λ|     , right :: BinaryTree a
+λ|     }
+λ|   deriving (Eq, Show)
+λ| :}
+```
+
+- **`EmptyTree`**: The tree has no data.
+- **`Node`**: It holds a value `a` and two sub-trees (`left` and `right`).
+
+### Helper Function: Single Node
+
+It is hard to type `EmptyTree` every time.
+
+Let's make a helper function to create a "Leaf" (a node with no children).
+
+```hs
+λ> :{
+λ| singleNode :: a -> BinaryTree a
+λ| singleNode x = Node x EmptyTree EmptyTree
+λ| :}
+```
+
+### 1. Making it a Functor
+
+We want to change values inside the tree (like `map` for a List).\
+So, we define the **Functor** instance.
+
+The logic is simple:
+
+1. Apply function `f` to the current `value`.
+2. Recursively call `fmap` on the `left` tree.
+3. Recursively call `fmap` on the `right` tree.
+
+```hs
+λ> :{
+λ| instance Functor BinaryTree where
+λ|   fmap _ EmptyTree = EmptyTree
+λ|   fmap f (Node x left right) = Node (f x) (fmap f left) (fmap f right)
+λ| :}
+```
+
+Now we can use `fmap` to change every value in the tree at once!
+
+## Building the Tree: `insertTree`
+
+We need a way to put data into the tree.\
+We will use the logic of a **Binary Search Tree (BST)**.
+
+The Logic:
+
+Let $x$ be the new value, and $v$ be the current node value.
+
+$$x < v \implies \text{Go Left}$$
+
+$$x > v \implies \text{Go Right}$$
+
+$$x = v \implies \text{Do nothing (No duplicates)}$$
+
+Here is the code:
+
+```hs
+λ> :{
+λ| insertTree :: (Ord a) => a -> BinaryTree a -> BinaryTree a
+λ| insertTree x EmptyTree = singleNode x
+λ| insertTree x (Node v left right)
+λ|   | x == v = Node v left right             -- Equal? Keep same.
+λ|   | x < v  = Node v (insertTree x left) right  -- Less? Insert Left.
+λ|   | x > v  = Node v left (insertTree x right)  -- More? Insert Right.
+λ| :}
+```
+
+**Let's test it:**
+
+```hs
+λ> t1 = singleNode 17
+-- Root is 17
+
+λ> t2 = insertTree 12 t1
+-- 12 < 17, so 12 goes to Left
+-- Node {value = 17, left = Node {value = 12 ...}, ...}
+
+λ> t3 = insertTree 21 t2
+-- 21 > 17, so 21 goes to Right
+-- Node {value = 17, left = ..., right = Node {value = 21 ...}}
+```
+
+## Smart Construction: Using `foldr`
+
+Inserting items one by one is slow and messy.\
+We want to turn a `List` of numbers into a `Tree` automatically.
+
+We can use **`foldr`**.
+
+> [!tip]
+> Think of `foldr` as a **Generalized Loop**.
+
+### Understanding the Type
+
+Let's look at the type of `foldr`:
+
+```hs
+foldr :: Foldable t => (a -> b -> b) -> b -> t a -> b
+```
+
+This looks complex.\
+Let's map it to our Tree problem.\
+We want to take a List (`t a`) and turn it into a Tree (`b`).
+
+1. **Input (`a`)**: A number from our list
+2. **Accumulator (`b`)**: Our `BinaryTree`
+3. **Function (`a -> b -> b`)**: A function that takes a number and a tree, and returns a new tree
+
+**Wait!**
+
+That is _exactly_ our `insertTree` function!
+
+```hs
+insertTree :: Ord a => a -> BinaryTree a -> BinaryTree a
+-- Matches ::         (a ->      b       ->      b)
+```
+
+So, `foldr` will loop through our list and call `insertTree` for every number.
+
+### The `mkTree` Function
+
+We can define a smart constructor called `mkTree`.
+
+```hs
+λ> :{
+λ| mkTree :: (Ord a) => [a] -> BinaryTree a
+λ| mkTree = foldr insertTree EmptyTree
+λ| :}
+```
+
+How it works:
+
+`foldr` processes the list from Right to Left.\
+Example: `mkTree [1, 3, 2]`
+
+1. Start with `EmptyTree`.
+2. Take `2`: `insertTree 2 EmptyTree` $\to$ Tree with 2.
+3. Take `3`: `insertTree 3 (Tree 2)` $\to$ 3 > 2, so 3 goes Right.
+4. Take `1`: `insertTree 1 (Tree 2)` $\to$ 1 < 2, so 1 goes Left.
+
+**Result:**
+
+```hs
+λ> mkTree [18, 9, 9, 7, 23, 19]
+Node {value = 19, left = Node {value = 7 ...} ...}
+```
+
+This is much cleaner than calling `insertTree` manually!
+
+---
+
+
+## Building the Tree: `insertTree`
+
+
+## Smart Construction: Using `foldr`
+
+Inserting items one by one is slow and messy.\
+We want to turn a `List` of numbers into a `Tree` automatically.
+
+We can use **`foldr`**.\
+Think of `foldr` as a **Generalized Loop**.
+
+### Understanding the Type
+
+Let's look at the type of `foldr`:
+
+```hs
+foldr :: Foldable t => (a -> b -> b) -> b -> t a -> b
+```
+
+This looks complex.\
+Let's map it to our Tree problem.\
+We want to take a List (`t a`) and turn it into a Tree (`b`).
+
+- **Input (`a`)**: A number from our list
+- **Accumulator (`b`)**: Our `BinaryTree`
+- **Function (`a -> b -> b`)**: A function that takes a number and a tree, and returns a new tree
+
+Wait!\
+That is exactly our `insertTree` function!
+
+```hs
+insertTree :: a -> BinaryTree a -> BinaryTree a
+-- Matches :: a ->      b       ->      b
+```
+
+So, `foldr` will loop through our list and call `insertTree` for every number.
