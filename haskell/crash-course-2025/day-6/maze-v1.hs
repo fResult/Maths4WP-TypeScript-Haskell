@@ -40,6 +40,16 @@ findStart maze = head [ (rowIdx, colIdx)
 newGame :: Maze -> GameState
 newGame maze = GameState maze (findStart maze) East []
 
+renderMap :: GameState -> String
+renderMap gs =
+  let tiles = maze gs
+      pos   = position gs
+      dir   = direction gs
+      disc  = discovered gs
+  in concatMap (renderRow pos dir disc) (zip [0..] tiles)
+  where
+    renderRow = undefined
+
 --- Dummy (Test Data) ---
 testMazeInput :: String
 testMazeInput = "[x][x][x][x][x][x][x][x]\n[x][x][x][_][_][x][x][x]\n[s][_][_][_][x][x][o][x]\n[x][x][x][_][x][x][_][x]\n[x][x][x][_][_][_][_][x]\n[x][x][x][x][x][x][x][x]\n"
