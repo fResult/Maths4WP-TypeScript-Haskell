@@ -5,6 +5,13 @@ data Direction = North | East | South | West deriving (Show, Eq)
 type Position = (Int, Int)
 type Maze = [[Tile]]
 
+data GameState = GameState
+  { maze     :: Maze
+  , position :: Position
+  , direction :: Direction
+  , discovered :: [Position]
+  } deriving (Show, Eq)
+
 parseMap :: String -> Maze
 parseMap input = map parseLine (lines input)
   where
@@ -22,6 +29,7 @@ parseMap input = map parseLine (lines input)
         'o' -> Goal
         _   -> Wall
 
+-- TODO: Refactor to return `Maybe` or `Either` to handle missing `Start` tile safely.
 findStart :: Maze -> Position
 findStart maze = head [ (rowIdx, colIdx)
                       | (rowIdx, row)  <- zip [0..] grid
