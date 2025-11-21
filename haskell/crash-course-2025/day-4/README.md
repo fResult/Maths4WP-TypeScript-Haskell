@@ -1125,42 +1125,88 @@ Node {value = 19, left = Node {value = 7 ...} ...}
 
 This is much cleaner than calling `insertTree` manually!
 
----
+## The Problem: We can't count it
 
+We have a tree.\
+But we cannot ask simple questions about it.
 
-## Building the Tree: `insertTree`
+```
+λ> t1 = mkTree [18, 9, 7, 23, 19]
 
-
-## Smart Construction: Using `foldr`
-
-Inserting items one by one is slow and messy.\
-We want to turn a `List` of numbers into a `Tree` automatically.
-
-We can use **`foldr`**.\
-Think of `foldr` as a **Generalized Loop**.
-
-### Understanding the Type
-
-Let's look at the type of `foldr`:
-
-```hs
-foldr :: Foldable t => (a -> b -> b) -> b -> t a -> b
+λ> length t1
+<interactive>:1106:1: error: [GHC-39999]
+    • No instance for ‘Foldable BinaryTree’ ...
 ```
 
-This looks complex.\
-Let's map it to our Tree problem.\
-We want to take a List (`t a`) and turn it into a Tree (`b`).
-
-- **Input (`a`)**: A number from our list
-- **Accumulator (`b`)**: Our `BinaryTree`
-- **Function (`a -> b -> b`)**: A function that takes a number and a tree, and returns a new tree
-
-Wait!\
-That is exactly our `insertTree` function!
+Why?\
+Because `length` requires the **`Foldable`** characteristic.
 
 ```hs
-insertTree :: a -> BinaryTree a -> BinaryTree a
--- Matches :: a ->      b       ->      b
+λ> :type length
+length :: Foldable t => t a -> Int
 ```
 
-So, `foldr` will loop through our list and call `insertTree` for every number.
+Haskell knows how to fold a List (`[]`).\
+But it does not know how to fold our `BinaryTree`.
+
+### The Solution: `instance Foldable`
+
+To be `Foldable`, we must explain how to "walk" through our tree.
+
+We will implement `foldr`.
+
+**The Logic:**
+
+1. Fold the **Right** side first.
+2. Process the **Current** value.
+3. Fold the **Left** side last.
+
+(This order creates a sorted list!)
+
+```hs
+λ> :{
+λ| instance Foldable BinaryTree where
+λ|   foldr :: (a -> b -> b) -> b -> BinaryTree a -> b
+λ|   foldr _ acc EmptyTree = acc
+λ|   foldr f acc (Node x left right) = 
+λ|      let acc_right = foldr f acc right    -- 1. Fold Right
+λ|          acc_node  = f x acc_right        -- 2. Apply function to Value
+λ|      in  foldr f acc_node left            -- 3. Fold Left
+λ| :}
+```
+
+> [!tip]
+> You can write it in one line: `foldr f e (Node x l r) = foldr f (f x (foldr f e r)) l`
+
+### The Magic of Type Classes
+
+Now that we added the `Foldable` characteristic, we get **superpowers** for free.
+
+We didn't write `sum`.\
+We didn't write `maximum`.\
+We didn't write `length`.
+
+But they all work now!
+
+```hs
+-- Count nodes
+λ> length t1
+5
+
+-- Find the biggest number
+λ> maximum t1
+23
+
+-- Sum all numbers
+λ> sum t1
+76
+
+-- Turn tree back into a list (Sorted!)
+λ> toList t1
+[7, 9, 18, 19, 23]
+```
+
+This is why Haskell is powerful.\
+We define the **Structure** (Data).\
+We define the **Characteristic** (Type Class).\
+And Haskell gives you the **Functions** for free.
