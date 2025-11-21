@@ -37,9 +37,15 @@ findStart maze = head [ (rowIdx, colIdx)
                       , tile == Start ]
                  where grid = maze
 
+newGame :: Maze -> GameState
+newGame maze = GameState maze (findStart maze) East []
+
 --- Dummy (Test Data) ---
 testMazeInput :: String
 testMazeInput = "[x][x][x][x][x][x][x][x]\n[x][x][x][_][_][x][x][x]\n[s][_][_][_][x][x][o][x]\n[x][x][x][_][x][x][_][x]\n[x][x][x][_][_][_][_][x]\n[x][x][x][x][x][x][x][x]\n"
 
 testMap :: Maze
 testMap = parseMap testMazeInput
+
+testGame :: GameState
+testGame = newGame testMap
