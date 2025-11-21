@@ -962,7 +962,9 @@ For simple types like `Optional a`, the compiler can even write the `fmap` code 
 
 We can apply the same recursive logic to a **Binary Tree**.
 
-[[Binary Search Tree Structure Image]]
+<div align=center>
+  <img width="2580" height="1600" alt="image" src="https://github.com/user-attachments/assets/a62665f1-246f-468f-8b09-7e77ad5831f6" />
+</div>
 
 A Binary Tree is recursive because a "Branch" of a tree is just another small tree.
 
