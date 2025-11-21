@@ -197,3 +197,11 @@ toList (Node x lt rt) = [x] ++ toList lt ++ toList rt
 countElem :: BinaryTree a -> Int
 countElem EmptyTree      = 0
 countElem (Node _ lt rt) = 1 + countElem lt + countElem rt
+
+withExclamation :: (Show a) => a -> [String] -> [String]
+withExclamation x acc = (show x ++ "!!") : acc
+-- λ> foldr withExclamation [] t1
+-- ["7!!","9!!","18!!","19!!","23!!"]
+
+--- Dummy Test Data ---
+t1 = mkTree [18,9,9,7,23,19]
