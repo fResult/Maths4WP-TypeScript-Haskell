@@ -61,11 +61,20 @@ renderMap gs =
       | isDiscoveredPosition = renderRoomWith (tileSymbol tile)
       | otherwise            = renderRoomWith '?'
       where
-        currentPos = (rowIdx, colIdx)
+        currentPos           = (rowIdx, colIdx)
         isDiscoveredPosition = currentPos `elem` disc
 
-    playerSymbol   = undefined
-    tileSymbol     = undefined
+    playerSymbol dir = case dir of
+      North -> '^'
+      East  -> '>'
+      South -> 'v'
+      West  -> '<'
+
+    tileSymbol tile = case tile of
+      Wall  -> 'x'
+      Empty -> '_'
+      Start -> 's'
+      Goal  -> 'o'
 
     renderRoomWith :: Char -> String
     renderRoomWith c = "[" ++ [c] ++ "]"
