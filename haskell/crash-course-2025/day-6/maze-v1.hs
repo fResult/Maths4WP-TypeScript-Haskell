@@ -79,7 +79,12 @@ visibleAround (GameState maze (rowIdx, colIdx) direction _) =
   in (rowIdx, colIdx) : filter (inBounds maze) neighbors
   where
     inBounds :: Maze -> Position -> Bool
-    inBounds = undefined
+    inBounds maze (rowIdx, colIdx)  = rowIdx >= 0
+                                    && colIdx >= 0
+                                    && rowIdx < length maze
+                                    && colIdx < length cols
+      where rows = maze
+            cols = head rows
 
 reveal :: GameState -> [Position] -> GameState
 reveal = undefined
