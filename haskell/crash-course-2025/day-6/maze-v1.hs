@@ -4,6 +4,8 @@ data Tile = Wall | Empty | Start | Goal deriving (Show, Eq)
 data Direction = North | East | South | West deriving (Show, Eq)
 type Position = (Int, Int)
 type Maze = [[Tile]]
+type MazeRow = [Tile]
+type Index = Int
 
 data GameState = GameState
   { maze     :: Maze
@@ -47,6 +49,7 @@ renderMap gs =
       dir   = direction gs
       disc  = discovered gs
   in concatMap (renderRow pos dir disc) (zip [0..] tiles)
+
   where
     renderRow = undefined
 
