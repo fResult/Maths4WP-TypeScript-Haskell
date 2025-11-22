@@ -71,6 +71,16 @@ moveForward gs@(GameState maze (rowIdx, colIdx) direction _) =
 isWalkable :: Tile -> Bool
 isWalkable tile = tile `elem` [Empty, Start, Goal]
 
+inBounds :: Maze -> Position -> Bool
+inBounds maze (rowIdx, colIdx) = rowIdxValid && colIdxValid
+  where
+    rowIdxValid = rowIdx >= 0 && rowIdx < length rows
+    colIdxValid = colIdx >= 0 && colIdx < length cols
+    rows        = maze
+    cols        = selectedRow
+    selectedRow = rows `at` rowIdx
+    at          = (!!)
+
 visibleAround :: GameState -> [Position]
 visibleAround (GameState maze (rowIdx, colIdx) direction _) =
   let directions         = [North, East, South, West]
@@ -79,14 +89,6 @@ visibleAround (GameState maze (rowIdx, colIdx) direction _) =
                            | (deltaRowIdx, deltaColIdx) <- deltaPositions
                            ]
   in (rowIdx, colIdx) : filter (inBounds maze) neighbors
-  where
-    inBounds :: Maze -> Position -> Bool
-    inBounds maze (rowIdx, colIdx)  = rowIdx >= 0
-                                    && colIdx >= 0
-                                    && rowIdx < length maze
-                                    && colIdx < length cols
-      where rows = maze
-            cols = head rows
 
 reveal :: GameState -> [Position] -> GameState
 reveal gameState positions =
@@ -95,16 +97,14 @@ reveal gameState positions =
     currentDiscovered = discovered gameState
 
 getTile :: Maze -> Position -> Maybe Tile
-getTile maze (rowIdx, colIdx)
-  | rowIdx < 0 || colIdx < 0 = Nothing
-  | rowIdx >= length rows    = Nothing
-  | colIdx >= length columns = Nothing
-  | otherwise                = Just (columns `at` colIdx)
+getTile maze position
+  | inBounds maze position = Just (columns `at` colIdx)
+  | otherwise              = Nothing
   where
-    rows        = maze
-    columns     = selectedRow
-    selectedRow = rows `at` rowIdx
-    at          = (!!)
+    columns = maze `at` fst position
+    rowIdx  = fst position
+    colIdx  = snd position
+    at      = (!!)
 
 {------------|
 |-- Render --|
