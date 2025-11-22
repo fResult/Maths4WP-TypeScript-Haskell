@@ -1,5 +1,7 @@
 module MazeV1 where
 
+import Data.List (nub)
+
 {-------------------|
 |--- Data Models ---|
 |-------------------}
@@ -87,7 +89,10 @@ visibleAround (GameState maze (rowIdx, colIdx) direction _) =
             cols = head rows
 
 reveal :: GameState -> [Position] -> GameState
-reveal = undefined
+reveal gameState positions =
+  gameState { discovered = nub (currentDiscovered ++ positions) }
+  where
+    currentDiscovered = discovered gameState
 
 getTile :: Maze -> Position -> Maybe Tile
 getTile maze (rowIdx, colIdx)
