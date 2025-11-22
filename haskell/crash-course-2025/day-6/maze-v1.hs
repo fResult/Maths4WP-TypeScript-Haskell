@@ -64,11 +64,12 @@ getTile maze (rowIdx, colIdx)
   | rowIdx < 0 || colIdx < 0 = Nothing
   | rowIdx >= length rows    = Nothing
   | colIdx >= length columns = Nothing
-  | otherwise                = Just (columns !! colIdx)
+  | otherwise                = Just (columns `at` colIdx)
   where
     rows        = maze
     columns     = selectedRow
-    selectedRow = rows !! rowIdx
+    selectedRow = rows `at` rowIdx
+    at          = (!!)
 
 {------------|
 |-- Render --|
