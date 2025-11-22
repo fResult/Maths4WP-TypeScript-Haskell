@@ -42,6 +42,9 @@ findStart maze = head [ (rowIdx, colIdx)
 newGame :: Maze -> GameState
 newGame maze = GameState maze (findStart maze) East []
 
+{------------|
+|-- Render --|
+|------------}
 renderMap :: GameState -> String
 renderMap gs =
   let tiles = maze gs
@@ -57,38 +60,38 @@ renderMap gs =
 
     renderCell :: Position -> Direction -> [Position] -> Index -> (Index, Tile) -> String
     renderCell pos dir disc rowIdx (colIdx, tile)
-      | currentPos == pos    = renderRoomWith (playerSymbol dir)
-      | isDiscoveredPosition = renderRoomWith (tileSymbol tile)
-      | otherwise            = renderRoomWith '?'
+      | currentPosition == pos = renderRoomWith (playerSymbol dir)
+      | isDiscoveredPosition   = renderRoomWith (tileSymbol tile)
+      | otherwise              = renderRoomWith '?'
       where
-        currentPos           = (rowIdx, colIdx)
-        isDiscoveredPosition = currentPos `elem` disc
-
-    playerSymbol :: Direction -> Char
-    playerSymbol dir = case dir of
-      North -> '^'
-      East  -> '>'
-      South -> 'v'
-      West  -> '<'
-
-    -- Why `Start` and `Goal` are `_`?
-    ---- Physically, they're empty walkable tiles, so we render them as Empty ('_')
-    tileSymbol :: Tile -> Char
-    tileSymbol tile = case tile of
-      Wall  -> '#'
-      Empty -> '_'
-      Start -> '_'
-      Goal  -> '_'
+        currentPosition      = (rowIdx, colIdx)
+        isDiscoveredPosition = currentPosition `elem` disc
 
     renderRoomWith :: Char -> String
     renderRoomWith c = "[" ++ [c] ++ "]"
 
---- Dummy (Test Data) ---
+playerSymbol :: Direction -> Char
+playerSymbol North = '∧'
+playerSymbol East  = '>'
+playerSymbol South = '∨'
+playerSymbol West  = '<'
+
+-- Why `Start` and `Goal` are `_`?
+---- Physically, they're empty walkable tiles, so we render them as Empty ('_')
+tileSymbol :: Tile -> Char
+tileSymbol Wall  = '#'
+tileSymbol Empty = '_'
+tileSymbol Start = '_'
+tileSymbol Goal  = '_'
+
+{-------------------------|
+|--- Dummy (Test Data) ---|
+|-------------------------}
 testMazeInput :: String
 testMazeInput = "[x][x][x][x][x][x][x][x]\n[x][x][x][_][_][x][x][x]\n[s][_][_][_][x][x][o][x]\n[x][x][x][_][x][x][_][x]\n[x][x][x][_][_][_][_][x]\n[x][x][x][x][x][x][x][x]\n"
 
-testMap :: Maze
-testMap = parseMap testMazeInput
+testMaze :: Maze
+testMaze = parseMap testMazeInput
 
 testGame :: GameState
-testGame = newGame testMap
+testGame = newGame testMaze
