@@ -64,17 +64,21 @@ renderMap gs =
         currentPos           = (rowIdx, colIdx)
         isDiscoveredPosition = currentPos `elem` disc
 
+    playerSymbol :: Direction -> Char
     playerSymbol dir = case dir of
       North -> '^'
       East  -> '>'
       South -> 'v'
       West  -> '<'
 
+    -- Why `Start` and `Goal` are `_`?
+    ---- Physically, they're empty walkable tiles, so we render them as Empty ('_')
+    tileSymbol :: Tile -> Char
     tileSymbol tile = case tile of
-      Wall  -> 'x'
+      Wall  -> '#'
       Empty -> '_'
-      Start -> 's'
-      Goal  -> 'o'
+      Start -> '_'
+      Goal  -> '_'
 
     renderRoomWith :: Char -> String
     renderRoomWith c = "[" ++ [c] ++ "]"
