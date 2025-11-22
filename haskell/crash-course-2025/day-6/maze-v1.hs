@@ -56,7 +56,19 @@ renderMap gs =
       concatMap (renderCell pos dir disc rowIdx) (zip [0..] row) ++ "\n"
 
     renderCell :: Position -> Direction -> [Position] -> Index -> (Index, Tile) -> String
-    renderCell = undefined
+    renderCell pos dir disc rowIdx (colIdx, tile)
+      | currentPos == pos    = renderRoomWith (playerSymbol dir)
+      | isDiscoveredPosition = renderRoomWith (tileSymbol tile)
+      | otherwise            = renderRoomWith '?'
+      where
+        currentPos = (rowIdx, colIdx)
+        isDiscoveredPosition = currentPos `elem` disc
+
+    playerSymbol   = undefined
+    tileSymbol     = undefined
+
+    renderRoomWith :: Char -> String
+    renderRoomWith c = "[" ++ [c] ++ "]"
 
 --- Dummy (Test Data) ---
 testMazeInput :: String
