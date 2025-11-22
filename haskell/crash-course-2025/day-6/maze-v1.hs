@@ -1,5 +1,8 @@
 module MazeV1 where
 
+{-------------------|
+|--- Data Models ---|
+|-------------------}
 data Tile = Wall | Empty | Start | Goal deriving (Show, Eq)
 data Direction = North | East | South | West deriving (Show, Eq)
 type Position = (Int, Int)
@@ -41,6 +44,12 @@ findStart maze = head [ (rowIdx, colIdx)
 
 newGame :: Maze -> GameState
 newGame maze = GameState maze (findStart maze) East []
+
+{----------------------|
+|--- Gameplay Logic ---|
+|----------------------}
+moveForward :: GameState -> (Bool, GameState)
+moveForward (GameState m (rowIdx, colIdx) dir disc) = undefined
 
 {------------|
 |-- Render --|
