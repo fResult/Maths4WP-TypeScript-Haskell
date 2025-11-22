@@ -3,7 +3,7 @@ module MazeV1 where
 data Tile = Wall | Empty | Start | Goal deriving (Show, Eq)
 data Direction = North | East | South | West deriving (Show, Eq)
 type Position = (Int, Int)
-type Maze = [[Tile]]
+type Maze = [MazeRow]
 type MazeRow = [Tile]
 type Index = Int
 
@@ -51,7 +51,12 @@ renderMap gs =
   in concatMap (renderRow pos dir disc) (zip [0..] tiles)
 
   where
-    renderRow = undefined
+    renderRow :: Position -> Direction -> [Position] -> (Index, MazeRow) -> String
+    renderRow pos dir disc (rowIdx, row) =
+      concatMap (renderCell pos dir disc rowIdx) (zip [0..] row) ++ "\n"
+
+    renderCell :: Position -> Direction -> [Position] -> Index -> (Index, Tile) -> String
+    renderCell = undefined
 
 --- Dummy (Test Data) ---
 testMazeInput :: String
