@@ -49,7 +49,18 @@ newGame maze = GameState maze (findStart maze) East []
 |--- Gameplay Logic ---|
 |----------------------}
 moveForward :: GameState -> (Bool, GameState)
-moveForward (GameState m (rowIdx, colIdx) dir disc) = undefined
+moveForward gs@(GameState maze (rowIdx, colIdx) dir _) =
+  let (deltaRowIdx, deltaColIdx) = moveDelta dir
+      newPosition                = ( rowIdx + deltaRowIdx
+                                   , colIdx + deltaColIdx
+                                   )
+  in case getTile maze newPosition of
+
+  where
+    moveDelta = undefined
+
+getTile :: Maze -> Position -> Maybe Tile
+getTile = undefined
 
 {------------|
 |-- Render --|
