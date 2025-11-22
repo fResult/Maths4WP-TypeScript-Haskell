@@ -178,3 +178,26 @@ testMaze = parseMap testMazeInput
 
 testGame :: GameState
 testGame = newGame testMaze
+
+{--------------------|
+|--- Unit Testing ---|
+|--------------------}
+test :: IO ()
+test = do
+  putStrLn "------- Testing Direction Helpers -------"
+  putStrLn $ "\tNorth turnLeft -> " ++ show (turnLeft North) -- Expected: West
+  putStrLn $ "\tNorth turnRight -> " ++ show (turnRight North) -- Expected: East
+
+  putStrLn "\n------- Testing Goal Check -------"
+  let gameAtStart = testGame -- อยู่ที่ Start (2,0)
+  putStrLn $ "\tAt Start is Goal? -> " ++ show (arrivedGoal gameAtStart) -- Expected: False
+
+  let gameAtGoal = gameAtStart { position = (2, 6) }
+  putStrLn $ "\tAt (2,6) is Goal? -> " ++ show (arrivedGoal gameAtGoal) -- Expected: True
+
+  putStrLn "\n------- Testing Movement & Fog of War -------"
+
+  let (moved, nextState) = moveForward gameAtStart
+  putStrLn $ "\tMove Success? -> " ++ show moved
+  putStrLn $ "\tNew Position -> " ++ show (position nextState)
+  putStrLn $ "\tDiscovered Count -> " ++ show (length (discovered nextState))
