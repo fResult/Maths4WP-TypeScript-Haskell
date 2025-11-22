@@ -71,6 +71,25 @@ moveForward gs@(GameState maze (rowIdx, colIdx) direction _) =
 isWalkable :: Tile -> Bool
 isWalkable tile = tile `elem` [Empty, Start, Goal]
 
+arrivedGoal :: GameState -> Bool
+arrivedGoal (GameState maze position _ _) = tile == Just Goal
+  where
+    tile = getTile maze position
+
+turnLeft :: Direction -> Direction
+turnLeft direction = case direction of
+  North -> West
+  West  -> South
+  South -> East
+  East  -> North
+
+turnRight :: Direction -> Direction
+turnRight direction = case direction of
+  North -> East
+  East  -> South
+  South -> West
+  West  -> North
+
 inBounds :: Maze -> Position -> Bool
 inBounds maze (rowIdx, colIdx) = rowIdxValid && colIdxValid
   where
