@@ -100,6 +100,15 @@ inBounds maze (rowIdx, colIdx) = rowIdxValid && colIdxValid
     selectedRow = rows `at` rowIdx
     at          = (!!)
 
+lookAround :: GameState -> (String, GameState)
+lookAround gameState = (desc, revealed)
+  where
+    desc = surroundingDescribe gameState
+    revealed = reveal gameState (visibleAround gameState)
+
+surroundingDescribe :: GameState -> String
+surroundingDescribe gameState = undefined
+
 visibleAround :: GameState -> [Position]
 visibleAround (GameState maze (rowIdx, colIdx) direction _) =
   let directions         = [North, East, South, West]
