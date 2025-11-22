@@ -63,11 +63,26 @@ moveForward gs@(GameState maze (rowIdx, colIdx) direction _) =
   in case getTile maze newPosition of
     Just tile | isWalkable tile ->
       let newGameState = gs { position = newPosition }
-      in (True, newGameState)
+      in (True, reveal newGameState (visibleAround newGameState))
     _ -> (False, gs)
 
 isWalkable :: Tile -> Bool
 isWalkable tile = tile `elem` [Empty, Start, Goal]
+
+visibleAround :: GameState -> [Position]
+visibleAround (GameState maze (rowIdx, colIdx) direction _) =
+  let directions         = [North, East, South, West]
+      deltaPositions     = map moveDelta directions
+      neighbors          = [(rowIdx + deltaRowIdx, colIdx + deltaColIdx)
+                           | (deltaRowIdx, deltaColIdx) <- deltaPositions
+                           ]
+  in (rowIdx, colIdx) : filter (inBounds maze) neighbors
+  where
+    inBounds :: Maze -> Position -> Bool
+    inBounds = undefined
+
+reveal :: GameState -> [Position] -> GameState
+reveal = undefined
 
 getTile :: Maze -> Position -> Maybe Tile
 getTile maze (rowIdx, colIdx)
