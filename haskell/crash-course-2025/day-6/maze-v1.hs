@@ -48,6 +48,12 @@ newGame maze = GameState maze (findStart maze) East []
 {----------------------|
 |--- Gameplay Logic ---|
 |----------------------}
+moveDelta :: Direction -> Position
+moveDelta North = (-1, 0)
+moveDelta East  = (0, 1)
+moveDelta South = (1, 0)
+moveDelta West  = (0, -1)
+
 moveForward :: GameState -> (Bool, GameState)
 moveForward gs@(GameState maze (rowIdx, colIdx) direction _) =
   let (deltaRowIdx, deltaColIdx) = moveDelta direction
@@ -59,9 +65,6 @@ moveForward gs@(GameState maze (rowIdx, colIdx) direction _) =
       let newGameState = gs { position = newPosition }
       in (True, newGameState)
     _ -> (False, gs)
-
-  where
-    moveDelta = undefined
 
 isWalkable :: Tile -> Bool
 isWalkable tile = tile `elem` [Empty, Start, Goal]
