@@ -60,7 +60,15 @@ moveForward gs@(GameState maze (rowIdx, colIdx) dir _) =
     moveDelta = undefined
 
 getTile :: Maze -> Position -> Maybe Tile
-getTile = undefined
+getTile maze (rowIdx, colIdx)
+  | rowIdx < 0 || colIdx < 0 = Nothing
+  | rowIdx >= length rows    = Nothing
+  | colIdx >= length columns = Nothing
+  | otherwise                = Just (columns !! colIdx)
+  where
+    rows        = maze
+    columns     = selectedRow
+    selectedRow = rows !! rowIdx
 
 {------------|
 |-- Render --|
