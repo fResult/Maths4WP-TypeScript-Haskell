@@ -229,24 +229,24 @@ test = do
     let expectedLeft = West
     let actualLeft   = turnLeft North
     putStrLn $ "\tNorth turnLeft -> " ++ show actualLeft
-    putStrLn $ "\t[Check] Expected \"" ++ show expectedLeft ++ "\" -> " ++ show (expectedLeft == actualLeft)
+    assertAndLog expectedLeft actualLeft
 
     let expectedRight = East
     let actualRight   = turnRight North
     putStrLn $ "\tNorth turnRight -> " ++ show actualRight
-    putStrLn $ "\t[Check] Expected \"" ++ show expectedRight ++ "\" -> " ++ show (expectedRight == actualRight)
+    assertAndLog expectedRight actualRight
 
   putStrLn "\n------- Testing Goal Check -------"
   do
     let expectedArrivedGoalAtStart = False
     let actualArrivedGoalAtStart = arrivedGoal gameAtStart
     putStrLn $ "\tAt Start is Goal? -> " ++ show actualArrivedGoalAtStart
-    putStrLn $ "\t[Check] Expected \"" ++ show expectedArrivedGoalAtStart ++ "\" -> " ++ show (expectedArrivedGoalAtStart == actualArrivedGoalAtStart)
+    assertAndLog expectedArrivedGoalAtStart actualArrivedGoalAtStart
 
     let expectedArrivedGoalAtGoal = True
     let actualArrivedGoalAtGoal = arrivedGoal gameAtGoal
     putStrLn $ "\tAt (2,6) is Goal? -> " ++ show actualArrivedGoalAtGoal
-    putStrLn $ "\t[Check] Expected \"" ++ show expectedArrivedGoalAtGoal ++ "\" -> " ++ show (expectedArrivedGoalAtGoal == actualArrivedGoalAtGoal)
+    assertAndLog expectedArrivedGoalAtGoal actualArrivedGoalAtGoal
 
   putStrLn "\n------- Testing Movement & Fog of War -------"
   do
@@ -255,21 +255,30 @@ test = do
     -- Check 1: Movement Success
     let expectedMoved = True
     putStrLn $ "\tMove Success? -> " ++ show actualMoved
-    putStrLn $ "\t[Check] Expected \"" ++ show expectedMoved ++ "\" -> " ++ show (expectedMoved == actualMoved)
+    assertAndLog expectedMoved actualMoved
 
     -- Check 2: New Position
-    let expectedPos = (2, 1)
-    putStrLn $ "\tNew Position -> " ++ show (position actualNextState)
-    putStrLn $ "\t[Check] Expected \"" ++ show expectedPos ++ "\" -> " ++ show (expectedPos == position actualNextState)
+    let expectedPosition = (2, 1)
+    let actualPosition = position actualNextState
+    putStrLn $ "\tNew Position -> " ++ show actualPosition
+    assertAndLog expectedPosition actualPosition
 
     -- Check 3: Fog of War (Discovered Count)
     let expectedDiscoveredCount = 5
     let actualDiscoveredCount = length (discovered actualNextState)
     putStrLn $ "\tDiscovered Count -> " ++ show actualDiscoveredCount
-    putStrLn $ "\t[Check] Expected \"" ++ show expectedDiscoveredCount ++ "\" -> " ++ show (expectedDiscoveredCount == actualDiscoveredCount)
+    assertAndLog expectedDiscoveredCount actualDiscoveredCount
 
+  putStrLn "\n------- Testing Look Surrounding -------"
   do
     let (actualDesc, _) = lookAround gameAtStart
     let expectedDesc = "You see a path in front of you. A wall to the left. A wall to the right."
     putStrLn $ "\tDescription -> " ++ show actualDesc
-    putStrLn $ "\t[Check] Expected Correct Description -> " ++ show (expectedDesc == actualDesc)
+    assertAndLog expectedDesc actualDesc
+
+assertAndLog :: (Show a, Eq a) => a -> a -> IO ()
+assertAndLog expected actual =
+  putStrLn $ "\t[Check] Expected \""
+  ++ show expected
+  ++ "\" -> "
+  ++ show (expected == actual)
