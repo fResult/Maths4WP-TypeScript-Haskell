@@ -221,24 +221,55 @@ testGame = newGame testMaze
 |--------------------}
 test :: IO ()
 test = do
-  putStrLn "------- Testing Direction Helpers -------"
-  putStrLn $ "\tNorth turnLeft -> " ++ show (turnLeft North) -- Expected: West
-  putStrLn $ "\tNorth turnRight -> " ++ show (turnRight North) -- Expected: East
-
-  putStrLn "\n------- Testing Goal Check -------"
   let gameAtStart = testGame
   let gameAtGoal = gameAtStart { position = (2, 6) }
-  putStrLn $ "\tAt Start is Goal? -> " ++ show (arrivedGoal gameAtStart) -- Expected: False
-  putStrLn $ "\tAt (2,6) is Goal? -> " ++ show (arrivedGoal gameAtGoal) -- Expected: True
+
+  putStrLn "------- Testing Direction Helpers -------"
+  do
+    let expectedLeft = West
+    let actualLeft   = turnLeft North
+    putStrLn $ "\tNorth turnLeft -> " ++ show actualLeft
+    putStrLn $ "\t[Check] Expected \"" ++ show expectedLeft ++ "\" -> " ++ show (expectedLeft == actualLeft)
+
+    let expectedRight = East
+    let actualRight   = turnRight North
+    putStrLn $ "\tNorth turnRight -> " ++ show actualRight
+    putStrLn $ "\t[Check] Expected \"" ++ show expectedRight ++ "\" -> " ++ show (expectedRight == actualRight)
+
+  putStrLn "\n------- Testing Goal Check -------"
+  do
+    let expectedArrivedGoalAtStart = False
+    let actualArrivedGoalAtStart = arrivedGoal gameAtStart
+    putStrLn $ "\tAt Start is Goal? -> " ++ show actualArrivedGoalAtStart
+    putStrLn $ "\t[Check] Expected \"" ++ show expectedArrivedGoalAtStart ++ "\" -> " ++ show (expectedArrivedGoalAtStart == actualArrivedGoalAtStart)
+
+    let expectedArrivedGoalAtGoal = True
+    let actualArrivedGoalAtGoal = arrivedGoal gameAtGoal
+    putStrLn $ "\tAt (2,6) is Goal? -> " ++ show actualArrivedGoalAtGoal
+    putStrLn $ "\t[Check] Expected \"" ++ show expectedArrivedGoalAtGoal ++ "\" -> " ++ show (expectedArrivedGoalAtGoal == actualArrivedGoalAtGoal)
 
   putStrLn "\n------- Testing Movement & Fog of War -------"
-  let (moved, nextState) = moveForward gameAtStart
-  putStrLn $ "\tMove Success? -> " ++ show moved
-  putStrLn $ "\tNew Position -> " ++ show (position nextState)
-  putStrLn $ "\tDiscovered Count -> " ++ show (length (discovered nextState))
+  do
+    let (actualMoved, actualNextState) = moveForward gameAtStart
 
-  putStrLn "\n------- Testing Look Description -------"
-  let (desc, _) = lookAround gameAtStart
-  let expectedResult = "You see a path in front of you. A wall to the left. A wall to the right."
-  putStrLn $ "\tDescription -> " ++ show desc
-  putStrLn $ "\tExpected Front->Path, Left->Wall, Right->Wall -> True" ++ show (expectedResult == desc)
+    -- Check 1: Movement Success
+    let expectedMoved = True
+    putStrLn $ "\tMove Success? -> " ++ show actualMoved
+    putStrLn $ "\t[Check] Expected \"" ++ show expectedMoved ++ "\" -> " ++ show (expectedMoved == actualMoved)
+
+    -- Check 2: New Position
+    let expectedPos = (2, 1)
+    putStrLn $ "\tNew Position -> " ++ show (position actualNextState)
+    putStrLn $ "\t[Check] Expected \"" ++ show expectedPos ++ "\" -> " ++ show (expectedPos == position actualNextState)
+
+    -- Check 3: Fog of War (Discovered Count)
+    let expectedDiscoveredCount = 5
+    let actualDiscoveredCount = length (discovered actualNextState)
+    putStrLn $ "\tDiscovered Count -> " ++ show actualDiscoveredCount
+    putStrLn $ "\t[Check] Expected \"" ++ show expectedDiscoveredCount ++ "\" -> " ++ show (expectedDiscoveredCount == actualDiscoveredCount)
+
+  do
+    let (actualDesc, _) = lookAround gameAtStart
+    let expectedDesc = "You see a path in front of you. A wall to the left. A wall to the right."
+    putStrLn $ "\tDescription -> " ++ show actualDesc
+    putStrLn $ "\t[Check] Expected Correct Description -> " ++ show (expectedDesc == actualDesc)
