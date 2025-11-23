@@ -1,6 +1,7 @@
 module MazeV1 where
 
 import Data.List (nub)
+import Data.Char (toUpper, toLower)
 
 {-------------------|
 |--- Data Models ---|
@@ -107,7 +108,16 @@ lookAround gameState = (desc, revealed)
     revealed = reveal gameState (visibleAround gameState)
 
 surroundingDescribe :: GameState -> String
-surroundingDescribe gameState = undefined
+surroundingDescribe (GameState maze (rowIdx, colIdx) direction _) = unwords
+  [ "You see", front, "in front of you."
+  , capitalize left, "to the left."
+  , capitalize right, "to the right."
+  ]
+  where
+    front        = lookDirectTo direction
+    left         = lookDirectTo (turnLeft direction)
+    right        = lookDirectTo (turnRight direction)
+    lookDirectTo = undefined
 
 visibleAround :: GameState -> [Position]
 visibleAround (GameState maze (rowIdx, colIdx) direction _) =
@@ -175,6 +185,14 @@ tileSymbol Wall  = '#'
 tileSymbol Empty = '_'
 tileSymbol Start = '_'
 tileSymbol Goal  = '_'
+
+
+{-----------|
+|-- Misc. --|
+|-----------}
+capitalize :: String -> String
+capitalize ""     = ""
+capitalize (x:xs) = toUpper x : map toLower xs
 
 {-------------------------|
 |--- Dummy (Test Data) ---|
