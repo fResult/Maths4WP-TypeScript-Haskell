@@ -104,11 +104,11 @@ inBounds maze (rowIdx, colIdx) = rowIdxValid && colIdxValid
 lookAround :: GameState -> (String, GameState)
 lookAround gameState = (desc, revealed)
   where
-    desc = surroundingDescribe gameState
+    desc = describeSurrounding gameState
     revealed = reveal gameState (visibleAround gameState)
 
-surroundingDescribe :: GameState -> String
-surroundingDescribe (GameState maze (rowIdx, colIdx) direction _) = unwords
+describeSurrounding :: GameState -> String
+describeSurrounding (GameState maze (rowIdx, colIdx) direction _) = unwords
   [ "You see", front, "in front of you."
   , capitalize left, "to the left."
   , capitalize right, "to the right."
@@ -117,7 +117,17 @@ surroundingDescribe (GameState maze (rowIdx, colIdx) direction _) = unwords
     front        = lookDirectTo direction
     left         = lookDirectTo (turnLeft direction)
     right        = lookDirectTo (turnRight direction)
-    lookDirectTo = undefined
+    lookDirectTo direction = describe (getTile maze (rowIdx + deltaRowIdx, colIdx + deltaColIdx))
+      where
+        (deltaRowIdx, deltaColIdx) = moveDelta direction
+
+    describe :: Maybe Tile -> String
+    describe (Just Wall)  = "a wall"
+    describe (Just Empty) = "a path"
+    describe (Just Start) = "a path"
+    describe (Just Goal)  = "a goal"
+    describe Nothing      = "a void"
+
 
 visibleAround :: GameState -> [Position]
 visibleAround (GameState maze (rowIdx, colIdx) direction _) =
