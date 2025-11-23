@@ -196,6 +196,24 @@ tileSymbol Empty = '_'
 tileSymbol Start = '_'
 tileSymbol Goal  = '_'
 
+{----------|
+|-- Main --|
+|----------}
+main :: IO ()
+main = do
+  putStr "What is your name?: "
+  name <- getLine
+  putStrLn ("Hello, " ++ name ++ "!")
+-- OLDER
+-- main =
+  -- putStr "What is your name?: " >> (getLine >>= \name ->
+  -- putStrLn ("Hello, " ++ name ++ "!"))
+-- OLDEST
+-- main =
+  -- putStr "What is your name?: " >>= \_ ->
+  -- getLine >>= \name ->
+  -- putStrLn ("Hello, " ++ name ++ "!")
+
 
 {-----------|
 |-- Misc. --|
