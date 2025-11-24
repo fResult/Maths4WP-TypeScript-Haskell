@@ -47,13 +47,10 @@ findStart maze = head [ (rowIdx, colIdx)
                  where grid = maze
 
 newGame :: Maze -> GameState
-newGame maze = GameState maze (findStart maze) East []
-
-initGame :: Maze -> GameState
-initGame maze =
-  let startPosition = findStart maze
-      gameState     = newGame maze
-  in reveal gameState (visibleAround gameState)
+newGame maze = reveal initialState (visibleAround initialState)
+  where
+    startPosition = findStart maze
+    initialState  = GameState maze startPosition East []
 
 {----------------------|
 |--- Gameplay Logic ---|
@@ -216,7 +213,7 @@ main = do
   putStrLn "-----------------------------"
   mazeGrid <- readFile "haskell/crash-course-2025/day-6/maze1.txt"
 
-  let game = initGame $ parseMap mazeGrid
+  let game = newGame $ parseMap mazeGrid
   putStrLn "Welcome to the maze!"
   putStrLn "Commands: forward | turn left | turn right | look | map | help | quit"
   putStrLn (fst $ lookAround game)
@@ -238,7 +235,7 @@ testMaze :: Maze
 testMaze = parseMap testMazeInput
 
 testGame :: GameState
-testGame = initGame testMaze
+testGame = newGame testMaze
 
 {--------------------|
 |--- Unit Testing ---|
