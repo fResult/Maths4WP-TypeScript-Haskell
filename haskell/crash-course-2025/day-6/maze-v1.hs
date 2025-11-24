@@ -3,6 +3,7 @@ module MazeV1 where
 import Data.List (nub)
 import Data.Char (toUpper, toLower)
 import Data.ByteString (initsNE)
+import System.IO (hFlush, stdout)
 
 {-------------------|
 |--- Data Models ---|
@@ -199,6 +200,30 @@ tileSymbol Wall  = '#'
 tileSymbol Empty = '_'
 tileSymbol Start = '_'
 tileSymbol Goal  = '_'
+
+{---------------|
+|-- Game Loop --|
+|---------------}
+gameLoop :: GameState -> IO ()
+gameLoop gameState = do
+  putStr "> "
+  hFlush stdout
+  cmd <- fmap (map toLower) getLine
+  case cmd of
+    "forward"    -> handleMoveForward gameState
+    "turn left"  -> handleTurnLeft gameState
+    "turn right" -> handleTurnRight gameState
+    "look"       -> handleLook gameState
+    "map"        -> handleMap gameState
+    "quit"       -> putStrLn "Goodbye!"
+    _            -> handleUnknown gameState
+
+handleMoveForward = undefined
+handleTurnLeft = undefined
+handleTurnRight = undefined
+handleLook = undefined
+handleMap = undefined
+handleUnknown = undefined
 
 {----------|
 |-- Main --|
