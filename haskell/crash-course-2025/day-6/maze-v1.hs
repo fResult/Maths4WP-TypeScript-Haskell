@@ -215,7 +215,7 @@ gameLoop gameState = do
     "turn right" -> handleTurnRight gameState
     "look"       -> handleLook gameState
     "map"        -> handleMap gameState
-    "quit"       -> putStrLn "Goodbye!"
+    "quit"       -> handleQuit
     _            -> handleUnknown gameState
 
 handleMoveForward = undefined
@@ -223,7 +223,14 @@ handleTurnLeft = undefined
 handleTurnRight = undefined
 handleLook = undefined
 handleMap = undefined
-handleUnknown = undefined
+
+handleQuit :: IO ()
+handleQuit = putStrLn "Goodbye!"
+
+handleUnknown :: GameState -> IO ()
+handleUnknown gameState = do
+  putStrLn "Unknown command. Try: forward | turn left | turn right | look | map | help | quit"
+  gameLoop gameState
 
 {----------|
 |-- Main --|
@@ -242,6 +249,7 @@ main = do
   putStrLn "Welcome to the maze!"
   putStrLn "Commands: forward | turn left | turn right | look | map | help | quit"
   putStrLn (fst $ lookAround game)
+  gameLoop game
 
 {-----------|
 |-- Misc. --|
