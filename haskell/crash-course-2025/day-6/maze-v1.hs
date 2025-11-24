@@ -2,6 +2,7 @@ module MazeV1 where
 
 import Data.List (nub)
 import Data.Char (toUpper, toLower)
+import Data.ByteString (initsNE)
 
 {-------------------|
 |--- Data Models ---|
@@ -47,6 +48,12 @@ findStart maze = head [ (rowIdx, colIdx)
 
 newGame :: Maze -> GameState
 newGame maze = GameState maze (findStart maze) East []
+
+initGame :: Maze -> GameState
+initGame maze =
+  let startPosition = findStart maze
+      gameState     = newGame maze
+  in reveal gameState (visibleAround gameState)
 
 {----------------------|
 |--- Gameplay Logic ---|
@@ -201,19 +208,18 @@ tileSymbol Goal  = '_'
 |----------}
 main :: IO ()
 main = do
-  putStr "What is your name?: "
-  name <- getLine
-  putStrLn ("Hello, " ++ name ++ "!")
--- OLDER
--- main =
-  -- putStr "What is your name?: " >> (getLine >>= \name ->
-  -- putStrLn ("Hello, " ++ name ++ "!"))
--- OLDEST
--- main =
-  -- putStr "What is your name?: " >>= \_ ->
-  -- getLine >>= \name ->
-  -- putStrLn ("Hello, " ++ name ++ "!")
+  test
 
+  putStrLn ""
+  putStrLn "-----------------------------"
+  putStrLn "--------- Start app ---------"
+  putStrLn "-----------------------------"
+  mazeGrid <- readFile "haskell/crash-course-2025/day-6/maze1.txt"
+
+  let game = initGame $ parseMap mazeGrid
+  putStrLn "Welcome to the maze!"
+  putStrLn "Commands: forward | turn left | turn right | look | map | help | quit"
+  putStrLn (fst $ lookAround game)
 
 {-----------|
 |-- Misc. --|
@@ -232,7 +238,7 @@ testMaze :: Maze
 testMaze = parseMap testMazeInput
 
 testGame :: GameState
-testGame = newGame testMaze
+testGame = initGame testMaze
 
 {--------------------|
 |--- Unit Testing ---|
