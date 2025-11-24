@@ -221,8 +221,18 @@ gameLoop gameState = do
 handleMoveForward = undefined
 handleTurnLeft = undefined
 handleTurnRight = undefined
-handleLook = undefined
-handleMap = undefined
+
+handleLook :: GameState -> IO ()
+handleLook gameState = do
+  let (desc, revealed) = lookAround gameState
+  putStrLn desc
+  gameLoop revealed
+
+handleMap :: GameState -> IO ()
+handleMap gameState = do
+  putStrLn $ renderMap gameState
+  gameLoop gameState
+
 
 handleQuit :: IO ()
 handleQuit = putStrLn "Goodbye!"
@@ -248,7 +258,6 @@ main = do
   let game = newGame $ parseMap mazeGrid
   putStrLn "Welcome to the maze!"
   putStrLn "Commands: forward | turn left | turn right | look | map | help | quit"
-  putStrLn (fst $ lookAround game)
   gameLoop game
 
 {-----------|
