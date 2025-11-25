@@ -2,7 +2,6 @@ module MazeV1 where
 
 import Data.List (nub)
 import Data.Char (toUpper, toLower)
-import Data.ByteString (initsNE)
 import System.IO (hFlush, stdout)
 
 {-------------------|
@@ -20,7 +19,7 @@ data GameState = GameState
   , position :: Position
   , direction :: Direction
   , discovered :: [Position]
-  } deriving (Show, Eq)
+  } deriving (Show)
 
 parseMap :: String -> Maze
 parseMap input = map parseLine (lines input)
@@ -218,8 +217,16 @@ gameLoop gameState = do
     "quit"       -> handleQuit
     _            -> handleUnknown gameState
 
-handleMoveForward = undefined
-
+handleMoveForward :: GameState -> IO ()
+handleMoveForward gameState = if isWalkable
+  then do
+    putStrLn "You moved forward."
+    afterAction newGameState
+  else do
+    putStrLn "You hit the wall."
+    gameLoop gameState
+  where
+    (isWalkable, newGameState) = moveForward gameState
 
 handleTurnLeft :: GameState -> IO ()
 handleTurnLeft gameState = do
@@ -240,13 +247,13 @@ afterAction gameState = do
   let (desc, revealed) = lookAround gameState
   putStrLn desc
   if arrivedGoal revealed
-    then putStrLn "🎉 You reached the goal!"
+    then putStrLn "🎉 You reached the goal! 🎉"
     else gameLoop revealed
 
 handleLook :: GameState -> IO ()
 handleLook gameState = do
-  let (desc, revealed) = lookAround gameState
-  putStrLn desc
+  let (description, revealed) = lookAround gameState
+  putStrLn description
   gameLoop revealed
 
 handleMap :: GameState -> IO ()
