@@ -219,8 +219,29 @@ gameLoop gameState = do
     _            -> handleUnknown gameState
 
 handleMoveForward = undefined
-handleTurnLeft = undefined
-handleTurnRight = undefined
+
+
+handleTurnLeft :: GameState -> IO ()
+handleTurnLeft gameState = do
+  let turned   = gameState { direction = turnLeft (direction gameState) }
+      revealed = reveal turned (visibleAround turned)
+  putStrLn "You turn left."
+  afterAction revealed
+
+handleTurnRight :: GameState -> IO ()
+handleTurnRight gameState = do
+  let turned   = gameState { direction = turnRight (direction gameState) }
+      revealed = reveal turned (visibleAround turned)
+  putStrLn "You turn right."
+  gameLoop turned
+
+afterAction :: GameState -> IO ()
+afterAction gameState = do
+  let (desc, revealed) = lookAround gameState
+  putStrLn desc
+  if arrivedGoal revealed
+    then putStrLn "🎉 You reached the goal!"
+    else gameLoop revealed
 
 handleLook :: GameState -> IO ()
 handleLook gameState = do
