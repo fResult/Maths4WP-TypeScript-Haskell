@@ -205,9 +205,10 @@ tileSymbol Goal  = '_'
 |---------------}
 gameLoop :: GameState -> IO ()
 gameLoop gameState = do
-  putStr "> "
+  putStr "\ESC[31m➜ \ESC[34m"
   hFlush stdout
   cmd <- fmap (map toLower) getLine
+  putStr "\ESC[m"
   case cmd of
     "forward"    -> handleMoveForward gameState
     "turn left"  -> handleTurnLeft gameState
