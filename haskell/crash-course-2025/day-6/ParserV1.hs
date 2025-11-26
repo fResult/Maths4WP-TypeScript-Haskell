@@ -1,21 +1,29 @@
 {-# LANGUAGE LambdaCase #-}
 module ParserV1 where
 
+import Data.Char (isAlpha, isDigit)
+import Control.Applicative (Alternative(some))
+
 newtype Parser a = Parser { runParser :: String -> Maybe (a, String) }
 
 instance Functor Parser where
   fmap :: (a -> b) -> Parser a -> Parser b
-  fmap f (Parser p) = Parser (\input ->
-    case p input of
-      Just (a, rest) -> Just (f a, rest)
+  fmap f (Parser pf) = Parser (\input ->
+    case pf input of
+      Just (x, rest) -> Just (f x, rest)
       Nothing        -> Nothing)
 
 instance Applicative Parser where
   pure :: a -> Parser a
-  pure x = undefined
+  pure x = Parser $ \input -> Just (x, input)
 
   (<*>) :: Parser (a -> b) -> Parser a -> Parser b
-  (Parser pf) <*> (Parser pg) = undefined
+  (Parser pf) <*> (Parser pg) = Parser $ \input ->
+    case pf input of
+      Nothing        -> Nothing
+      Just (f, rest) -> case pg rest of
+        Nothing         -> Nothing
+        Just (x, rest') -> Just (f x, rest')
 
 -- char :: Char -> Parser Char
 -- char c = Parser (\input ->
