@@ -1,42 +1,34 @@
-# Day 6 - Haskell Maze Adventure Game
+# Day 6 - Haskell Maze Game
 
-- **`maze-v1.hs`**: The stable baseline version.\
-  Implements the game using standard list manipulation and jagged array handling
-- **`maze-v2.hs`**: The development version.
-  Currently being refactored to include a custom `Parser` type and instances (`Functor`, `Applicative`, `Monad`, `Alternative`)
+There are two versions of this game:
 
-## How to Run
+- **`maze-v1.hs`**: The stable version.\
+  It is complete and works well. It uses standard list logic.
+- **`maze-v2.hs`**: The new version.\
+  It uses a custom `Parser` and advanced types like `Functor` and `Monad`.
+
+## How to Play
 
 ### Version 1 (Stable / Baseline)
 
-This version runs the original logic (Manual List Processing).
+This version runs the original game logic.
 
 ```bash
-cd $(git rev-parse --show-toplevel) && \
-  ghci haskell/crash-course-2025/day-6/maze-v1.hs
+./run-maze-v1.md
+# OR if you are in the root folder:
+haskell/crash-course-2025/day-6/run-maze-v1.md
 ```
 
-**Inside GHCi**:
+**To quit the game:** Press <kbd>Ctrl</kbd> + <kbd>C</kbd>.
+
+### Version 2 (New Parser)
+
+This version tests the new `Parser` code. It is currently being built.
 
 ```bash
-main
--- Or to run unit tests:
-test
+./run-maze-v2.md
+# OR if you are in the root folder:
+haskell/crash-course-2025/day-6/run-maze-v2.md
 ```
 
-### Version 2 (Functional Parser)
-
-This version contains the new `Parser` type definitions and is under active development.
-
-```bash
-cd $(git rev-parse --show-toplevel) && \
-  ghci haskell/crash-course-2025/day-6/maze-v2.hs
-```
-
-**Inside GHCi**:
-
-```bash
-main
--- Or to run unit tests:
-test
-```
+**To quit the game:** Press <kbd>Ctrl</kbd> + <kbd>C</kbd>.
