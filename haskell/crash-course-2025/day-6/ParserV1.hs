@@ -3,6 +3,13 @@ module ParserV1 where
 
 newtype Parser a = Parser { runParser :: String -> Maybe (a, String) }
 
+instance Functor Parser where
+  fmap :: (a -> b) -> Parser a -> Parser b
+  fmap f (Parser p) = Parser (\input ->
+    case p input of
+      Just (a, rest) -> Just (f a, rest)
+      Nothing        -> Nothing)
+
 -- char :: Char -> Parser Char
 -- char c = Parser (\input ->
 --   case input of
