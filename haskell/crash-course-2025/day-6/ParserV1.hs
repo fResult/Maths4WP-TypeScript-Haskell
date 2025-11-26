@@ -2,7 +2,7 @@
 module ParserV1 where
 
 import Data.Char (isAlpha, isDigit)
-import Control.Applicative (Alternative(some))
+import Control.Applicative (Alternative (empty, (<|>)))
 
 newtype Parser a = Parser { runParser :: String -> Maybe (a, String) }
 
@@ -24,6 +24,14 @@ instance Applicative Parser where
       Just (f, rest) -> case pg rest of
         Nothing         -> Nothing
         Just (x, rest') -> Just (f x, rest')
+
+instance Alternative Parser where
+  empty :: Parser a
+  empty = Parser $ const Nothing
+
+  (<|>) :: Parser a -> Parser a -> Parser a
+  (Parser pf) <|> (Parser pg) = Parser $ \input ->
+    pf input <|> pg input
 
 -- char :: Char -> Parser Char
 -- char c = Parser (\input ->
