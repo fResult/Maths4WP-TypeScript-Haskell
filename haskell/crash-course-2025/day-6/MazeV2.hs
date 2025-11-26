@@ -3,6 +3,8 @@ module MazeV2 where
 import Data.List (nub)
 import Data.Char (toUpper, toLower)
 import System.IO (hFlush, stdout)
+import Control.Applicative ((<|>))
+import Data.Functor (($>))
 
 import ParserV1
 
@@ -27,6 +29,17 @@ data GameState = GameState
   , direction :: Direction
   , discovered :: [Position]
   } deriving (Show)
+
+
+{--------------------|
+|--- Game Parsers ---|
+|--------------------}
+parseDirection :: Parser Direction
+parseDirection =
+      word "north" $> North
+  <|> word "east"  $> East
+  <|> word "south" $> South
+  <|> word "west"  $> West
 
 parseMap :: String -> Maze
 parseMap input = map parseLine (lines input)
