@@ -51,6 +51,22 @@ parseDirection =
   <|> word "south" $> South
   <|> word "west"  $> West
 
+parseAction :: Parser Action
+parseAction =
+      word "forward" $> Forward
+  <|> word "move" *> word "forward" $> Forward
+  <|> word "turn" *> word "left" $> TurnLeft
+  <|> word "turn" *> word "right" $> TurnRight
+  <|> word "left" $> TurnLeft
+  <|> word "right" $> TurnRight
+  <|> word "turn" *> (Turn <$> parseDirection)
+  <|> Turn <$> parseDirection
+  <|> word "look" $> Look
+  <|> word "map" $> Map
+  <|> word "help" $> Help
+  <|> word "commands" $> Help
+  <|> word "quit" $> Quit
+
 parseMap :: String -> Maze
 parseMap input = map parseLine (lines input)
   where
