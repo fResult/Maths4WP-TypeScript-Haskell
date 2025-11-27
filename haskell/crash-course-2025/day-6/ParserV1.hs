@@ -47,9 +47,7 @@ insensitiveChar :: Char -> Parser Char
 insensitiveChar c = fmap toLower (char (toLower c) <|> char (toUpper c))
 
 word :: String -> Parser String
-word str = token $ word' str
-  where
-    word' = traverse insensitiveChar
+word str = token $ traverse char str
 
 spaces :: Parser ()
 spaces = Parser $ \input -> Just ((), dropWhile isSpace input)

@@ -30,6 +30,16 @@ data GameState = GameState
   , discovered :: [Position]
   } deriving (Show)
 
+data Action
+  = Forward
+  | TurnLeft
+  | TurnRight
+  | Turn Direction
+  | Look
+  | Map
+  | Quit
+  | Help
+  deriving (Show, Eq)
 
 {--------------------|
 |--- Game Parsers ---|
