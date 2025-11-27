@@ -1,8 +1,8 @@
 {-# LANGUAGE LambdaCase #-}
 module ParserV1 where
 
-import Data.Char (isAlpha, isDigit)
-import Control.Applicative (Alternative (empty, (<|>)))
+import Data.Char (isAlpha, isDigit, isSpace)
+import Control.Applicative (Alternative (empty, (<|>)), (*>), (<*))
 
 newtype Parser a = Parser { runParser :: String -> Maybe (a, String) }
 
@@ -44,4 +44,10 @@ char c = Parser (\case
   _ -> Nothing)
 
 word :: String -> Parser String
-word = traverse char
+word str = token $ traverse char str
+
+spaces :: Parser ()
+spaces = Parser $ \input -> Just ((), dropWhile isSpace input)
+
+token :: Parser a -> Parser a
+token parser = spaces *> parser <* spaces
