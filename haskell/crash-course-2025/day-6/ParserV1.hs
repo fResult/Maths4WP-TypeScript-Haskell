@@ -1,7 +1,7 @@
 {-# LANGUAGE LambdaCase #-}
 module ParserV1 where
 
-import Data.Char (isAlpha, isDigit, isSpace)
+import Data.Char (isAlpha, isDigit, isSpace, toLower, toUpper)
 import Control.Applicative (Alternative (empty, (<|>)), (*>), (<*))
 
 newtype Parser a = Parser { runParser :: String -> Maybe (a, String) }
@@ -43,8 +43,13 @@ char c = Parser (\case
   (x : xs) | x == c -> Just (x, xs)
   _ -> Nothing)
 
+insensitiveChar :: Char -> Parser Char
+insensitiveChar c = fmap toLower (char (toLower c) <|> char (toUpper c))
+
 word :: String -> Parser String
-word str = token $ traverse char str
+word str = token $ word' str
+  where
+    word' = traverse insensitiveChar
 
 spaces :: Parser ()
 spaces = Parser $ \input -> Just ((), dropWhile isSpace input)
