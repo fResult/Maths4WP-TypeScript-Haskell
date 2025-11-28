@@ -6,12 +6,7 @@ import System.IO (hFlush, stdout)
 import Control.Applicative ((<|>))
 import Data.Functor (($>))
 
-import ParserV1
-
-{--------------------------|
-|--- Functional Parsers ---|
-|--------------------------}
-newtype Parser a = Parser { runParser :: String -> Maybe (a, String) }
+import ParserV1 ( word, Parser(runParser) )
 
 {-------------------|
 |--- Data Models ---|

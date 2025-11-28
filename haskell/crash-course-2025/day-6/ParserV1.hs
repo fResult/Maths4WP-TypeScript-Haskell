@@ -1,7 +1,8 @@
 {-# LANGUAGE LambdaCase #-}
-module ParserV1 where
+module ParserV1 ( Parser (runParser)
+                , word ) where
 
-import Data.Char (isAlpha, isDigit, isSpace, toLower, toUpper)
+import Data.Char (isSpace, toLower, toUpper)
 import Control.Applicative (Alternative (empty, (<|>)), (*>), (<*))
 
 newtype Parser a = Parser { runParser :: String -> Maybe (a, String) }
