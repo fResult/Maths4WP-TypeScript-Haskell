@@ -260,69 +260,89 @@ gameLoop :: GameState -> IO ()
 gameLoop gameState = do
   putStr "\ESC[31m➜ \ESC[34m"
   hFlush stdout
-  cmd <- fmap (map toLower) getLine
-  putStr "\ESC[m"
-  case cmd of
-    "forward"    -> handleMoveForward gameState
-    "turn left"  -> handleTurnLeft gameState
-    "turn right" -> handleTurnRight gameState
-    "look"       -> handleLook gameState
-    "map"        -> handleMap gameState
-    "quit"       -> handleQuit
-    _            -> handleUnknown gameState
+  cmd <- {-fmap (map toLower)-} getLine
+  case parseInput cmd of
+    Just Quit   -> handleQuit
+    Just action ->
+      handleAction action gameState >>= gameLoop
+    Nothing     -> handleUnknown gameState >>= gameLoop
 
-handleMoveForward :: GameState -> IO ()
+handleAction :: Action -> GameState -> IO GameState
+handleAction action gameState = case action of
+  Look        -> handleLook gameState
+  Map         -> handleMap gameState
+  Forward     -> handleMoveForward gameState
+  TurnLeft    -> handleTurnLeft gameState
+  TurnRight   -> handleTurnRight gameState
+  Turn dir    -> handleTurnDirection dir gameState
+  Help        -> handleHelp gameState
+
+handleLook :: GameState -> IO GameState
+handleLook gameState = do
+  let (description, revealed) = lookAround gameState
+  putStrLn description
+  pure revealed
+
+handleMap :: GameState -> IO GameState
+handleMap gameState = do
+  putStrLn $ renderMap gameState
+  pure gameState
+
+handleMoveForward :: GameState -> IO GameState
 handleMoveForward gameState = if isWalkable
   then do
     putStrLn "You moved forward."
     afterAction newGameState
   else do
     putStrLn "You hit the wall."
-    gameLoop gameState
+    pure gameState
   where
     (isWalkable, newGameState) = moveForward gameState
 
-handleTurnLeft :: GameState -> IO ()
+handleTurnLeft :: GameState -> IO GameState
 handleTurnLeft gameState = do
   let turned   = gameState { direction = turnLeft (direction gameState) }
       revealed = reveal turned (visibleAround turned)
   putStrLn "You turn left."
   afterAction revealed
 
-handleTurnRight :: GameState -> IO ()
+handleTurnRight :: GameState -> IO GameState
 handleTurnRight gameState = do
   let turned   = gameState { direction = turnRight (direction gameState) }
       revealed = reveal turned (visibleAround turned)
   putStrLn "You turn right."
-  gameLoop turned
+  afterAction turned
 
-afterAction :: GameState -> IO ()
+handleTurnDirection :: Direction -> GameState -> IO GameState
+handleTurnDirection dir gameState = do
+  let turned   = gameState { direction = dir }
+      revealed = reveal turned (visibleAround turned)
+  putStrLn $ "You now face " ++ show dir
+  afterAction revealed
+
+afterAction :: GameState -> IO GameState
 afterAction gameState = do
   let (desc, revealed) = lookAround gameState
   putStrLn desc
   if arrivedGoal revealed
-    then putStrLn "🎉 You reached the goal! 🎉"
-    else gameLoop revealed
+    then do
+      putStrLn "🎉 You reached the goal! 🎉"
+      pure revealed
+    else pure revealed
 
-handleLook :: GameState -> IO ()
-handleLook gameState = do
-  let (description, revealed) = lookAround gameState
-  putStrLn description
-  gameLoop revealed
-
-handleMap :: GameState -> IO ()
-handleMap gameState = do
-  putStrLn $ renderMap gameState
-  gameLoop gameState
-
+handleHelp :: GameState -> IO GameState
+handleHelp gameState = do
+  putStrLn helpText
+  pure gameState
+  where helpText = "____"
 
 handleQuit :: IO ()
 handleQuit = putStrLn "Goodbye!"
 
-handleUnknown :: GameState -> IO ()
+handleUnknown :: GameState -> IO GameState
 handleUnknown gameState = do
   putStrLn "Unknown command. Try: forward | turn left | turn right | look | map | help | quit"
-  gameLoop gameState
+  pure gameState
 
 {----------|
 |-- Main --|
