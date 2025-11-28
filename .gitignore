@@ -1,7 +1,12 @@
 .idea
 **/.DS_Store
 
+# TypeScript
 node_modules
 
+# Haskell
 **/*.o
 **/*.hi
+
+**/.stack-work/
+**/*~
