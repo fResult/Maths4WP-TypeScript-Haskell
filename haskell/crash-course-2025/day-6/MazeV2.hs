@@ -334,7 +334,6 @@ handleHelp :: GameState -> IO GameState
 handleHelp gameState = do
   putStrLn helpText
   pure gameState
-  where helpText = "____"
 
 handleQuit :: IO ()
 handleQuit = putStrLn "Goodbye!"
@@ -343,6 +342,19 @@ handleUnknown :: GameState -> IO GameState
 handleUnknown gameState = do
   putStrLn "Unknown command. Try: forward | turn left | turn right | look | map | help | quit"
   pure gameState
+
+helpText :: String
+helpText = unlines
+  [ "Available commands:"
+  , "\tforward / move forward     - move ahead"
+  , "\tturn left / left           - turn left"
+  , "\tturn right / right         - turn right"
+  , "\tturn north/south/east/west - face that direction"
+  , "\tlook                       - look around"
+  , "\tmap                        - show explored map"
+  , "\thelp / commands            - show this list"
+  , "\tquit                       - exit the game"
+  ]
 
 {----------|
 |-- Main --|
@@ -353,9 +365,9 @@ main = do
   testParse
 
   putStrLn ""
-  putStrLn "-----------------------------"
-  putStrLn "--------- Start app ---------"
-  putStrLn "-----------------------------"
+  putStrLn "------------------------------"
+  putStrLn "--------- Start Game ---------"
+  putStrLn "------------------------------"
   -- haskell/crash-course-2025/maze-maps/maze1.txt
   mazeGrid <- readFile "../maze-maps/maze1.txt"
 
