@@ -323,6 +323,7 @@ handleUnknown gameState = do
 main :: IO ()
 main = do
   test
+  testParse
 
   putStrLn ""
   putStrLn "-----------------------------"
@@ -421,3 +422,59 @@ assertAndLog expected actual =
   ++ show expected
   ++ "\" -> "
   ++ show (expected == actual)
+
+testParse :: IO ()
+testParse = do
+  putStrLn "\n------------------------------"
+  putStrLn "--- Testing Action Parser  ---"
+  putStrLn "------------------------------"
+
+  let testCases =
+        -- 1. Movement
+        [ ("forward",       Just Forward)  -- Happy path
+        , ("move forward",  Just Forward)  -- Synonym
+        , ("turn left",     Just TurnLeft) -- Two words
+
+        -- 2. Turning (Relative)
+        , ("turn left",     Just TurnLeft)
+        , ("left",          Just TurnLeft)
+        , ("turn right",    Just TurnRight)
+        , ("right",         Just TurnRight)
+
+        -- 3. Turning (Absolute / Cardinal)
+        , ("turn north",    Just (Turn North))
+        , ("north",         Just (Turn North))
+        , ("turn south",    Just (Turn South))
+        , ("east",          Just (Turn East))
+        , ("WEST",          Just (Turn West)) -- Case Insensitivity Check
+
+        -- 4. Actions / Utilities
+        , ("look",          Just Look)
+        , ("map",           Just Map)
+        , ("help",          Just Help)
+        , ("commands",      Just Help)      -- Synonym
+        , ("quit",          Just Quit)
+
+        -- 5. Invalid Commands (Should fail)
+        , ("fly",           Nothing)        -- Unknown command
+        , ("jump",          Nothing)
+        , ("turn up",       Nothing)        -- Invalid direction
+        , ("",              Nothing)        -- Empty string
+        , ("   ",           Nothing)        -- Whitespace only
+        ]
+
+  mapM_ check testCases
+
+  where
+    check (input, expected) = do
+      let result = runParser parseAction input
+      let actual = fmap fst result
+
+      let status = if actual == expected
+                   then "✅ PASS"
+                   else "❌ FAIL"
+
+      putStrLn $ status ++ " Input: " ++ show input
+               ++ " -> Expected: " ++ show expected
+               ++ ", Actual: " ++ show actual
+
