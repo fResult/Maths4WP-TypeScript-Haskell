@@ -67,6 +67,13 @@ parseAction =
   <|> word "commands" $> Help
   <|> word "quit" $> Quit
 
+parseInput :: String -> Maybe Action
+parseInput input = case run input of
+  Just (a, _) -> Just a
+  Nothing     -> Nothing
+  where
+    run = runParser parseAction
+
 parseMap :: String -> Maze
 parseMap input = map parseLine (lines input)
   where
