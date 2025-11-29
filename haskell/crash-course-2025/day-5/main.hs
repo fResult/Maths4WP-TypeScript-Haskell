@@ -66,3 +66,51 @@ half = (/ 2)
 
 sqr :: Float -> Float
 sqr n = n * n
+
+
+{-------------------------|
+|--- Dummy (Test Data) ---|
+|-------------------------}
+rose :: FramedRose
+rose = mkFramedRose 10000
+
+{--------------------|
+|--- Unit Testing ---|
+|--------------------}
+infix 4 ~=
+(~=) :: Float -> Float -> Bool
+x ~= y = abs (x - y) < epsilon
+  where epsilon = 1e-6 -- 0.000001
+
+testFramedRoseArea :: IO ()
+testFramedRoseArea = do
+  putStrLn "\n----------------------------------"
+  putStrLn "--- Testing Framed Rose Area   ---"
+  putStrLn "----------------------------------"
+
+  let expectedTheoreticalArea n = sqr n * (pi / 2 - 1)
+  let testCases =
+        -- 1. Normal Case (Large)
+        [ (100.0, expectedTheoreticalArea 100.0)   -- Theoretical: S^2 * (π/2 - 1)
+
+        -- 2. Normal Case (Medium)
+        , (50.0,  expectedTheoreticalArea 50.0)
+
+        -- 3. Edge Case (Zero / Small enough)
+        , (0.0,   expectedTheoreticalArea 0.0)
+        ]
+
+  mapM_ checkApprox testCases
+
+  where
+    checkApprox (size, expected) = do
+      let rose = mkFramedRose size
+      let actual = area rose
+
+      let status = if actual ~= expected
+                   then "✅ PASS"
+                   else "❌ FAIL"
+
+      putStrLn $ status ++ " Size: " ++ show size
+                 ++ " -> Expected: " ++ show expected
+                 ++ ", Actual: " ++ show actual
