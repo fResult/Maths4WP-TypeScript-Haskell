@@ -28,11 +28,11 @@ instance HasArea Petal where
 
 instance HasArea Square where
   area :: Square -> Float
-  area square = undefined
+  area (Square side) = sqr side
 
 instance HasArea Circle where
   area :: Circle -> Float
-  area circle = undefined
+  area (Circle radius) = pi * sqr radius
 
 mkFramedRose :: Float -> FramedRose
 mkFramedRose frameSide
