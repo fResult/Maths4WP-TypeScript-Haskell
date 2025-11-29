@@ -34,6 +34,10 @@ instance HasArea Circle where
   area :: Circle -> Float
   area (Circle radius) = pi * sqr radius
 
+depth :: FramedRose -> Int
+depth EmptyRose = 0
+depth (Rose _ innerRose) = 1 + depth innerRose
+
 mkFramedRose :: Float -> FramedRose
 mkFramedRose frameSide
   | isSmallEnough frameSide = EmptyRose
@@ -71,8 +75,21 @@ sqr n = n * n
 {-------------------------|
 |--- Dummy (Test Data) ---|
 |-------------------------}
-rose :: FramedRose
-rose = mkFramedRose 10000
+rose100 :: FramedRose
+rose100 = mkFramedRose 100
+
+rose1k :: FramedRose
+rose1k = mkFramedRose 1_000
+
+rose10k :: FramedRose
+rose10k = mkFramedRose 10_000
+
+
+rose100k :: FramedRose
+rose100k = mkFramedRose 100_000
+
+rose1m :: FramedRose
+rose1m = mkFramedRose 1_000_000
 
 {--------------------|
 |--- Unit Testing ---|
