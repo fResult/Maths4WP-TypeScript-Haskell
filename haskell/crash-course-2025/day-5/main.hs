@@ -18,8 +18,14 @@ mkFramedRose frameSide
   | isSmallEnough frameSide = EmptyRose
   | otherwise               = Rose petal innerRose
   where
-    petal = undefined
+    petal = Petal (Square frameSide) (Circle $ half frameSide) (Square hypotenuse)
     innerRose = undefined
+    hypotenuse = undefined
 
 isSmallEnough :: Float -> Bool
-isSmallEnough x = undefined
+isSmallEnough n = n <= epsilon
+  where
+    epsilon = 0.0001
+
+half :: Float -> Float
+half = (/ 2)
