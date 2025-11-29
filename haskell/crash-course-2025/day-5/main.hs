@@ -47,6 +47,14 @@ mkFramedRose frameSide
     innerRose = mkFramedRose innerFrameSide
     innerFrameSide = hypotenuseOfRightTri $ half frameSide
 
+mkFramedRoseWithDepth :: Int -> Float -> FramedRose
+mkFramedRoseWithDepth depth frameSide
+  | depth == 0 = EmptyRose
+  | otherwise  = Rose petal innerRose
+  where
+    petal     = undefined
+    innerRose = undefined
+
 mkPetal :: Float -> Petal
 mkPetal frameSide = Petal frameSquare innerCircle innerSquare
   where
