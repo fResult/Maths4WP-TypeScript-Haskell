@@ -12,3 +12,14 @@ data Petal = Petal { frameSquare :: Square
 
 newtype Square = Square { side :: Float } deriving (Show, Eq)
 newtype Circle = Circle { radius :: Float } deriving (Show, Eq)
+
+mkFramedRose :: Float -> FramedRose
+mkFramedRose frameSide
+  | isSmallEnough frameSide = EmptyRose
+  | otherwise               = Rose petal innerRose
+  where
+    petal = undefined
+    innerRose = undefined
+
+isSmallEnough :: Float -> Bool
+isSmallEnough x = undefined
