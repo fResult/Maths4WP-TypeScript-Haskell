@@ -18,9 +18,24 @@ mkFramedRose frameSide
   | isSmallEnough frameSide = EmptyRose
   | otherwise               = Rose petal innerRose
   where
-    petal = Petal (Square frameSide) (Circle $ half frameSide) (Square hypotenuse)
-    innerRose = undefined
-    hypotenuse = undefined
+    petal = mkPetal frameSide
+    innerRose = mkInnerRose innerFrameSide
+    innerFrameSide = undefined
+
+mkPetal :: Float -> Petal
+mkPetal frameSide = Petal
+  (Square frameSide)
+  (Circle $ half frameSide)
+  (Square $ hypotenuseEqual (half frameSide))
+
+mkInnerRose :: Float -> FramedRose
+mkInnerRose frameSide = undefined
+
+hypotenuseEqual :: Float -> Float
+hypotenuseEqual a = hypotenuse a a
+
+hypotenuse :: Float -> Float -> Float
+hypotenuse a b = sqrt (sqr a + sqr b)
 
 isSmallEnough :: Float -> Bool
 isSmallEnough n = n <= epsilon
@@ -29,3 +44,6 @@ isSmallEnough n = n <= epsilon
 
 half :: Float -> Float
 half = (/ 2)
+
+sqr :: Float -> Float
+sqr n = n * n
