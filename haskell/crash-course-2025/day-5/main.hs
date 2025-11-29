@@ -24,7 +24,15 @@ instance HasArea FramedRose where
 
 instance HasArea Petal where
   area :: Petal -> Float
-  area petal = undefined
+  area (Petal _ innerCircle innerSquare) = area innerCircle - area innerSquare
+
+instance HasArea Square where
+  area :: Square -> Float
+  area square = undefined
+
+instance HasArea Circle where
+  area :: Circle -> Float
+  area circle = undefined
 
 mkFramedRose :: Float -> FramedRose
 mkFramedRose frameSide
