@@ -19,17 +19,15 @@ mkFramedRose frameSide
   | otherwise               = Rose petal innerRose
   where
     petal = mkPetal frameSide
-    innerRose = mkInnerRose innerFrameSide
+    innerRose = mkFramedRose innerFrameSide
     innerFrameSide = hypotenuseOfRightTri $ half frameSide
 
 mkPetal :: Float -> Petal
-mkPetal frameSide = Petal
-  (Square frameSide)
-  (Circle $ half frameSide)
-  (Square $ hypotenuseOfRightTri (half frameSide))
-
-mkInnerRose :: Float -> FramedRose
-mkInnerRose frameSide = undefined
+mkPetal frameSide = Petal frameSquare innerCircle innerSquare
+  where
+    frameSquare = Square frameSide
+    innerCircle = Circle $ half frameSide
+    innerSquare = Square (hypotenuseOfRightTri $ half frameSide)
 
 hypotenuseOfRightTri :: Float -> Float
 hypotenuseOfRightTri a = hypotenuse a a
