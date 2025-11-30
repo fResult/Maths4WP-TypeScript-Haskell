@@ -109,6 +109,9 @@ hogofM''' n = hM =<< gM =<< fM n
 data Option a = None | Some a
   deriving (Show, Eq)
 
+fromSome :: Option a -> a
+fromSome (Some x) = x
+
 instance Monad Option where
   (>>=) :: Option a -> (a -> Option b) -> Option b
   None   >>= _ = None
@@ -116,10 +119,12 @@ instance Monad Option where
 
 instance Applicative Option where
   pure :: a -> Option a
-  pure x = undefined
+  pure = Some
 
   (<*>) :: Option (a -> b) -> Option a -> Option b
-  _ <*> _ = undefined
+  None   <*> _      = None
+  _      <*> None   = None
+  Some f <*> Some x = Some $ f x
 
 instance Functor Option where
   fmap :: (a -> b) -> Option a -> Option b
