@@ -113,6 +113,27 @@ hogofM''''Sugar n = do
   y <- gM x
   fM y
 
+-- λ> [1..5] >>= \x -> [x, -x]
+-- [1,-1,2,-2,3,-3,4,-4,5,-5]
+
+l1 :: [(Int, Char)]
+l1 = [1, 2] >>= \n -> ['a', 'b'] >>= \ch -> return (n, ch)
+
+l2 :: [(Integer, Char)]
+l2 =
+  [1, 2] >>= (\n ->
+  ['a', 'b'] >>= (\ch ->
+  return (n, ch)))
+
+l3 :: [(Integer, Char)]
+l3 = do
+  n <- [1, 2]
+  ch <- ['a', 'b']
+  return (n, ch)
+
+l4 :: [(Int, Char)]
+l4 = [ (n, ch) | n <- [1, 2], ch <- ['a', 'b'] ]
+
 -- instance Monad Maybe where
   -- (>>=) :: Maybe a -> (a -> Maybe b) -> Maybe b
   -- Nothing >>= _ = Nothing

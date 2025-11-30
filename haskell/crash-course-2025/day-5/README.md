@@ -194,3 +194,39 @@ Nothing
 λ> Just 58 >>= fM >>= gM >>= hM
 Nothing
 ```
+
+#### List Comprehension Is Just Syntactic Sugar for List Monad
+
+The teacher said this was very confusing when he saw it for the first time.
+
+```hs
+λ> [1..5] >>= \x -> [x, -x]
+[1,-1,2,-2,3,-3,4,-4,5,-5]
+```
+
+That one is still okay.\
+But look at this one:
+
+```hs
+λ> [1, 2] >>= \n -> ['a', 'b'] >>= \ch -> return (n, ch)
+[(1,'a'),(1,'b'),(2,'a'),(2,'b')]
+```
+
+Does it look familiar?
+
+Let's rewrite it with `do` notation:
+
+```hs
+do
+  n <- [1, 2]
+  ch <- ['a', 'b']
+  return (n, ch)
+```
+
+Now, see the connection?\
+It is exactly the same as List Comprehension:
+
+```hs
+λ> [ (n, ch) | n <- [1, 2], ch <- ['a', 'b'] ]
+[(1,'a'),(1,'b'),(2,'a'),(2,'b')]
+```
