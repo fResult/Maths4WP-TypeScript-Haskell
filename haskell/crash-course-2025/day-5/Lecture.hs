@@ -101,11 +101,26 @@ hogofM'' n = fM n >>= gM >>= hM
 hogofM''' :: Int -> Maybe Int
 hogofM''' n = hM =<< gM =<< fM n
 
+hogofM'''' :: Int -> Maybe Int
+hogofM''''  n =
+  hM n >>= (\x ->
+  gM x >>= (\y ->
+  fM y))
+
+hogofM''''Sugar :: Int -> Maybe Int
+hogofM''''Sugar n = do
+  x <- hM n
+  y <- gM x
+  fM y
+
 -- instance Monad Maybe where
   -- (>>=) :: Maybe a -> (a -> Maybe b) -> Maybe b
   -- Nothing >>= _ = Nothing
   -- Just x  >>= f = f x
 
+{---------------------------|
+|--- Self-created Option ---|
+|---------------------------}
 data Option a = None | Some a
   deriving (Show, Eq)
 
