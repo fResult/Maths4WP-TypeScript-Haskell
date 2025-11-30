@@ -128,4 +128,5 @@ instance Applicative Option where
 
 instance Functor Option where
   fmap :: (a -> b) -> Option a -> Option b
-  fmap = undefined
+  fmap _ None     = None
+  fmap f (Some x) = Some (f x)
