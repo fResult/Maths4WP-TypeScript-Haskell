@@ -105,3 +105,22 @@ hogofM''' n = hM =<< gM =<< fM n
   -- (>>=) :: Maybe a -> (a -> Maybe b) -> Maybe b
   -- Nothing >>= _ = Nothing
   -- Just x  >>= f = f x
+
+data Option a = None | Some a
+  deriving (Show, Eq)
+
+instance Monad Option where
+  (>>=) :: Option a -> (a -> Option b) -> Option b
+  None   >>= _ = None
+  Some x >>= f = f x
+
+instance Applicative Option where
+  pure :: a -> Option a
+  pure x = undefined
+
+  (<*>) :: Option (a -> b) -> Option a -> Option b
+  _ <*> _ = undefined
+
+instance Functor Option where
+  fmap :: (a -> b) -> Option a -> Option b
+  fmap = undefined
