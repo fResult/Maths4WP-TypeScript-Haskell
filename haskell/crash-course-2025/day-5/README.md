@@ -18,7 +18,7 @@
 
 ---
 
-## fmap (`<$>`) and apply (`<*>`)
+## fmap (`<$>`), apply (`<*>`), and bind (`>>=`)
 
 ### 1. Functor: fmap (`<$>`)
 
@@ -85,3 +85,112 @@ We apply every function on the left to every value on the right (Cartesian Produ
 **Conclusion:**
 
 Yes, we get the result applied for **all possible combinations** of values.
+
+---
+
+### 3. Monad: bind (`>>=`)
+
+Let's look at the type signature.
+
+```hs
+λ> :type (>>=)
+(>>=) :: Monad m => m a -> (a -> m b) -> m b
+```
+
+To align with the diagrams above, let's think of `m` as the context `f`.
+
+```hs
+(>>=) :: Monad f => f a -> (a -> f b) -> f b
+```
+
+**The Problem: Function Composition**
+
+In the "Beautiful World" (Pure functions), composition is easy.
+
+
+|**Context**|**Function 1**|**Function 2**|**Composition**|
+|:---:|:---:|:---:|:---:|
+|**Normal**|`f :: A -> B`|`g :: B -> C`|`g . f :: A -> C`|
+
+But in the "Monad World" (Contextual functions), we have a problem.
+
+|**Context**|**Function 1**|**Function 2**|**Composition**|
+|---|---|---|---|
+|**Monad**|`f :: A -> m B`|`g :: B -> m C`|**???**|
+
+**Why can't we compose them?**
+
+Because the output of `f` is `m B`, but the input of `g` expects just `B`.\
+The types do not match.
+
+**Example: The Chain of Failure**
+
+Let's define 3 functions that might fail (return `Nothing` for specific numbers).
+
+```hs
+λ> :{
+λ| fM :: Int -> Maybe Int
+λ| fM n = if n == 42 then Nothing else Just n
+λ|
+λ| gM :: Int -> Maybe Int
+λ| gM n = if n == 58 then Nothing else Just n
+λ|
+λ| hM :: Int -> Maybe Int
+λ| hM n = if n == 61 then Nothing else Just n
+λ| :}
+```
+
+**The Hard Way: Nested Case (Callback Hell)**
+
+If we want to do `hM(gM(fM(n)))` manually, we must unwrap the value every time.
+
+```hs
+λ> :{
+λ| hogofM :: Int -> Maybe Int
+λ| hogofM n =
+λ|   case fM n of
+λ|     Nothing -> Nothing
+λ|     Just x  ->
+λ|       case gM x of
+λ|         Nothing -> Nothing
+λ|         Just y  -> hM y
+λ| :}
+```
+
+> **"This is fucking brutal !!!"**
+
+**The Monad Way: Bind (`>>=`)**
+
+The `>>=` operator handles the "unwrapping" logic for us.
+
+**Mathematical Logic for Maybe:**
+
+1. **Failure:** `Nothing >>= f = Nothing` (Stop immediately)
+2. **Success:** `Just x >>= f = f x` (Pass value to next function)
+
+Let's define the instance (Standard Library already does this):
+
+```hs
+λ> :{
+λ| instance Monad Maybe where
+λ|   (>>=) :: Maybe a -> (a -> Maybe b) -> Maybe b
+λ|   Nothing >>= _ = Nothing
+λ|   Just x  >>= f = f x
+λ| :}
+```
+
+**The Result: Clean Chain**
+
+Now we can chain them like a pipeline.
+
+```hs
+λ> Just 40 >>= fM >>= gM >>= hM
+Just 40
+
+-- If one fails, the whole chain returns Nothing
+λ> Just 42 >>= fM >>= gM >>= hM
+Nothing
+
+λ> Just 58 >>= fM >>= gM >>= hM
+Nothing
+```
