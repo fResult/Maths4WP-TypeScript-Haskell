@@ -42,8 +42,7 @@ fmap' :: (a -> b) -> Maybe a -> Maybe b
 fmap' f mx = Just (f (fromJust mx))
 
 data User = User { name  :: String
-                 , age   :: Int
-                 , email :: String }
+                 , age   :: Int }
                  deriving (Show, Eq)
 
 fM :: Int -> Maybe Int
@@ -138,6 +137,17 @@ l4 = [ (n, ch) | n <- [1, 2], ch <- ['a', 'b'] ]
   -- (>>=) :: Maybe a -> (a -> Maybe b) -> Maybe b
   -- Nothing >>= _ = Nothing
   -- Just x  >>= f = f x
+
+{---------------------------------|
+|--- Validation By Applicative ---|
+|---------------------------------}
+validations :: [Int -> Bool]
+validations = [even, (>0)]
+
+inputs :: [Int]
+inputs = [4, -5]
+-- λ> validations <*> inputs
+-- [True,False,True,False]
 
 {---------------------------|
 |--- Self-created Option ---|
