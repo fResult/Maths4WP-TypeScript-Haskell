@@ -167,6 +167,42 @@ createUser n a = User <$> validateName n <*> validateAge a
 -- λ> createUser "John" (-4)
 -- Left "Age cannot be negative"
 
+-----
+
+data Validation e a = Failure [e] | Success a
+  deriving (Show, Eq)
+
+instance Applicative (Validation e) where
+  pure :: a -> Validation e a
+  pure = Success
+
+  (<*>) :: Validation e (a -> b) -> Validation e a -> Validation e b
+  Failure e1 <*> Failure e2 = Failure (e1 ++ e2)
+  Failure e1 <*> _          = Failure e1
+  _          <*> Failure e2 = Failure e2
+  Success f  <*> Success x  = Success (f x)
+
+instance Functor (Validation e) where
+  fmap :: (a -> b) -> Validation e a -> Validation e b
+  fmap _ (Failure e) = Failure e
+  fmap f (Success x) = Success (f x)
+
+checkName :: String -> Validation String String
+checkName "" = Failure ["Name cannot be empty"]
+checkName n  = Success n
+
+checkAge :: Int -> Validation String Int
+checkAge a
+  | a < 0     = Failure ["Age cannot be negative"]
+  | otherwise = Success a
+-- λ> mkUser "John" 25
+-- Success (User {name = "John", age = 25})
+-- λ> mkUser "" (-5)
+-- Failure ["Name empty!","Age negative!"]
+
+mkUser :: String -> Int -> Validation String User
+mkUser name age = User <$> checkName name <*> checkAge age
+
 {---------------------------|
 |--- Self-created Option ---|
 |---------------------------}
