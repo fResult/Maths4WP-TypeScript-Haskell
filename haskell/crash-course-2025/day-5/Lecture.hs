@@ -149,6 +149,24 @@ inputs = [4, -5]
 -- λ> validations <*> inputs
 -- [True,False,True,False]
 
+-----
+
+validateName :: String -> Either String String
+validateName "" = Left "Name cannot be empty"
+validateName n  = Right n
+
+validateAge :: Int -> Either String Int
+validateAge a
+  | a < 0     = Left "Age cannot be negative"
+  | otherwise = Right a
+
+createUser :: String -> Int -> Either String User
+createUser n a = User <$> validateName n <*> validateAge a
+-- λ> createUser "John" 25
+-- Right (User {name = "John", age = 25})
+-- λ> createUser "John" (-4)
+-- Left "Age cannot be negative"
+
 {---------------------------|
 |--- Self-created Option ---|
 |---------------------------}
