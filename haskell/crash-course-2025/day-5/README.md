@@ -230,3 +230,91 @@ It is exactly the same as List Comprehension:
 λ> [ (n, ch) | n <- [1, 2], ch <- ['a', 'b'] ]
 [(1,'a'),(1,'b'),(2,'a'),(2,'b')]
 ```
+---
+
+## Why Applicative Matters: Practical Examples
+
+We can use Applicative to apply **multiple functions** to **multiple values** in a specific context.
+
+```hs
+[validateX, validateY, ValidateZ, ...] :: [X -> Bool]
+                <*>
+[x₁, x₂, x₃, ..., xₙ] :: [X]
+```
+
+### 1. Batch Processing (List Context)
+
+This is useful when we want to run **multiple checks** against **multiple inputs** at once (Cartesian Product).
+
+**Example:** Suppose we have `even` and positive (`> 0`) checkers, and a set of input data.
+
+```hs
+λ> :{
+λ| validations :: [Int -> Bool]
+λ| validations = [even, (>0)]
+
+λ| inputs :: [Int]
+λ| inputs = [4, -5]
+λ| :}
+```
+
+When we use `<*>`:
+
+```hs
+λ> validations <*> inputs
+[True,False,True,False]
+```
+
+**Tracing the logic:**
+
+1. `even` applied to `4` -> `True`
+2. `even` applied to `-5` -> `False`
+3. `(> 0)` applied to `4` -> `True`
+4. `(> 0)` applied to `-5` -> `False`
+
+---
+
+### 2. Fail-Fast Validation (Either Context)
+
+Standard `Either` is great for validation, but it stops at the **first error**.
+
+```hs
+λ> :{
+λ| validateName :: String -> Either String String
+λ| validateName "" = Left "Name cannot be empty"
+λ| validateName n  = Right n
+
+λ| validateAge :: Int -> Either String Int
+λ| validateAge a
+λ|   | a < 0     = Left "Age cannot be negative"
+λ|   | otherwise = Right a
+
+λ| createUser :: String -> Int -> Either String User
+λ| createUser n a = User <$> validateName n <*> validateAge a
+λ| :}
+```
+
+**Usage:**
+
+```hs
+-- Success case
+λ> createUser "John" 25
+Right (User {name = "John", age = 25})
+
+-- First argument fails
+λ> createUser "" 25
+Left "Name cannot be empty"
+
+-- Second argument fails
+λ> createUser "John" (-1)
+Left "Age cannot be negative"
+
+-- Both fail (Returns ONLY the first error)
+λ> createUser "" (-1)
+Left "Name cannot be empty"
+```
+
+**Conclusion:**\
+It has a **Fail-Fast** behavior.\
+It is the limitation of normal `Either` when we want to see all errors.
+
