@@ -318,3 +318,69 @@ Left "Name cannot be empty"
 It has a **Fail-Fast** behavior.\
 It is the limitation of normal `Either` when we want to see all errors.
 
+---
+
+### 3. Accumulative Validation (Custom Context)
+
+To get **all errors** (instead of stopping at the first one), we need a custom type that knows how to **combine** failures.
+
+**1. Define Type and Instances**
+
+The magic happens in the `Applicative` instance.
+Notice `Failure e1 <*> Failure e2`: we use `++` to **combine** the error lists.
+
+```hs
+λ> :{
+λ| data Validation e a = Failure [e] | Success a
+λ|   deriving (Show, Eq)
+λ|
+λ| instance Functor (Validation e) where
+λ|   fmap _ (Failure e) = Failure e
+λ|   fmap f (Success x) = Success (f x)
+λ|
+λ| instance Applicative (Validation e) where
+λ|   pure = Success
+λ|   Failure e1 <*> Failure e2 = Failure (e1 ++ e2) -- Accumulate errors!
+λ|   Failure e1 <*> _          = Failure e1
+λ|   _          <*> Failure e2 = Failure e2
+λ|   Success f  <*> Success x  = Success (f x)
+λ| :}
+```
+
+**2. The Validators**
+
+We rewrite validators to return `Validation` instead of `Either`.
+
+```hs
+λ> :{
+λ| checkName :: String -> Validation String String
+λ| checkName "" = Failure ["Name cannot be empty"]
+λ| checkName n  = Success n
+λ|
+λ| checkAge :: Int -> Validation String Int
+λ| checkAge a
+λ|   | a < 0     = Failure ["Age cannot be negative"]
+λ|   | otherwise = Success a
+λ|
+λ| mkUser :: String -> Int -> Validation String User
+λ| mkUser name age = User <$> checkName name <*> checkAge age
+λ| :}
+```
+
+**3. Conclusion**
+
+Unlike `Either`, we can see **all errors** at once.
+
+```hs
+-- Success case
+λ> mkUser "Somchai" 25
+Success (User {name = "Somchai", age = 25})
+
+-- One error
+λ> mkUser "" 25
+Failure ["Name cannot be empty"]
+
+-- Both errors (Accumulated!)
+λ> mkUser "" (-4)
+Failure ["Name cannot be empty","Age cannot be negative"]
+```
