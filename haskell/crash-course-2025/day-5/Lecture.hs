@@ -195,13 +195,23 @@ checkAge :: Int -> Validation String Int
 checkAge a
   | a < 0     = Failure ["Age cannot be negative"]
   | otherwise = Success a
+
+mkUser :: String -> Int -> Validation String User
+mkUser name age = User <$> checkName name <*> checkAge age
 -- λ> mkUser "John" 25
 -- Success (User {name = "John", age = 25})
 -- λ> mkUser "" (-5)
 -- Failure ["Name empty!","Age negative!"]
 
-mkUser :: String -> Int -> Validation String User
-mkUser name age = User <$> checkName name <*> checkAge age
+handleUserCreationResult :: Validation String User -> IO ()
+handleUserCreationResult validation =
+  case validation of
+    Success user ->
+      putStrLn $ "Success:" ++ show user
+    Failure es -> do
+      putStrLn "Validation Failed:"
+      mapM_ (putStrLn . (" - " ++) . show) es
+
 
 {---------------------------|
 |--- Self-created Option ---|
