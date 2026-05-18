@@ -53,7 +53,8 @@ Now, even the **function is in a context**.
 (<*>) :: Applicative f => f (a -> b) -> f a -> f b
 ```
 
-**The List Context:** Why does it produce a longer list?\
+**The List Context:**\
+Why does it produce a longer list?\
 In Functional Programming, a `List` isn't just a container; it represents **non-determinism** or **possibilities**.
 
 When we use `<*>`, we are combining **every possible function** with **every possible value**.

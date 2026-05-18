@@ -2,7 +2,7 @@
   "cSpell.words": [
     "Bifunctor",
     "concat",
-    "Endomoprhism",
+    "Endomorphism",
     "Finishable",
     "fmap",
     "foldl",
@@ -13,7 +13,11 @@
     "Monoidal",
     "Morphism",
     "scanl",
-    "scanr"
+    "scanr",
+    "ghci",
+    "ghcup",
+    "concatMap",
+    "uncurry"
   ],
   "editor.tabSize": 2,
   "haskell.serverExecutablePath": "/Users/fresult/.ghcup/bin/haskell-language-server-wrapper",

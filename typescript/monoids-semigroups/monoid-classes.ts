@@ -170,7 +170,7 @@
     }
 
     // List is Monoid under Concatenation is (List[T], concat, [])
-    // Endomoprhism is a Monoid under Composition is (T -> T, compose, id)
+    // Endomorphism is a Monoid under Composition is (T -> T, compose, id)
     // Endomorphism is not quite clear for this example
     class List<T = any> extends Monoid<T[]> {
         private constructor(protected x: T[]) {
