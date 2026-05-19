@@ -10,10 +10,6 @@ cd "$(dirname "$0")" || return
 
 export WORK_DIR=haskell/crash-course-2025/day-6
 
-## Compile `MazeV2.hs` and `ParserV1.hs` files
-
-ghc maze-v2 ParserV1
-
 ## Start the adventure!!
 
-runHaskell maze-v2
+runghc MazeV2
