@@ -32,3 +32,15 @@ haskell/crash-course-2025/day-6/run-maze-v2.md
 ```
 
 **To quit the game:** Press <kbd>Ctrl</kbd> + <kbd>C</kbd>.
+
+## Development Notes
+
+### Version 1 (Stable / Baseline)
+
+...
+
+### Version 2 (New Parser)
+
+```bash
+./develop-maze-v2.md
+```
