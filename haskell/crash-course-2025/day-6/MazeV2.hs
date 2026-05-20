@@ -69,6 +69,7 @@ parseInput input = case run input of
   where
     run = runParser parseAction
 
+-- TODO: Refactor parseMap to use Parser combinator instead of manual string matching
 parseMap :: String -> Maze
 parseMap input = map parseLine (lines input)
   where
