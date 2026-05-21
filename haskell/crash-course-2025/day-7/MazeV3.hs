@@ -1,4 +1,4 @@
-module MazeV2 where
+module MazeV3 where
 
 import Data.List (nub)
 import Data.Char (toUpper, toLower)
@@ -6,7 +6,7 @@ import System.IO (hFlush, stdout)
 import Control.Applicative ((<|>))
 import Data.Functor (($>))
 
-import ParserV1 ( word, Parser(runParser) )
+import ParserV2 ( word, Parser(runParser) )
 
 {-------------------|
 |--- Data Models ---|
