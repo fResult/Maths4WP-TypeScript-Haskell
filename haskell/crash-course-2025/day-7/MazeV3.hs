@@ -103,6 +103,13 @@ parseMap input = map parseLine (lines input)
         'o' -> Goal
         _   -> Wall
 
+parseTile :: Parser Tile
+parseTile =
+      word "[x]" $> Wall
+  <|> word "[_]" $> Empty
+  <|> word "[s]" $> Start
+  <|> word "[o]" $> Goal
+
 
 -- TODO: Refactor to return `Maybe` or `Either` to handle missing `Start` tile safely.
 findStart :: Maze -> Position
