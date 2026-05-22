@@ -8,6 +8,22 @@ import Data.Functor (($>))
 
 import ParserV2 ( word, Parser(runParser) )
 
+data Color = Color
+  { info    :: String
+  , success :: String
+  , warning :: String
+  , danger  :: String
+  , reset   :: String
+  }
+colors :: Color
+colors = Color
+  { info    = "\ESC[36m"
+  , success = "\ESC[32m"
+  , warning = "\ESC[33m"
+  , danger  = "\ESC[31m"
+  , reset   = "\ESC[m"
+  }
+
 {-------------------|
 |--- Data Models ---|
 |-------------------}
@@ -87,6 +103,7 @@ parseMap input = map parseLine (lines input)
         'o' -> Goal
         _   -> Wall
 
+
 -- TODO: Refactor to return `Maybe` or `Either` to handle missing `Start` tile safely.
 findStart :: Maze -> Position
 findStart maze = head [ (rowIdx, colIdx)
@@ -157,7 +174,7 @@ inBounds maze (rowIdx, colIdx) = rowIdxValid && colIdxValid
 lookAround :: GameState -> (String, GameState)
 lookAround gameState = (desc, revealed)
   where
-    desc = describeSurrounding gameState
+    desc = info colors ++ (describeSurrounding gameState) ++ reset colors
     revealed = reveal gameState (visibleAround gameState)
 
 describeSurrounding :: GameState -> String
@@ -254,9 +271,10 @@ tileSymbol Goal  = '_'
 |---------------}
 gameLoop :: GameState -> IO ()
 gameLoop gameState = do
-  putStr "\ESC[31m➜ \ESC[34m"
+  putStr $ danger colors ++ "➜ \ESC[34m"
   hFlush stdout
   cmd <- {-fmap (map toLower)-} getLine
+  putStr $ reset colors
   case parseInput cmd of
     Just Quit   -> handleQuit
     Just action ->
@@ -287,10 +305,10 @@ handleMap gameState = do
 handleMoveForward :: GameState -> IO GameState
 handleMoveForward gameState = if isWalkable
   then do
-    putStrLn "You moved forward."
+    putStrLn $ success colors ++ "You moved forward." ++ reset colors
     afterAction newGameState
   else do
-    putStrLn "You hit the wall."
+    putStrLn $ danger colors ++ "You hit the wall." ++ reset colors
     pure gameState
   where
     (isWalkable, newGameState) = moveForward gameState
@@ -299,21 +317,21 @@ handleTurnLeft :: GameState -> IO GameState
 handleTurnLeft gameState = do
   let turned   = gameState { direction = turnLeft (direction gameState) }
       revealed = reveal turned (visibleAround turned)
-  putStrLn "You turn left."
+  putStrLn $ info colors ++ "You turn left." ++ reset colors
   afterAction revealed
 
 handleTurnRight :: GameState -> IO GameState
 handleTurnRight gameState = do
   let turned   = gameState { direction = turnRight (direction gameState) }
       revealed = reveal turned (visibleAround turned)
-  putStrLn "You turn right."
+  putStrLn $ info colors ++ "You turn right." ++ reset colors
   afterAction turned
 
 handleTurnDirection :: Direction -> GameState -> IO GameState
 handleTurnDirection dir gameState = do
   let turned   = gameState { direction = dir }
       revealed = reveal turned (visibleAround turned)
-  putStrLn $ "You now face " ++ show dir
+  putStrLn $ info colors ++ "You now face " ++ show dir ++ reset colors
   afterAction revealed
 
 afterAction :: GameState -> IO GameState
@@ -322,7 +340,7 @@ afterAction gameState = do
   putStrLn desc
   if arrivedGoal revealed
     then do
-      putStrLn "🎉 You reached the goal! 🎉"
+      putStrLn $ success colors ++ "🎉 You reached the goal! 🎉" ++ reset colors
       pure revealed
     else pure revealed
 
@@ -360,7 +378,7 @@ main = do
   test
   testParse
 
-  putStrLn ""
+  putStrLn (info colors)
   putStrLn "------------------------------"
   putStrLn "--------- Start Game ---------"
   putStrLn "------------------------------"
@@ -368,8 +386,8 @@ main = do
   mazeGrid <- readFile "../maze-maps/maze1.txt"
 
   let game = newGame $ parseMap mazeGrid
-  putStrLn "Welcome to the maze!"
-  putStrLn "Commands: forward | turn left | turn right | look | map | help | quit"
+  putStrLn $ "Welcome to the maze!"
+  putStrLn $ "Commands: forward | turn left | turn right | look | map | help | quit" ++ reset colors
   gameLoop game
 
 {-----------|

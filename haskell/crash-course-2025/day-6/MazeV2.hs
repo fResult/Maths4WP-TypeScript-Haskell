@@ -257,6 +257,7 @@ gameLoop gameState = do
   putStr "\ESC[31m➜ \ESC[34m"
   hFlush stdout
   cmd <- {-fmap (map toLower)-} getLine
+  putStr "\ESC[0m"
   case parseInput cmd of
     Just Quit   -> handleQuit
     Just action ->
