@@ -23,3 +23,15 @@ Just (Empty,"")
 λ > runParser parseTile "[ ]"
 Nothing
 ```
+
+- **What:** Introduced `parseRow` using `some` applicative combinator (`some parseTile`).
+- **Why:** To automatically parse a sequence of tiles until the end of the row. It aggregates results into a list of tile (`[Tile]`) without requiring manual loops.
+
+```hs
+λ > runParser parseRow "[s][_][_][_][x][x][o][x]"
+Just ([Start,Empty,Empty,Empty,Wall,Wall,Goal,Wall],"")
+
+-- Stops parsing when it encounters an unknown tile (e.g., "[?]")
+λ > runParser parseRow "[s][_][?][_][x][x][o][x]"
+Just ([Start,Empty],"[?][_][x][x][o][x]")
+```
