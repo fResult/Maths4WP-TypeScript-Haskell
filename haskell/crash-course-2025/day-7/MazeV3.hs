@@ -98,25 +98,26 @@ parseInput input = case run input of
     run = runParser parseAction
 
 -- TODO: Refactor parseMap to use Parser combinator instead of manual string matching
-parseMap :: String -> MazeLayout
-parseMap input = map parseLine (lines input)
-  where
-    parseLine [] = []
-    parseLine str =
-      case break (==']') str of
-        ('[':c:_, ']':rest) -> charToTile c : parseLine rest
-        _                   -> []
+parseMap :: String -> Maze
+parseMap = undefined
+-- parseMap input = map parseLine (lines input)
+  -- where
+    -- parseLine [] = []
+    -- parseLine str =
+      -- case break (==']') str of
+        -- ('[':c:_, ']':rest) -> charToTile c : parseLine rest
+        -- _                   -> []
+--
+    -- charToTile c =
+      -- case c of
+        -- 'x' -> Wall
+        -- '_' -> Empty
+        -- 's' -> Start
+        -- 'o' -> Goal
+        -- _   -> Wall
 
-    charToTile c =
-      case c of
-        'x' -> Wall
-        '_' -> Empty
-        's' -> Start
-        'o' -> Goal
-        _   -> Wall
-
-parseMaze :: Parser MazeLayout
-parseMaze = parseByLines parseRow
+-- parseMaze :: Parser Maze
+-- parseMaze = parseByLines parseRow
 
 parseRow :: Parser MazeRow -- Parser [Tile]
 parseRow = some parseTile
@@ -129,14 +130,14 @@ parseTile =
   <|> word "[o]" $> Goal
 
 -- TODO: Refactor to return `Maybe` or `Either` to handle missing `Start` tile safely.
-findStart :: MazeLayout -> Position
+findStart :: Maze -> Position
 findStart maze = head [ (rowIdx, colIdx)
-                      | (rowIdx, row)  <- zip [0..] grid
+                      | (rowIdx, row)  <- zip [0..] $ grid
                       , (colIdx, tile) <- zip [0..] row
                       , tile == Start ]
-                 where grid = maze
+                 where grid = layout maze
 
-newGame :: MazeLayout -> GameState
+newGame :: Maze -> GameState
 newGame maze = reveal initialState (visibleAround initialState)
   where
     startPosition = findStart maze
@@ -230,7 +231,7 @@ visibleAround (GameState maze (rowIdx, colIdx) direction _) =
       neighbors          = [(rowIdx + deltaRowIdx, colIdx + deltaColIdx)
                            | (deltaRowIdx, deltaColIdx) <- deltaPositions
                            ]
-  in (rowIdx, colIdx) : filter (inBounds maze) neighbors
+  in (rowIdx, colIdx) : filter (inBounds (layout maze)) neighbors
 
 reveal :: GameState -> [Position] -> GameState
 reveal gameState positions =
@@ -238,26 +239,22 @@ reveal gameState positions =
   where
     currentDiscovered = discovered gameState
 
-getTile :: MazeLayout -> Position -> Maybe Tile
-getTile maze position
-  | inBounds maze position = Just (columns `at` colIdx)
-  | otherwise              = Nothing
+getTile :: Maze -> Position -> Maybe Tile
+getTile maze (rowIdx, colIdx)
+  | inBounds grid (rowIdx, colIdx) = Just (columns `at` colIdx)
+  | otherwise                      = Nothing
   where
-    columns = maze `at` fst position
-    rowIdx  = fst position
-    colIdx  = snd position
+    columns = grid `at` rowIdx
+    grid = layout maze
     at      = (!!)
 
 {------------|
 |-- Render --|
 |------------}
 renderMap :: GameState -> String
-renderMap gs =
-  let tiles = maze gs
-      pos   = position gs
-      dir   = direction gs
-      disc  = discovered gs
-  in concatMap (renderRow pos dir disc) (zip [0..] tiles)
+renderMap gs@(GameState grid pos dir disc) =
+  let grid = layout $ maze gs
+  in concatMap (renderRow pos dir disc) (zip [0..] grid)
 
   where
     renderRow :: Position -> Direction -> [Position] -> (Index, MazeRow) -> String
@@ -427,7 +424,7 @@ capitalize (x:xs) = toUpper x : map toLower xs
 testMazeInput :: String
 testMazeInput = "[x][x][x][x][x][x][x][x]\n[x][x][x][_][_][x][x][x]\n[s][_][_][_][x][x][o][x]\n[x][x][x][_][x][x][_][x]\n[x][x][x][_][_][_][_][x]\n[x][x][x][x][x][x][x][x]\n"
 
-testMaze :: MazeLayout
+testMaze :: Maze
 testMaze = parseMap testMazeInput
 
 testGame :: GameState
