@@ -36,10 +36,14 @@ type Index = Int
 
 newtype Maze = Maze
   { layout :: MazeLayout
-  -- Future extension (will require changing to `data`), for e.g.:
-  -- - `mazeDifficulty: Layout complexity score
+  -- Future extension (Require changing `newtype` to `data`):
+  -- - difficultyScore: Layout complexity score
   -- - shortestRoute: Precomputed optimal path
-  -- Note: Game rules (e.g., Easy = 50x shortest route steps, ..., Nightmare = strict steps) belong in GameState
+  -- - bestActionSeq: Ideal Sequence of the action
+  -- - maxTreasures: Total spawnable items
+  --
+  -- Boundary Note:
+  -- Game rules (e.g., Easy = 50x shortest route steps, ..., Nightmare = strict steps) belong in `GameState`, not here
   } deriving (Show)
 
 data GameState = GameState
