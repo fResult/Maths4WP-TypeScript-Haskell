@@ -9,9 +9,6 @@ This is Version 3, refactored from Version 2:
 
 We are breaking down `parseMap` (from `MazeV2.hs`) into smaller parsers to replace manual string manipulation with combinators.
 
-**What:** Renamed `type Maze` to `MazeLayout` and introduced a `newtype Maze` wrapper.
-**Why:** To decouple the raw grid data from the domain model. This prepares the `Maze` type to hold future pre-computed properties (e.g., shortest route, maze complexity) without breaking existing layout logic.
-
 - **What:** Renamed `type Maze` to `MazeLayout` and introduced a `newtype Maze` wrapper.
 - **Why:** To decouple the raw grid data from the domain model. This prepares the `Maze` type to hold future pre-computed properties (e.g., shortest route, maze complexity) without breaking existing layout logic.
 
@@ -43,5 +40,19 @@ We are breaking down `parseMap` (from `MazeV2.hs`) into smaller parsers to repla
   ```
 
 - **What:** Introduce `parseByLines :: Parser a -> Parser [a]` to run a parser across multiple lines.
-- **Why:** To parse the entire maze map row by row combining the results into a list of rows (`[[Tile]]`).
+- **Why:** To parse the entire maze map row-by-row-combining the results into a list of rows (`[[Tile]]`).
 
+- **What:** Introduced `parseMaze :: Parser Maze` as the final composer.
+- **Why:** To combine `parseByLines parseRow` and map the result directly into the `Maze` domain object (`Maze <$> ...`), completing the replacement of the old `parseMap`.
+
+- **What:** Added `processLine` helper inside `ParserV2.hs` to filter out carriage returns (`\r`) and handle trailing whitespaces/tabs.
+- **Why:** To make the parser robust against different operating system line endings (CRLF vs LF) and invisible trailing spaces in text files.
+- **Demo:**
+  ```hs
+  λ > runParser parseMaze testMazeInput
+  Just (Maze { layout = [[Wall,Wall,Wall,Wall,Wall,Wall,Wall,Wall],[Wall,Wall,Wall,Empty,Empty,Wall,Wall,Wall],[Start,Empty,Empty,Empty,Wall,Wall,Goal,Wall],[Wall,Wall,Wall,Empty,Wall,Wall,Empty,Wall],[Wall,Wall,Wall,Empty,Empty,Empty,Empty,Wall],[Wall,Wall,Wall,Wall,Wall,Wall,Wall,Wall]]},"")
+  ```
+
+## Minor Enhancement
+
+- Added basic ANSI terminal colors to the gameplay output for better readability.

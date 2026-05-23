@@ -2,6 +2,7 @@
 module ParserV2 ( Parser (runParser)
                 , word
                 , parseByLines
+                , runParserUnsafe
                 ) where
 
 import Data.Char (isSpace, toLower, toUpper)
@@ -62,4 +63,23 @@ token :: Parser a -> Parser a
 token parser = spaces *> parser <* spaces
 
 parseByLines :: Parser a -> Parser [a]
-parseByLines = undefined
+parseByLines parser = Parser $ \input ->
+  case traverse (processLine parser) (lines input) of
+    Just results -> Just (results, "")
+    Nothing      -> Nothing
+
+processLine :: Parser a -> String -> Maybe a
+processLine parser str =
+  case runParser parser (filter (/= '\r') str) of
+    Just (results, rest)
+      | all (`elem` (" \t" :: String)) rest -> Just results
+      | otherwise               -> Nothing
+    Nothing -> Nothing
+
+-- For REPL testing purpose:
+runParserUnsafe :: Parser a -> String -> a
+runParserUnsafe p s =
+  case runParser p s of
+    Just (result, "") -> result
+    Just _            -> error "Unconsumed input"
+    Nothing           -> error "Parse error"

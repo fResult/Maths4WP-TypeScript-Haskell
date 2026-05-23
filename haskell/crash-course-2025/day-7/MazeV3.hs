@@ -6,7 +6,8 @@ import System.IO (hFlush, stdout)
 import Control.Applicative ((<|>), Alternative (some))
 import Data.Functor (($>))
 
-import ParserV2 ( word, Parser(runParser), parseByLines )
+import ParserV2 ( word, Parser(runParser), parseByLines, runParserUnsafe )
+import Data.Maybe (fromJust)
 
 data Color = Color
   { info    :: String
@@ -116,8 +117,8 @@ parseMap = undefined
         -- 'o' -> Goal
         -- _   -> Wall
 
--- parseMaze :: Parser Maze
--- parseMaze = parseByLines parseRow
+parseMaze :: Parser Maze
+parseMaze = Maze <$> parseByLines parseRow
 
 parseRow :: Parser MazeRow -- Parser [Tile]
 parseRow = some parseTile
@@ -425,10 +426,11 @@ testMazeInput :: String
 testMazeInput = "[x][x][x][x][x][x][x][x]\n[x][x][x][_][_][x][x][x]\n[s][_][_][_][x][x][o][x]\n[x][x][x][_][x][x][_][x]\n[x][x][x][_][_][_][_][x]\n[x][x][x][x][x][x][x][x]\n"
 
 testMaze :: Maze
-testMaze = parseMap testMazeInput
+testMaze = runParserUnsafe parseMaze testMazeInput
 
 testGame :: GameState
 testGame = newGame testMaze
+-- testGame = newGame $ fst $ fromJust testMaze
 
 {--------------------|
 |--- Unit Testing ---|
