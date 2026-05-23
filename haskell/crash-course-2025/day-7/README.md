@@ -42,3 +42,6 @@ We are breaking down `parseMap` (from `MazeV2.hs`) into smaller parsers to repla
   Just ([Start,Empty],"[?][_][x][x][o][x]")
   ```
 
+- **What:** Introduce `parseByLines :: Parser a -> Parser [a]` to run a parser across multiple lines.
+- **Why:** To parse the entire maze map row by row combining the results into a list of rows (`[[Tile]]`).
+

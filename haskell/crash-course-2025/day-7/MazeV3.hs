@@ -6,7 +6,7 @@ import System.IO (hFlush, stdout)
 import Control.Applicative ((<|>), Alternative (some))
 import Data.Functor (($>))
 
-import ParserV2 ( word, Parser(runParser) )
+import ParserV2 ( word, Parser(runParser), parseByLines )
 
 data Color = Color
   { info    :: String
@@ -110,6 +110,9 @@ parseMap input = map parseLine (lines input)
         's' -> Start
         'o' -> Goal
         _   -> Wall
+
+parseMaze :: Parser MazeLayout
+parseMaze = parseByLines parseRow
 
 parseRow :: Parser MazeRow -- Parser [Tile]
 parseRow = some parseTile

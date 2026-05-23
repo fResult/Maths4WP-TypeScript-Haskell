@@ -1,6 +1,8 @@
 {-# LANGUAGE LambdaCase #-}
 module ParserV2 ( Parser (runParser)
-                , word ) where
+                , word
+                , parseByLines
+                ) where
 
 import Data.Char (isSpace, toLower, toUpper)
 import Control.Applicative (Alternative (empty, (<|>)), (*>), (<*))
@@ -58,3 +60,6 @@ spaces = Parser $ \input -> Just ((), dropWhile isSpace input)
 
 token :: Parser a -> Parser a
 token parser = spaces *> parser <* spaces
+
+parseByLines :: Parser a -> Parser [a]
+parseByLines = undefined
