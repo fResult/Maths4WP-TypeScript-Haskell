@@ -30,9 +30,17 @@ colors = Color
 data Tile = Wall | Empty | Start | Goal deriving (Show, Eq)
 data Direction = North | East | South | West deriving (Show, Eq)
 type Position = (Int, Int)
-type Maze = [MazeRow]
+type MazeLayout = [MazeRow]
 type MazeRow = [Tile]
 type Index = Int
+
+newtype Maze = Maze
+  { layout :: MazeLayout
+  -- Future extension (will require changing to `data`), for e.g.:
+  -- - `mazeDifficulty: Layout complexity score
+  -- - shortestRoute: Precomputed optimal path
+  -- Note: Game rules (e.g., Easy = 50x shortest route steps, ..., Nightmare = strict steps) belong in GameState
+  } deriving (Show)
 
 data GameState = GameState
   { maze     :: Maze
@@ -86,7 +94,7 @@ parseInput input = case run input of
     run = runParser parseAction
 
 -- TODO: Refactor parseMap to use Parser combinator instead of manual string matching
-parseMap :: String -> Maze
+parseMap :: String -> MazeLayout
 parseMap input = map parseLine (lines input)
   where
     parseLine [] = []
@@ -113,16 +121,15 @@ parseTile =
   <|> word "[s]" $> Start
   <|> word "[o]" $> Goal
 
-
 -- TODO: Refactor to return `Maybe` or `Either` to handle missing `Start` tile safely.
-findStart :: Maze -> Position
+findStart :: MazeLayout -> Position
 findStart maze = head [ (rowIdx, colIdx)
                       | (rowIdx, row)  <- zip [0..] grid
                       , (colIdx, tile) <- zip [0..] row
                       , tile == Start ]
                  where grid = maze
 
-newGame :: Maze -> GameState
+newGame :: MazeLayout -> GameState
 newGame maze = reveal initialState (visibleAround initialState)
   where
     startPosition = findStart maze
@@ -171,7 +178,7 @@ turnRight direction = case direction of
   South -> West
   West  -> North
 
-inBounds :: Maze -> Position -> Bool
+inBounds :: MazeLayout -> Position -> Bool
 inBounds maze (rowIdx, colIdx) = rowIdxValid && colIdxValid
   where
     rowIdxValid = rowIdx >= 0 && rowIdx < length rows
@@ -224,7 +231,7 @@ reveal gameState positions =
   where
     currentDiscovered = discovered gameState
 
-getTile :: Maze -> Position -> Maybe Tile
+getTile :: MazeLayout -> Position -> Maybe Tile
 getTile maze position
   | inBounds maze position = Just (columns `at` colIdx)
   | otherwise              = Nothing
@@ -413,7 +420,7 @@ capitalize (x:xs) = toUpper x : map toLower xs
 testMazeInput :: String
 testMazeInput = "[x][x][x][x][x][x][x][x]\n[x][x][x][_][_][x][x][x]\n[s][_][_][_][x][x][o][x]\n[x][x][x][_][x][x][_][x]\n[x][x][x][_][_][_][_][x]\n[x][x][x][x][x][x][x][x]\n"
 
-testMaze :: Maze
+testMaze :: MazeLayout
 testMaze = parseMap testMazeInput
 
 testGame :: GameState
