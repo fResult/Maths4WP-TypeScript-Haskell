@@ -4,6 +4,7 @@ import Control.Applicative ((<|>), Alternative (some))
 import Data.Char (toUpper, toLower)
 import Data.Functor (($>))
 import Data.List (nub)
+import System.Environment (getArgs, getProgName)
 import System.IO (hFlush, stdout)
 
 import ParserV2 ( word, Parser(runParser), parseByLines, runParserUnsafe )
@@ -33,6 +34,7 @@ type Position = (Int, Int)
 type MazeLayout = [MazeRow]
 type MazeRow = [Tile]
 type Index = Int
+type ErrorMessage = String
 
 newtype Maze = Maze
   { layout :: MazeLayout
@@ -391,6 +393,43 @@ helpText = unlines
   , "\tquit                       - exit the game"
   ]
 
+{---------------------|
+|----- IO Stuffs -----|
+|---------------------}
+
+printWelcomeMessage :: IO ()
+printWelcomeMessage = do
+  putStrLn "Welcome to the maze!"
+  putStrLn "Type \"help\" or \"command\" to see available commands"
+
+printUsage :: String -> IO ()
+printUsage programName = do
+  putStrLn $ "Usage " ++ programName ++ " <maze_file>"
+  putStrLn $ "Example: " ++ programName ++ " maze1.txt"
+
+startGameFrom :: [String] -> IO ()
+startGameFrom [path] = do
+  mazeGrid <- loadMaze path
+  either printError startGame mazeGrid
+startGameFrom _ = getProgName >>= printUsage
+-- startGameFrom _ = do
+  -- programName <- getProgName
+  -- printUsage programName
+
+loadMaze :: FilePath -> IO (Either ErrorMessage Maze)
+loadMaze path = do
+  mazeGrid <- readFile path
+  case runParser parseMaze mazeGrid of
+    Just (maze, _) -> pure $ Right maze
+    Nothing        -> do
+      pure . Left $ "Failed to parse maze file \"" ++ path ++ "\". Please check file format."
+
+printError :: String -> IO ()
+printError = undefined
+
+startGame :: Maze -> IO ()
+startGame = undefined
+
 {----------|
 |-- Main --|
 |----------}
@@ -404,12 +443,15 @@ main = do
   putStrLn "--------- Start Game ---------"
   putStrLn "------------------------------"
   -- haskell/crash-course-2025/maze-maps/maze1.txt
-  mazeGrid <- readFile "../maze-maps/maze1.txt"
+  -- mazeGrid <- readFile "../maze-maps/maze1.txt"
+  --
+  -- let game = newGame $ parseMap mazeGrid
+  -- gameLoop game
+  mazeFile <- getArgs
+  printWelcomeMessage
+  putStrLn $ reset colors
 
-  let game = newGame $ parseMap mazeGrid
-  putStrLn $ "Welcome to the maze!"
-  putStrLn $ "Commands: forward | turn left | turn right | look | map | help | quit" ++ reset colors
-  gameLoop game
+  startGameFrom $ map (++ "../maze-maps/") mazeFile
 
 {-----------|
 |-- Misc. --|
