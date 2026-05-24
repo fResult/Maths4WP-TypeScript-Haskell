@@ -1,13 +1,12 @@
 module MazeV3 where
 
-import Data.List (nub)
-import Data.Char (toUpper, toLower)
-import System.IO (hFlush, stdout)
 import Control.Applicative ((<|>), Alternative (some))
+import Data.Char (toUpper, toLower)
 import Data.Functor (($>))
+import Data.List (nub)
+import System.IO (hFlush, stdout)
 
 import ParserV2 ( word, Parser(runParser), parseByLines, runParserUnsafe )
-import Data.Maybe (fromJust)
 
 data Color = Color
   { info    :: String
@@ -88,7 +87,7 @@ parseAction =
   <|> word "look" $> Look
   <|> word "map" $> Map
   <|> word "help" $> Help
-  <|> word "commands" $> Help
+  <|> word "command" $> Help
   <|> word "quit" $> Quit
 
 parseInput :: String -> Maybe Action
@@ -388,7 +387,7 @@ helpText = unlines
   , "\tturn north/south/east/west - face that direction"
   , "\tlook                       - look around"
   , "\tmap                        - show explored map"
-  , "\thelp / commands            - show this list"
+  , "\thelp / command             - show this list"
   , "\tquit                       - exit the game"
   ]
 
@@ -430,7 +429,6 @@ testMaze = runParserUnsafe parseMaze testMazeInput
 
 testGame :: GameState
 testGame = newGame testMaze
--- testGame = newGame $ fst $ fromJust testMaze
 
 {--------------------|
 |--- Unit Testing ---|
@@ -528,7 +526,7 @@ testParse = do
         , ("look",          Just Look)
         , ("map",           Just Map)
         , ("help",          Just Help)
-        , ("commands",      Just Help)      -- Synonym
+        , ("command",      Just Help)      -- Synonym
         , ("quit",          Just Quit)
 
         -- 5. Invalid Commands (Should fail)
