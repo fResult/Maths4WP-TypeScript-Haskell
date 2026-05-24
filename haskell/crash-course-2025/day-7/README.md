@@ -55,7 +55,8 @@ We are breaking down `parseMap` (from `MazeV2.hs`) into smaller parsers to repla
 
 ## Minor Enhancement
 
-- Added basic ANSI terminal colors to the gameplay output for better readability.
+- Added basic ANSI terminal colors and updated map symbols (e.g., 'S' for Start, 'O' for Goal) for better readability.
+- Improved CLI argument handling to accept a simple maze run
 
 ## How to Play
 

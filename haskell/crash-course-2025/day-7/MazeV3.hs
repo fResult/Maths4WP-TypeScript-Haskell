@@ -273,7 +273,17 @@ renderMap gs@(GameState grid pos dir disc) =
         isDiscoveredPosition = currentPosition `elem` disc
 
     renderRoomWith :: Char -> String
-    renderRoomWith c = "[" ++ [c] ++ "]"
+    renderRoomWith c = "[" ++ colorizeTile [c] ++ "]"
+
+    colorizeTile :: String -> String
+    colorizeTile [c]
+      | c `elem` directions = success colors ++ [c] ++ reset colors
+      | c `elem` portals    = info colors ++ [c] ++ reset colors
+      | c == '#'            = danger colors ++ [c] ++ reset colors
+      | otherwise           = [c]
+      where
+        directions = ("^>v<_" :: String)
+        portals    = ("SO" :: String)
 
 playerSymbol :: Direction -> Char
 playerSymbol North = '∧'
@@ -286,8 +296,8 @@ playerSymbol West  = '<'
 tileSymbol :: Tile -> Char
 tileSymbol Wall  = '#'
 tileSymbol Empty = '_'
-tileSymbol Start = '_'
-tileSymbol Goal  = '_'
+tileSymbol Start = 'S'
+tileSymbol Goal  = 'O'
 
 {---------------|
 |-- Game Loop --|
@@ -405,7 +415,7 @@ printWelcomeMessage = do
 printUsage :: String -> IO ()
 printUsage programName = do
   putStrLn $ "Usage " ++ programName ++ " <maze_file>"
-  putStrLn $ "Example: " ++ programName ++ " maze1.txt"
+  putStrLn $ "Example: " ++ programName ++ " maze-01.txt"
 
 startGameFrom :: [String] -> IO ()
 startGameFrom [path] = do
