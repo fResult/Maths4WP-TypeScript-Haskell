@@ -56,3 +56,29 @@ We are breaking down `parseMap` (from `MazeV2.hs`) into smaller parsers to repla
 ## Minor Enhancement
 
 - Added basic ANSI terminal colors to the gameplay output for better readability.
+
+## How to Play
+
+Run the game and optionally pass a maze number (defaults to `1`):
+
+```bash
+./run-maze-v3.md [maze_number]
+# OR if you are in the root folder:
+haskell/crash-course-2025/day-7/run-maze-v3.md [maze_number]
+```
+
+
+*Example:* `./run-maze-v3.md 2` (loads `maze2.txt`)
+*(From the project root: `haskell/crash-course-2025/day-7/run-maze-v3.md 2`)
+
+**To quit the game:** Press <kbd>Ctrl</kbd> + <kbd>C</kbd>.
+
+## Development Notes
+
+Boot up GHCi with a specific maze loaded (defaults to `1`):
+
+```bash
+./develop-maze-v3.md [maze_number]
+# OR if you are in the root folder:
+haskell/crash-course-2025/day-7/develop-maze-v3.md [maze_number]
+```
