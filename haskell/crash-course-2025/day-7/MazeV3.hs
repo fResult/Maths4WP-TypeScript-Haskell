@@ -435,10 +435,13 @@ loadMaze path = do
       pure . Left $ "Failed to parse maze file \"" ++ path ++ "\". Please check file format."
 
 printError :: String -> IO ()
-printError = undefined
+printError err = putStrLn $ "Error: " ++ err
 
 startGame :: Maze -> IO ()
-startGame = undefined
+startGame maze = do
+  let game = newGame maze
+  printWelcomeMessage
+  gameLoop game
 
 {----------|
 |-- Main --|
@@ -452,16 +455,16 @@ main = do
   putStrLn "------------------------------"
   putStrLn "--------- Start Game ---------"
   putStrLn "------------------------------"
-  -- haskell/crash-course-2025/maze-maps/maze1.txt
-  -- mazeGrid <- readFile "../maze-maps/maze1.txt"
+  -- haskell/crash-course-2025/maze-maps/maze-01.txt
+  -- mazeGrid <- readFile "../maze-maps/maze-01.txt"
   --
   -- let game = newGame $ parseMap mazeGrid
   -- gameLoop game
-  mazeFile <- getArgs
+  mazeStage <- getArgs
   printWelcomeMessage
   putStrLn $ reset colors
 
-  startGameFrom $ map (++ "../maze-maps/") mazeFile
+  startGameFrom $ map mazePath mazeStage
 
 {-----------|
 |-- Misc. --|
@@ -469,6 +472,12 @@ main = do
 capitalize :: String -> String
 capitalize ""     = ""
 capitalize (x:xs) = toUpper x : map toLower xs
+
+mazePath :: String -> String
+mazePath = ("../maze-maps/maze-" ++) . (++ ".txt") . padZero
+  where
+    padZero [c] = ['0', c]
+    padZero s   = s
 
 {-------------------------|
 |--- Dummy (Test Data) ---|

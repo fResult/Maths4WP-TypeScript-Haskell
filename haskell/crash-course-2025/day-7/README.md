@@ -69,7 +69,7 @@ haskell/crash-course-2025/day-7/run-maze-v3.md [maze_number]
 ```
 
 
-*Example:* `./run-maze-v3.md 2` (loads `maze2.txt`)
+*Example:* `./run-maze-v3.md 2` (loads `maze-02.txt`)
 *(From the project root: `haskell/crash-course-2025/day-7/run-maze-v3.md 2`)
 
 **To quit the game:** Press <kbd>Ctrl</kbd> + <kbd>C</kbd>.
@@ -82,4 +82,12 @@ Boot up GHCi with a specific maze loaded (defaults to `1`):
 ./develop-maze-v3.md [maze_number]
 # OR if you are in the root folder:
 haskell/crash-course-2025/day-7/develop-maze-v3.md [maze_number]
+```
+
+To change the maze on the fly, use the `:set args` command in GHCi:
+
+```hs
+:set args <maze_number>
+-- OR
+:main <maze_number>
 ```
