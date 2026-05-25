@@ -8,6 +8,7 @@ import System.Environment (getArgs, getProgName)
 import System.IO (hFlush, stdout)
 
 import ParserV2 ( word, Parser(runParser), parseByLines, runParserUnsafe )
+import Control.Monad.State (State, MonadState(get, put))
 
 data Color = Color
   { info    :: String
@@ -65,6 +66,12 @@ data Action
   | Quit
   | Help
   deriving (Show, Eq)
+
+
+{-------------------------|
+|--- Game State Monads ---|
+|-------------------------}
+type Game a = State GameState a
 
 {--------------------|
 |--- Game Parsers ---|
@@ -146,6 +153,21 @@ moveForward gs@(GameState maze (rowIdx, colIdx) direction _) =
       let newGameState = gs { position = newPosition }
       in (True, reveal newGameState (visibleAround newGameState))
     _ -> (False, gs)
+
+-- as example, state version of the moveForward function
+moveForwardM :: Game Bool
+moveForwardM = do
+  gs@(GameState maze (rowIdx, colIdx) direction _) <- get
+  let (deltaRowIdx, deltaColIdx) = moveDelta direction
+      newPosition                = ( rowIdx + deltaRowIdx
+                                   , colIdx + deltaColIdx
+                                   ) :: Position
+  case getTile maze newPosition of
+    Just tile | isWalkable tile -> do
+      let newGameState = gs { position = newPosition }
+      put $ reveal newGameState (visibleAround newGameState)
+      pure True
+    _ -> pure False
 
 isWalkable :: Tile -> Bool
 isWalkable tile = tile `elem` [Empty, Start, Goal]
