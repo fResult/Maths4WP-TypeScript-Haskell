@@ -1,4 +1,4 @@
-module MazeV3 where
+module MazeV4 where
 
 import Control.Applicative ((<|>), Alternative (some))
 import Data.Char (toUpper, toLower)
@@ -38,7 +38,7 @@ type ErrorMessage = String
 
 newtype Maze = Maze
   { layout :: MazeLayout
-  -- Future extension (Require changijng `newtype` to `data`):
+  -- Future extension (Require changing `newtype` to `data`):
   -- - difficultyScore: Layout complexity score
   -- - shortestRoute: Precomputed optimal path
   -- - bestActionSeq: Ideal Sequence of the action
