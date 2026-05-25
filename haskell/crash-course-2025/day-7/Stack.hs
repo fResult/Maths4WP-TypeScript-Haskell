@@ -43,6 +43,14 @@ manipulateStack s0 =
       ((), s3) = push 4 s2
   in pop s3
 
+stateManipulateStack :: State' Stack Int
+stateManipulateStack = do
+  _ <- statePop
+  _ <- statePush 3
+  _ <- statePush 4
+  val <- statePop
+  return val
+
 newtype State' s a = State' { runState' :: s -> (a, s) }
 
 instance Functor (State' s) where
