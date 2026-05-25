@@ -7,6 +7,8 @@ This is Version 3, refactored from Version 2:
 
 ## Refactoring Notes
 
+### Maze Version 3 (Parser)
+
 We are breaking down `parseMap` (from `MazeV2.hs`) into smaller parsers to replace manual string manipulation with combinators.
 
 - **What:** Renamed `type Maze` to `MazeLayout` and introduced a `newtype Maze` wrapper.
@@ -52,6 +54,13 @@ We are breaking down `parseMap` (from `MazeV2.hs`) into smaller parsers to repla
   λ > runParser parseMaze testMazeInput
   Just (Maze { layout = [[Wall,Wall,Wall,Wall,Wall,Wall,Wall,Wall],[Wall,Wall,Wall,Empty,Empty,Wall,Wall,Wall],[Start,Empty,Empty,Empty,Wall,Wall,Goal,Wall],[Wall,Wall,Wall,Empty,Wall,Wall,Empty,Wall],[Wall,Wall,Wall,Empty,Empty,Empty,Empty,Wall],[Wall,Wall,Wall,Wall,Wall,Wall,Wall,Wall]]},"")
   ```
+
+- **What:** Introduced \`loadMaze :: FilePath -> IO (Either ErrorMessage Maze)\` to handle parsing logic at the I/O boundary.
+- **Why:** To handle invalid file formats. By converting the \`Parser\`'s \`Nothing\` state into an \`Either ErrorMessage Maze\`, the application can gracefully report parsing error instead of crashing or silently failing.
+
+### Maze Version 4 (State)
+
+Coming soon: We will refactor the game logic to use a `State` monad for managing the player's position and game state instead of passing it around manually.
 
 ## Minor Enhancement
 

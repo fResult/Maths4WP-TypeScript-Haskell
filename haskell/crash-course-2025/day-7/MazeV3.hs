@@ -99,27 +99,8 @@ parseInput input = case run input of
   where
     run = runParser parseAction
 
--- TODO: Refactor parseMap to use Parser combinator instead of manual string matching
-parseMap :: String -> Maze
-parseMap = undefined
--- parseMap input = map parseLine (lines input)
-  -- where
-    -- parseLine [] = []
-    -- parseLine str =
-      -- case break (==']') str of
-        -- ('[':c:_, ']':rest) -> charToTile c : parseLine rest
-        -- _                   -> []
---
-    -- charToTile c =
-      -- case c of
-        -- 'x' -> Wall
-        -- '_' -> Empty
-        -- 's' -> Start
-        -- 'o' -> Goal
-        -- _   -> Wall
-
-parseMaze :: Parser Maze
-parseMaze = Maze <$> parseByLines parseRow
+parseMap :: Parser Maze
+parseMap = Maze <$> parseByLines parseRow
 
 parseRow :: Parser MazeRow -- Parser [Tile]
 parseRow = some parseTile
@@ -406,7 +387,6 @@ helpText = unlines
 {---------------------|
 |----- IO Stuffs -----|
 |---------------------}
-
 printWelcomeMessage :: IO ()
 printWelcomeMessage = do
   putStrLn "Welcome to the maze!"
@@ -429,7 +409,7 @@ startGameFrom _ = getProgName >>= printUsage
 loadMaze :: FilePath -> IO (Either ErrorMessage Maze)
 loadMaze path = do
   mazeGrid <- readFile path
-  case runParser parseMaze mazeGrid of
+  case runParser parseMap mazeGrid of
     Just (maze, _) -> pure $ Right maze
     Nothing        -> do
       pure . Left $ "Failed to parse maze file \"" ++ path ++ "\". Please check file format."
@@ -455,11 +435,6 @@ main = do
   putStrLn "------------------------------"
   putStrLn "--------- Start Game ---------"
   putStrLn "------------------------------"
-  -- haskell/crash-course-2025/maze-maps/maze-01.txt
-  -- mazeGrid <- readFile "../maze-maps/maze-01.txt"
-  --
-  -- let game = newGame $ parseMap mazeGrid
-  -- gameLoop game
   mazeStage <- getArgs
   printWelcomeMessage
   putStrLn $ reset colors
@@ -486,7 +461,7 @@ testMazeInput :: String
 testMazeInput = "[x][x][x][x][x][x][x][x]\n[x][x][x][_][_][x][x][x]\n[s][_][_][_][x][x][o][x]\n[x][x][x][_][x][x][_][x]\n[x][x][x][_][_][_][_][x]\n[x][x][x][x][x][x][x][x]\n"
 
 testMaze :: Maze
-testMaze = runParserUnsafe parseMaze testMazeInput
+testMaze = runParserUnsafe parseMap testMazeInput
 
 testGame :: GameState
 testGame = newGame testMaze
