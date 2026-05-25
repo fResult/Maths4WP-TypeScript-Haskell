@@ -7,6 +7,12 @@ pop (Stack (x:xs)) = (x, Stack xs)
 push :: Int -> Stack -> ((), Stack)
 push x (Stack xs) = ((), Stack (x:xs))
 
+statePop :: State' Stack Int
+statePop = state' $ \(Stack (x:xs)) -> (x, Stack xs)
+
+statePush :: Int -> State' Stack ()
+statePush x = state' $ \(Stack xs) -> ((), Stack (x:xs))
+
 stack :: Stack
 stack = Stack [1..10]
 
