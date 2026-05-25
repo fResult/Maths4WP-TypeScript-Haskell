@@ -24,6 +24,13 @@ popSecond stack =
       ((), finalStack) = push val newStack2
   in (finalVal, finalStack)
 
+statePopSecond :: State' Stack Int
+statePopSecond =
+  statePop >>= (\val ->
+    statePop >>= (\finalVal ->
+      statePush val >>= (\_ ->
+        return finalVal)))
+
 manipulateStack :: Stack -> (Int, Stack)
 manipulateStack s0 =
   let (_, s1)  = pop s0
