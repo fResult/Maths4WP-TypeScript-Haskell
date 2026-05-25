@@ -25,11 +25,16 @@ popSecond stack =
   in (finalVal, finalStack)
 
 statePopSecond :: State' Stack Int
-statePopSecond =
-  statePop >>= (\val ->
-    statePop >>= (\finalVal ->
-      statePush val >>= (\_ ->
-        return finalVal)))
+statePopSecond = do
+  val <- statePop
+  finalVal <- statePop
+  statePush val
+  pure finalVal
+-- statePopSecond =
+--   statePop >>= (\val ->
+--     statePop >>= (\finalVal ->
+--       statePush val >>= (\_ ->
+--         return finalVal)))
 
 manipulateStack :: Stack -> (Int, Stack)
 manipulateStack s0 =
