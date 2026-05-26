@@ -325,6 +325,12 @@ turnRightAction = do
       newGameState = gs { direction = newDir }
   put newGameState
 
+turnDirectionAction :: Direction -> Game ()
+turnDirectionAction dir = do
+  gs <- get
+  let newGameState = gs { direction = dir }
+  put newGameState
+
 {---------------|
 |-- Game Loop --|
 |---------------}
