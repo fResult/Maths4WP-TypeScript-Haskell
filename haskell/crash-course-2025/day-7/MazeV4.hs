@@ -128,7 +128,7 @@ findStart maze = head [ (rowIdx, colIdx)
                  where grid = layout maze
 
 newGame :: Maze -> GameState
-newGame maze = reveal initialState (visibleAround initialState)
+newGame maze = updateVision initialState
   where
     startPosition = findStart maze
     initialState  = GameState maze startPosition East []
@@ -151,7 +151,7 @@ moveForward gs@(GameState maze (rowIdx, colIdx) direction _) =
   in case getTile maze newPosition of
     Just tile | isWalkable tile ->
       let newGameState = gs { position = newPosition }
-      in (True, reveal newGameState (visibleAround newGameState))
+      in (True, updateVision newGameState)
     _ -> (False, gs)
 
 -- as example, state version of the moveForward function
@@ -165,7 +165,7 @@ moveForwardM = do
   case getTile maze newPosition of
     Just tile | isWalkable tile -> do
       let newGameState = gs { position = newPosition }
-      put $ reveal newGameState (visibleAround newGameState)
+      put $ updateVision newGameState
       pure True
     _ -> pure False
 
@@ -205,7 +205,7 @@ lookAround :: GameState -> (String, GameState)
 lookAround gameState = (desc, revealed)
   where
     desc = info colors ++ (describeSurrounding gameState) ++ reset colors
-    revealed = reveal gameState (visibleAround gameState)
+    revealed = updateVision gameState
 
 describeSurrounding :: GameState -> String
 describeSurrounding (GameState maze (rowIdx, colIdx) direction _) = unwords
@@ -228,6 +228,8 @@ describeSurrounding (GameState maze (rowIdx, colIdx) direction _) = unwords
     describe (Just Goal)  = "a goal"
     describe Nothing      = "a void"
 
+updateVision :: GameState -> GameState
+updateVision gs = reveal gs (visibleAround gs)
 
 visibleAround :: GameState -> [Position]
 visibleAround (GameState maze (rowIdx, colIdx) direction _) =
@@ -381,21 +383,21 @@ handleMoveForward gameState = if isWalkable
 handleTurnLeft :: GameState -> IO GameState
 handleTurnLeft gameState = do
   let turned   = gameState { direction = turnLeft (direction gameState) }
-      revealed = reveal turned (visibleAround turned)
+      revealed = updateVision turned
   putStrLn $ info colors ++ "You turn left." ++ reset colors
   afterAction revealed
 
 handleTurnRight :: GameState -> IO GameState
 handleTurnRight gameState = do
   let turned   = gameState { direction = turnRight (direction gameState) }
-      revealed = reveal turned (visibleAround turned)
+      revealed = updateVision turned
   putStrLn $ info colors ++ "You turn right." ++ reset colors
   afterAction turned
 
 handleTurnDirection :: Direction -> GameState -> IO GameState
 handleTurnDirection dir gameState = do
   let turned   = gameState { direction = dir }
-      revealed = reveal turned (visibleAround turned)
+      revealed = updateVision turned
   putStrLn $ info colors ++ "You now face " ++ show dir ++ reset colors
   afterAction revealed
 
