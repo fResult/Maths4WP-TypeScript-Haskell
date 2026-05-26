@@ -300,6 +300,16 @@ tileSymbol Empty = '_'
 tileSymbol Start = 'S'
 tileSymbol Goal  = 'O'
 
+{------------------------------|
+|-- State-Monad Based Action --|
+|------------------------------}
+moveForwardAction ::  Game Bool
+moveForwardAction = do
+  gs <- get
+  let (canMove, newGameState) = moveForward gs
+  put newGameState
+  pure canMove
+
 {---------------|
 |-- Game Loop --|
 |---------------}
