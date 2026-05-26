@@ -8,7 +8,7 @@ import System.Environment (getArgs, getProgName)
 import System.IO (hFlush, stdout)
 
 import ParserV2 ( word, Parser(runParser), parseByLines, runParserUnsafe )
-import Control.Monad.State (State, MonadState(get, put), gets)
+import Control.Monad.State (State, MonadState(get, put), gets, runState)
 
 data Color = Color
   { info    :: String
@@ -312,7 +312,6 @@ moveForwardAction = do
   put newGameState
   pure canMove
 
-
 turnLeftAction :: Game ()
 turnLeftAction = do
   gs <- get
@@ -346,70 +345,134 @@ renderMapAction = gets renderMap
 {---------------|
 |-- Game Loop --|
 |---------------}
+-- gameLoop :: GameState -> IO ()
+-- gameLoop gameState = do
+--   putStr $ danger colors ++ "➜ \ESC[34m"
+--   hFlush stdout
+--   cmd <- {-fmap (map toLower)-} getLine
+--   putStr $ reset colors
+--   case parseInput cmd of
+--     Just Quit   -> handleQuit
+--     Just action ->
+--       handleAction action gameState >>= gameLoop
+--     Nothing     -> handleUnknown gameState >>= gameLoop
+
 gameLoop :: GameState -> IO ()
-gameLoop gameState = do
+gameLoop gs = do
   putStr $ danger colors ++ "➜ \ESC[34m"
   hFlush stdout
-  cmd <- {-fmap (map toLower)-} getLine
-  putStr $ reset colors
+  cmd <- getLine
   case parseInput cmd of
     Just Quit   -> handleQuit
-    Just action ->
-      handleAction action gameState >>= gameLoop
-    Nothing     -> handleUnknown gameState >>= gameLoop
+    Just action -> do
+      let (msg, newGameState) = runState (handleAction action) gs
+      putStrLn msg
+      gameLoop newGameState
+    Nothing     -> handleUnknown gs >>= gameLoop
+    -- Nothing     -> do
+      -- let (msg, newGameState) = runState handleUnknown' gs
+      -- putStrLn msg
+      -- gameLoop newGameState
 
-handleAction :: Action -> GameState -> IO GameState
-handleAction action gameState = case action of
-  Look        -> handleLook gameState
-  Map         -> handleMap gameState
-  Forward     -> handleMoveForward gameState
-  TurnLeft    -> handleTurnLeft gameState
-  TurnRight   -> handleTurnRight gameState
-  Turn dir    -> handleTurnDirection dir gameState
-  Help        -> handleHelp gameState
+-- handleAction :: Action -> GameState -> IO GameState
+-- handleAction action gameState = case action of
+  -- Look        -> handleLook gameState
+  -- Map         -> handleMap gameState
+  -- Forward     -> handleMoveForward gameState
+  -- TurnLeft    -> handleTurnLeft gameState
+  -- TurnRight   -> handleTurnRight gameState
+  -- Turn dir    -> handleTurnDirection dir gameState
+  -- Help        -> handleHelp gameState
 
-handleLook :: GameState -> IO GameState
-handleLook gameState = do
-  let (description, revealed) = lookAround gameState
-  putStrLn description
-  pure revealed
+handleAction :: Action -> Game String
+handleAction action = case action of
+  Look        -> handleLook
+  Map         -> handleMap
+  Forward     -> handleMoveForward
+  TurnLeft    -> handleTurnLeft
+  TurnRight   -> handleTurnRight
+  Turn dir    -> handleTurnDirection dir
+  Help        -> handleHelp
 
-handleMap :: GameState -> IO GameState
-handleMap gameState = do
-  putStrLn $ renderMap gameState
-  pure gameState
 
-handleMoveForward :: GameState -> IO GameState
-handleMoveForward gameState = if isWalkable
-  then do
-    putStrLn $ success colors ++ "You moved forward." ++ reset colors
-    afterAction newGameState
-  else do
-    putStrLn $ danger colors ++ "You hit the wall." ++ reset colors
-    pure gameState
-  where
-    (isWalkable, newGameState) = moveForward gameState
+-- handleLook :: GameState -> IO GameState
+-- handleLook gameState = do
+--   let (description, revealed) = lookAround gameState
+--   putStrLn description
+--   pure revealed
 
-handleTurnLeft :: GameState -> IO GameState
-handleTurnLeft gameState = do
-  let turned   = gameState { direction = turnLeft (direction gameState) }
-      revealed = updateVision turned
-  putStrLn $ info colors ++ "You turn left." ++ reset colors
-  afterAction revealed
+handleLook :: Game String
+handleLook = lookAroundAction
 
-handleTurnRight :: GameState -> IO GameState
-handleTurnRight gameState = do
-  let turned   = gameState { direction = turnRight (direction gameState) }
-      revealed = updateVision turned
-  putStrLn $ info colors ++ "You turn right." ++ reset colors
-  afterAction turned
+-- handleMap :: GameState -> IO GameState
+-- handleMap gameState = do
+--   putStrLn $ renderMap gameState
+--   pure gameState
 
-handleTurnDirection :: Direction -> GameState -> IO GameState
-handleTurnDirection dir gameState = do
-  let turned   = gameState { direction = dir }
-      revealed = updateVision turned
-  putStrLn $ info colors ++ "You now face " ++ show dir ++ reset colors
-  afterAction revealed
+handleMap :: Game String
+handleMap = renderMapAction
+
+-- handleMoveForward :: GameState -> IO GameState
+-- handleMoveForward gameState = if isWalkable
+--   then do
+--     putStrLn $ success colors ++ "You moved forward." ++ reset colors
+--     afterAction newGameState
+--   else do
+--     putStrLn $ danger colors ++ "You hit the wall." ++ reset colors
+--     pure gameState
+--   where
+--     (isWalkable, newGameState) = moveForward gameState
+
+handleMoveForward :: Game String
+handleMoveForward = do
+  isWalkable <- moveForwardAction
+  if isWalkable
+    then do
+      description <- lookAroundAction
+      pure $ success colors ++ "You moved forward.\n" ++
+        info colors ++ description ++ reset colors
+    else
+      pure $ danger colors ++ "You hit the wall." ++ reset colors
+
+-- handleTurnLeft :: GameState -> IO GameState
+-- handleTurnLeft gameState = do
+--   let turned   = gameState { direction = turnLeft (direction gameState) }
+--       revealed = updateVision turned
+--   putStrLn $ info colors ++ "You turn left." ++ reset colors
+--   afterAction revealed
+
+handleTurnLeft :: Game String
+handleTurnLeft = do
+  turnLeftAction
+  description <- lookAroundAction
+  pure $ info colors ++ "You turned left.\n" ++ description ++ reset colors
+
+-- handleTurnRight :: GameState -> IO GameState
+-- handleTurnRight gameState = do
+  -- let turned   = gameState { direction = turnRight (direction gameState) }
+      -- revealed = updateVision turned
+  -- putStrLn $ info colors ++ "You turn right." ++ reset colors
+  -- afterAction turned
+
+handleTurnRight :: Game String
+handleTurnRight = do
+  turnRightAction
+  description <- lookAroundAction
+  pure $ info colors ++ "You turn right.\n" ++ description ++ reset colors
+
+-- handleTurnDirection :: Direction -> GameState -> IO GameState
+-- handleTurnDirection dir gameState = do
+--   let turned   = gameState { direction = dir }
+--       revealed = updateVision turned
+--   putStrLn $ info colors ++ "You now face " ++ show dir ++ reset colors
+--   afterAction revealed
+
+handleTurnDirection :: Direction -> Game String
+handleTurnDirection dir = do
+  turnDirectionAction dir
+  description <- lookAroundAction
+  pure $ info colors ++ "You now face " ++ show dir ++ ".\n"
+    ++ description ++ reset colors
 
 afterAction :: GameState -> IO GameState
 afterAction gameState = do
@@ -421,18 +484,25 @@ afterAction gameState = do
       pure revealed
     else pure revealed
 
-handleHelp :: GameState -> IO GameState
-handleHelp gameState = do
-  putStrLn helpText
-  pure gameState
+-- handleHelp :: GameState -> IO GameState
+-- handleHelp gameState = do
+  -- putStrLn helpText
+  -- pure gameState
+
+handleHelp :: Game String
+handleHelp = pure helpText
 
 handleQuit :: IO ()
-handleQuit = putStrLn "Goodbye!"
+handleQuit = putStrLn $ success colors ++ "Goodbye!"
 
 handleUnknown :: GameState -> IO GameState
 handleUnknown gameState = do
-  putStrLn "Unknown command. Try: forward | turn left | turn right | look | map | help | quit"
+  putStrLn $ warning colors ++ "Unknown command. Try: forward | turn left | turn right | look | map | help | quit" ++ reset colors
   pure gameState
+
+handleUnknown' :: Game String
+handleUnknown' = do
+  pure $ warning colors ++ "Unknown command. Try: forward | turn left | turn right | look | map | help | quit" ++ reset colors
 
 helpText :: String
 helpText = unlines
