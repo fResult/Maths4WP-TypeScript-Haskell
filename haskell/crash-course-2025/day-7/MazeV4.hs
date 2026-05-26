@@ -310,6 +310,21 @@ moveForwardAction = do
   put newGameState
   pure canMove
 
+
+turnLeftAction :: Game ()
+turnLeftAction = do
+  gs <- get
+  let newDir       = turnLeft $ direction gs
+      newGameState = gs { direction = newDir }
+  put newGameState
+
+turnRightAction :: Game ()
+turnRightAction = do
+  gs <- get
+  let newDir       = turnRight $ direction gs
+      newGameState = gs { direction = newDir }
+  put newGameState
+
 {---------------|
 |-- Game Loop --|
 |---------------}
