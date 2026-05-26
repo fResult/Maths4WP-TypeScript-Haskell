@@ -8,7 +8,7 @@ import System.Environment (getArgs, getProgName)
 import System.IO (hFlush, stdout)
 
 import ParserV2 ( word, Parser(runParser), parseByLines, runParserUnsafe )
-import Control.Monad.State (State, MonadState(get, put))
+import Control.Monad.State (State, MonadState(get, put), gets)
 
 data Color = Color
   { info    :: String
@@ -332,6 +332,16 @@ turnDirectionAction dir = do
   gs <- get
   let newGameState = gs { direction = dir }
   put newGameState
+
+lookAroundAction :: Game String
+lookAroundAction = do
+  gs <- get
+  let (description, newGameState) = lookAround gs
+  put newGameState
+  pure description
+
+renderMapAction :: Game String
+renderMapAction = gets renderMap
 
 {---------------|
 |-- Game Loop --|
