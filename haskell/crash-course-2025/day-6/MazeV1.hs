@@ -282,8 +282,8 @@ main = do
   putStrLn "-----------------------------"
   putStrLn "--------- Start app ---------"
   putStrLn "-----------------------------"
-  -- haskell/crash-course-2025/maze-maps/maze1.txt
-  mazeGrid <- readFile "../maze-maps/maze1.txt"
+  -- haskell/crash-course-2025/maze-maps/maze-01.txt
+  mazeGrid <- readFile "../maze-maps/maze-01.txt"
 
   let game = newGame $ parseMap mazeGrid
   putStrLn "Welcome to the maze!"

@@ -2,10 +2,10 @@
 
 There are two versions of this game:
 
-- **`maze-v1.hs`**: The stable version.\
+- **`MazeV1.hs`**: The stable version.\
   It is complete and works well. It uses standard list logic.
-- **`maze-v2.hs`**: The new version.\
-  It uses a custom `Parser` and advanced types like `Functor` and `Monad`.
+- **`MazeV2.hs`**: The new version.\
+  It uses a custom `Parser` (*`ParserV1.hs`*) and advanced types like `Functor` and `Monad`.
 
 ## How to Play
 
@@ -37,10 +37,16 @@ haskell/crash-course-2025/day-6/run-maze-v2.md
 
 ### Version 1 (Stable / Baseline)
 
-...
+```bash
+./develop-maze-v1.md
+# OR if you are in the root folder:
+haskell/crash-course-2025/day-6/develop-maze-v1.md
+```
 
 ### Version 2 (New Parser)
 
 ```bash
 ./develop-maze-v2.md
+# OR if you are in the root folder:
+haskell/crash-course-2025/day-6/develop-maze-v2.md
 ```
