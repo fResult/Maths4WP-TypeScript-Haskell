@@ -27,7 +27,7 @@
         // Identity Element
         // Monoid.empty is an `mempty` in Haskell
         static empty(): Monoid {
-            throw Error("Empty doesn't Implement Error")
+            throw new Error("Empty doesn't Implement Error")
         }
     }
 
