@@ -60,7 +60,24 @@ We are breaking down `parseMap` (from `MazeV2.hs`) into smaller parsers to repla
 
 ### Maze Version 4 (State)
 
-Coming soon: We will refactor the game logic to use a `State` monad for managing the player's position and game state instead of passing it around manually.
+We refactored the game logic to use a `State` monad for managing the game state instead of manually threading it through every function.
+
+- **What:** Introduced a state monad alias `type Game a = State GameState a` and extracted `updateVision`.
+- **Why:** To eliminate the boilerplate of manually passing `GameState` and to encapsulate the domain concept of "Fog of War" (`updateVision`), keeping the business logic low-entropy and readable.
+
+- **What:** Refactored action handlers (e.g., `handleAction`, `handleMoveForward`) to return `Game String` instead of `GameState -> IO GameState`.
+- **Why:** To push side-effects (`IO`) to the outermost boundary of the system (`gameLoop`). By decoupling pure state transitions from I/O operations, the core game logic becomes perfectly pure, deterministic, and highly testable without needing to mock the console.
+- **Demo:**
+  ```hs
+  -- 1. Initialize a pure state
+  λ > let initialState = newGame testMaze
+
+  -- 2. Run pure state transitions without IO side-effects
+  λ > let (outputMsg, nextState) = runState handleLook initialState
+
+  λ > outputMsg
+  "You see a path in front of you. A wall to the left. A wall to the right."
+  ```
 
 ## Minor Enhancement
 
