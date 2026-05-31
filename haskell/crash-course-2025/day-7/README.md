@@ -65,6 +65,9 @@ We refactored the game logic to use a `State` monad for managing the game state 
 - **What:** Introduced a state monad alias `type Game a = State GameState a` and extracted `updateVision`.
 - **Why:** To eliminate the boilerplate of manually passing `GameState` and to encapsulate the domain concept of "Fog of War" (`updateVision`), keeping the business logic low-entropy and readable.
 
+- **What:** Extracted primitive state operations (e.g., `moveForward :: Game Bool`, `turnLeftAction :: Game ()`) utilizing `get` and `put` from the `State` monad.
+- **Why:** To strictly separate core state mutations from the presentation formatting. By building a composition internal DSL for game mechanics, the command handlers (like `handleMoveForward`)
+
 - **What:** Refactored action handlers (e.g., `handleAction`, `handleMoveForward`) to return `Game String` instead of `GameState -> IO GameState`.
 - **Why:** To push side-effects (`IO`) to the outermost boundary of the system (`gameLoop`). By decoupling pure state transitions from I/O operations, the core game logic becomes perfectly pure, deterministic, and highly testable without needing to mock the console.
 - **Demo:**
