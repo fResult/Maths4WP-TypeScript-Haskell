@@ -367,7 +367,9 @@ gameLoop gs = do
     Just action -> do
       let (msg, newGameState) = runState (handleAction action) gs
       putStrLn msg
-      gameLoop newGameState
+      if arrivedGoal newGameState
+        then putStrLn $ success colors ++ "🎉 You reached the goal! 🎉" ++ reset colors
+        else gameLoop newGameState
     Nothing     -> handleUnknown gs >>= gameLoop
     -- Nothing     -> do
       -- let (msg, newGameState) = runState handleUnknown' gs
