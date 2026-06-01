@@ -8,7 +8,14 @@ import System.Environment (getArgs, getProgName)
 import System.IO (hFlush, stdout)
 
 import ParserV2 ( word, Parser(runParser), parseByLines, runParserUnsafe )
-import Control.Monad.State (State, MonadState(get, put), StateT, gets, runState)
+import Control.Monad.State ( State
+                           , MonadState(get, put)
+                           , StateT
+                           , MonadIO (liftIO)
+                           , gets
+                           , runState
+                           , evalStateT
+                           )
 
 data Color = Color
   { info    :: String
@@ -70,7 +77,8 @@ data Action
 {-------------------------|
 |--- Game State Monads ---|
 |-------------------------}
-type Game a = State GameState a
+-- type Game a = State GameState a
+type Game a = StateT GameState IO a
 
 {--------------------|
 |--- Game Parsers ---|
@@ -344,24 +352,39 @@ renderMapAction = gets renderMap
 {---------------|
 |-- Game Loop --|
 |---------------}
-gameLoop :: GameState -> IO ()
-gameLoop gs = do
-  putStr $ danger colors ++ "➜ \ESC[34m"
-  hFlush stdout
-  cmd <- getLine
-  case parseInput cmd of
-    Just Quit   -> handleQuit
-    Just action -> do
-      let (msg, newGameState) = runState (handleAction action) gs
-      putStrLn msg
-      if arrivedGoal newGameState
-        then putStrLn $ success colors ++ "🎉 You reached the goal! 🎉" ++ reset colors
-        else gameLoop newGameState
-    Nothing     -> handleUnknown gs >>= gameLoop
-    -- Nothing     -> do
-      -- let (msg, newGameState) = runState handleUnknown' gs
+-- gameLoop :: GameState -> IO ()
+-- gameLoop gs = do
+  -- putStr $ danger colors ++ "➜ \ESC[34m"
+  -- hFlush stdout
+  -- cmd <- getLine
+  -- case parseInput cmd of
+    -- Just Quit   -> handleQuit
+    -- Just action -> do
+      -- let (msg, newGameState) = runState (handleAction action) gs
       -- putStrLn msg
-      -- gameLoop newGameState
+      -- if arrivedGoal newGameState
+        -- then putStrLn $ success colors ++ "🎉 You reached the goal! 🎉" ++ reset colors
+        -- else gameLoop newGameState
+    -- Nothing     -> handleUnknown gs >>= gameLoop
+
+gameLoop :: Game ()
+gameLoop = do
+  liftIO $ putStr $ danger colors ++ "➜ \ESC[34m"
+  liftIO $ hFlush stdout
+  command <- liftIO getLine
+  case parseInput command of
+    Nothing -> do
+      handleUnknown
+      gameLoop
+
+    Just Quit -> handleQuit
+    Just action -> do
+      message <- handleAction action
+      liftIO $ putStrLn message
+      gameState <- get
+      if arrivedGoal gameState
+        then liftIO (putStrLn $ success colors ++ "🎉 You reached the goal! 🎉" ++ reset colors)
+        else gameLoop
 
 handleAction :: Action -> Game String
 handleAction action = case action of
@@ -423,13 +446,20 @@ afterAction gameState = do
 handleHelp :: Game String
 handleHelp = pure helpText
 
-handleQuit :: IO ()
-handleQuit = putStrLn $ success colors ++ "Goodbye!"
+-- handleQuit :: IO ()
+-- handleQuit = putStrLn $ success colors ++ "Goodbye!"
 
-handleUnknown :: GameState -> IO GameState
-handleUnknown gameState = do
-  putStrLn $ warning colors ++ "Unknown command. Try: forward | turn left | turn right | look | map | help | quit" ++ reset colors
-  pure gameState
+handleQuit :: Game ()
+handleQuit = liftIO $ putStrLn $ success colors ++ "Goodbye!"
+
+-- handleUnknown :: Game ()
+-- handleUnknown gameState = do
+  -- putStrLn $ warning colors ++ "Unknown command. Try: forward | turn left | turn right | look | map | help | quit" ++ reset colors
+  -- pure gameState
+
+handleUnknown :: Game ()
+handleUnknown = do
+  liftIO $ putStrLn $ warning colors ++ "Unknown command. Try: forward | turn left | turn right | look | map | help | quit" ++ reset colors
 
 handleUnknown' :: Game String
 handleUnknown' = do
@@ -482,7 +512,7 @@ startGame :: Maze -> IO ()
 startGame maze = do
   let game = newGame maze
   printWelcomeMessage
-  gameLoop game
+  evalStateT gameLoop game
 
 {----------|
 |-- Main --|
