@@ -102,6 +102,19 @@ To solve this, we upgraded our Architecture to use **Monad Transformers**.
 - **What:** Replaced `runState` with `evalStateT` in `startGame`.
 - **Why:** To unwrap the `StateT` monad transformer, execute the resulting `IO` action, and discard the final state (since the game session ends).
 
+#### Final Note
+
+By breaking down the game into functional concept, we archieved highly decoupled architecture:
+
+1. **Parser Combinators ([ParserV2.hs](ParserV2.hs)):**\
+  We replaced imperative string manipulation with composable, declarative parsers (`parseRow`, `parseMaze`).
+2. **Ultimate Testability (The REPL Test):**\
+  Our game logic is composed of pure functions (`GameState -> GameState`).\
+  The true indicator of testability is the REPL: because we don't need to mock databases or consoles, we can instantly initiate a `GameState`, in GHCi, apply a function, and assert the output.
+3. **Monad Transformers (State + IO):**\
+  We built a "Functional Core, Imperative Shell".\
+  The primitive actions remain pure, while `StateT` handles the orchestration with `IO` at the absolute boundary (`gameLoop`).
+
 ## Minor Enhancement
 
 - Added basic ANSI terminal colors and updated map symbols (e.g., 'S' for Start, 'O' for Goal) for better readability.
