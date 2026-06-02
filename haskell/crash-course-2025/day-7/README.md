@@ -115,6 +115,16 @@ By breaking down the game into functional concept, we archieved highly decoupled
   We built a "Functional Core, Imperative Shell".\
   The primitive actions remain pure, while `StateT` handles the orchestration with `IO` at the absolute boundary (`gameLoop`).
 
+#### Looking Ahead to Day 8: Building a Mini Programming Language (AST)
+
+On Day 8, we will level up our programming language concepts.\
+We will introduce an Abstract Syntax Tree (AST) to our `Action` data structure to support programmability inside the game:
+
+- `Sequence [Action]` (e.g., "forward then left then forward")
+- `Repeat Int Action` (e.g., "repeat 3 forward" or "left 3")
+- `Assign Alias Action` (e.g., "jump = forward 2")
+- `Use Alias` (e.g., "Use jump")
+
 ## Minor Enhancement
 
 - Added basic ANSI terminal colors and updated map symbols (e.g., 'S' for Start, 'O' for Goal) for better readability.
