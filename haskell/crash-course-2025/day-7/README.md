@@ -82,6 +82,26 @@ We refactored the game logic to use a `State` monad for managing the game state 
   "You see a path in front of you. A wall to the left. A wall to the right."
   ```
 
+# Maze Version 5 (Monad Transformers (State + IO))
+
+We encountered a limitation: we cannot mix `IO` actions (like reading input) and `State` operations in the same `do` block without explicitly passing the state back and forth.\
+To solve this, we upgraded our Architecture to use **Monad Transformers**.
+
+- **What:** Upgraded the monad alias from pure `State` to Monad Transformer stack: `type Game a = StateT GameState IO a`.
+- **Why:** To fuse the \`State\` and \`IO\` contexts together. This allows us to orchestrate pure state mutations and side-effects (printing/reading) in a single `do` block without manual state threading.
+- **Demo:**
+  ```hs
+  -- Notice how `handleUnknown` safely executes an IO action (`liftIO $ putStrLn`) directly inside the State context!
+  λ > evalStateT handleUnknown testGame
+  Unknown command. Try: forward | turn left | turn right | look | map | help | quit
+  ```
+
+- **What:** Left existing primitive actions (e.g., `moveForwardAction`, `turnLeftAction`) entirely unchanged, despite the type signature change to the `Game` monad.
+- **Why:** Because `StateT` inherently provides `MonadState` instances (`get`, `put`, `gets`). This proves the power of Monadic abstraction: we changed entire execution context (adding `IO`) without modifying the core domain logic.
+
+- **What:** Replaced `runState` with `evalStateT` in `startGame`.
+- **Why:** To unwrap the `StateT` monad transformer, execute the resulting `IO` action, and discard the final state (since the game session ends).
+
 ## Minor Enhancement
 
 - Added basic ANSI terminal colors and updated map symbols (e.g., 'S' for Start, 'O' for Goal) for better readability.
