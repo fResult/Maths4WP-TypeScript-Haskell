@@ -1,4 +1,4 @@
-# Day 7 - Haskell Maze Game - Version 3
+# Day 7 - Functional Core, Imperative Shell (Maze V3 - V5)
 
 This is Version 3, refactored from Version 2:
 
@@ -66,7 +66,7 @@ We refactored the game logic to use a `State` monad for managing the game state 
 - **Why:** To eliminate the boilerplate of manually passing `GameState` and to encapsulate the domain concept of "Fog of War" (`updateVision`), keeping the business logic low-entropy and readable.
 
 - **What:** Extracted primitive state operations (e.g., `moveForward :: Game Bool`, `turnLeftAction :: Game ()`) utilizing `get` and `put` from the `State` monad.
-- **Why:** To strictly separate core state mutations from the presentation formatting. By building a composition internal DSL for game mechanics, the command handlers (like `handleMoveForward`)
+- **Why:** To strictly separate core state mutations from the presentation formatting. By building a composable internal DSL for game mechanics, the command handlers (like `handleMoveForward`) only need to orchestrate these primitives and format the resulting `String`, adhering to the Single Responsibility Principle.
 
 - **What:** Refactored action handlers (e.g., `handleAction`, `handleMoveForward`) to return `Game String` instead of `GameState -> IO GameState`.
 - **Why:** To push side-effects (`IO`) to the outermost boundary of the system (`gameLoop`). By decoupling pure state transitions from I/O operations, the core game logic becomes perfectly pure, deterministic, and highly testable without needing to mock the console.
@@ -82,13 +82,13 @@ We refactored the game logic to use a `State` monad for managing the game state 
   "You see a path in front of you. A wall to the left. A wall to the right."
   ```
 
-# Maze Version 5 (Monad Transformers (State + IO))
+### Maze Version 5 (Monad Transformers (State + IO))
 
 We encountered a limitation: we cannot mix `IO` actions (like reading input) and `State` operations in the same `do` block without explicitly passing the state back and forth.\
 To solve this, we upgraded our Architecture to use **Monad Transformers**.
 
 - **What:** Upgraded the monad alias from pure `State` to Monad Transformer stack: `type Game a = StateT GameState IO a`.
-- **Why:** To fuse the \`State\` and \`IO\` contexts together. This allows us to orchestrate pure state mutations and side-effects (printing/reading) in a single `do` block without manual state threading.
+- **Why:** To fuse the `State` and `IO` contexts together. This allows us to orchestrate pure state mutations and side-effects (printing/reading) in a single `do` block without manual state threading.
 - **Demo:**
   ```hs
   -- Notice how `handleUnknown` safely executes an IO action (`liftIO $ putStrLn`) directly inside the State context!
@@ -102,7 +102,7 @@ To solve this, we upgraded our Architecture to use **Monad Transformers**.
 - **What:** Replaced `runState` with `evalStateT` in `startGame`.
 - **Why:** To unwrap the `StateT` monad transformer, execute the resulting `IO` action, and discard the final state (since the game session ends).
 
-#### Final Note
+### Final Note
 
 By breaking down the game into functional concept, we archieved highly decoupled architecture:
 
@@ -115,7 +115,7 @@ By breaking down the game into functional concept, we archieved highly decoupled
   We built a "Functional Core, Imperative Shell".\
   The primitive actions remain pure, while `StateT` handles the orchestration with `IO` at the absolute boundary (`gameLoop`).
 
-#### Looking Ahead to Day 8: Building a Mini Programming Language (AST)
+### Look Ahead to Day 8: Building a Mini Language (AST)
 
 On Day 8, we will level up our programming language concepts.\
 We will introduce an Abstract Syntax Tree (AST) to our `Action` data structure to support programmability inside the game:
