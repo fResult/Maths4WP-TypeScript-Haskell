@@ -1,13 +1,13 @@
 module MazeV6 where
 
-import Control.Applicative ((<|>), Alternative (some))
+import Control.Applicative ((<|>), Alternative (some, many))
 import Data.Char (toUpper, toLower)
 import Data.Functor (($>))
 import Data.List (nub)
 import System.Environment (getArgs, getProgName)
 import System.IO (hFlush, stdout)
 
-import ParserV2 ( word, Parser(runParser), parseByLines, runParserUnsafe )
+import ParserV3 ( word, Parser(runParser), parseByLines, runParserUnsafe )
 import Control.Monad.State ( State
                            , MonadState(get, put)
                            , StateT
@@ -73,9 +73,6 @@ data Action
   | Quit
   | Help
   | Sequence [Action]   -- forward then left then left then forward
-  | Repeat Int Action   -- repeat 3 forward || forward 3 || left 3
-  -- | Assign Alias Action -- jump = forward 2
-  -- | Use Alias           -- use jump
   deriving (Show, Eq)
 
 {-------------------------|
@@ -87,12 +84,12 @@ type Game a = StateT GameState IO a
 {--------------------|
 |--- Game Parsers ---|
 |--------------------}
-parseDirection :: Parser Direction
-parseDirection =
-      word "north" $> North
-  <|> word "east"  $> East
-  <|> word "south" $> South
-  <|> word "west"  $> West
+parseInput :: String -> Maybe Action
+parseInput input = case run input of
+  Just (a, _) -> Just a
+  Nothing     -> Nothing
+  where
+    run = runParser parseSequence
 
 parseAction :: Parser Action
 parseAction =
@@ -110,12 +107,21 @@ parseAction =
   <|> word "command" $> Help
   <|> word "quit" $> Quit
 
-parseInput :: String -> Maybe Action
-parseInput input = case run input of
-  Just (a, _) -> Just a
-  Nothing     -> Nothing
-  where
-    run = runParser parseAction
+parseSequence :: Parser Action
+parseSequence = do
+  first <- parseAction
+  rest  <- many (word "then" *> parseAction)
+  pure $
+    case rest of
+      []  -> first
+      _   -> Sequence (first : rest)
+
+parseDirection :: Parser Direction
+parseDirection =
+      word "north" $> North
+  <|> word "east"  $> East
+  <|> word "south" $> South
+  <|> word "west"  $> West
 
 parseMap :: Parser Maze
 parseMap = Maze <$> parseByLines parseRow
