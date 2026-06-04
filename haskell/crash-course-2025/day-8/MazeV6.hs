@@ -405,6 +405,7 @@ handleAction action = case action of
   TurnRight   -> handleTurnRight
   Turn dir    -> handleTurnDirection dir
   Help        -> handleHelp
+  Sequence xs -> handleSequence xs
 
 
 handleLook :: Game String
@@ -445,6 +446,18 @@ handleTurnDirection dir = do
 
 handleHelp :: Game String
 handleHelp = pure helpText
+
+handleSequence :: [Action] -> Game String
+handleSequence []  = pure ""
+handleSequence [a] = handleAction a
+handleSequence (a: as) = do
+  message1 <- handleAction a
+  gameState <- get
+  if arrivedGoal gameState
+    then pure message1
+    else do
+      message2 <- handleSequence as
+      pure (message1 ++ "\n" ++ message2)
 
 -- handleQuit :: IO ()
 -- handleQuit = putStrLn $ success colors ++ "Goodbye!"
