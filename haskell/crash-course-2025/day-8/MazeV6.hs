@@ -443,16 +443,6 @@ handleTurnDirection dir = do
   pure $ info colors ++ "You now face " ++ show dir ++ ".\n"
     ++ description ++ reset colors
 
-afterAction :: GameState -> IO GameState
-afterAction gameState = do
-  let (desc, revealed) = lookAround gameState
-  putStrLn desc
-  if arrivedGoal revealed
-    then do
-      putStrLn $ success colors ++ "🎉 You reached the goal! 🎉" ++ reset colors
-      pure revealed
-    else pure revealed
-
 handleHelp :: Game String
 handleHelp = pure helpText
 
