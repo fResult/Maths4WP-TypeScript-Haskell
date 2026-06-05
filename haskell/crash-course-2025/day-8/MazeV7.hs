@@ -362,21 +362,6 @@ renderMapAction = gets renderMap
 {---------------|
 |-- Game Loop --|
 |---------------}
--- gameLoop :: GameState -> IO ()
--- gameLoop gs = do
-  -- putStr $ danger colors ++ "➜ \ESC[34m"
-  -- hFlush stdout
-  -- cmd <- getLine
-  -- case parseInput cmd of
-    -- Just Quit   -> handleQuit
-    -- Just action -> do
-      -- let (msg, newGameState) = runState (handleAction action) gs
-      -- putStrLn msg
-      -- if arrivedGoal newGameState
-        -- then putStrLn $ success colors ++ "🎉 You reached the goal! 🎉" ++ reset colors
-        -- else gameLoop newGameState
-    -- Nothing     -> handleUnknown gs >>= gameLoop
-
 gameLoop :: Game ()
 gameLoop = do
   liftIO $ putStr $ danger colors ++ "➜ \ESC[34m"

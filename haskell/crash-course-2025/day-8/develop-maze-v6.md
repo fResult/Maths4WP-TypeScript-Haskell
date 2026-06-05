@@ -13,4 +13,4 @@ export WORK_DIR=haskell/crash-course-2025/day-8
 ## Start the development!!
 
 TARGET_MAZE_NUMBER="${1:-1}"
-ghci MazeV6 ParserV2 -ghci-script <(echo ":set args $TARGET_MAZE_NUMBER")
+ghci MazeV6 ParserV3 -ghci-script <(echo ":set args $TARGET_MAZE_NUMBER")
