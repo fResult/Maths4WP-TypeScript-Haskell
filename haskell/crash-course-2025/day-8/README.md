@@ -72,21 +72,23 @@ Let's start by refactoring [MazeV5.hs][maze-v5] into [MazeV6.hs][maze-v6] and be
 
 ## Refactoring Note
 
-### 1. Monadic Parser
+### [ParserV3][parser-v3] (Monadic Parser)
 
 We upgraded our custom `Parser` to be a full Monad.
 
 - **What:** Implemented the `Monad` typeclass instance (`>>=`) for our `Parser`.
 - **Why:** To unlock the power of `do` notation. While `Applicative` (`<*>`) is great for independent parsing, a `Monad` allows context-dependent parsing step can depend on the extracted value of the previous step. It makes writing complex syntax rules (like our sequence parser) cleaner.
 
-### 2. Expanding the AST (`MazeV6.hs`)
+###  [MazeV6.hs][maze-v6] (AST & Interpreter)
 
 We started building our mini language by introducing the first composite node into our Abstract Syntax Tree (AST).
+
+#### 1. Expanding the AST (The Model)
 
 - **What:** Added `Sequence [Action]` to the `Action` data type.
 - **Why:** to elevate our domain model from single, isolated commands into a programmable structure. `Sequence` acts as an AST node that holds a list of sub-actions to be executed sequentially.
 
-### 3. Parsing the Language Syntax ([`MazeV6.hs`][maze-v6])
+### 2. Parsing the Language Syntax (The "What")
 
 We created a parser that understands how to chain commands together.
 
@@ -103,6 +105,24 @@ We created a parser that understands how to chain commands together.
   Just (Sequence [Forward,TurnLeft,Forward])
   ```
 
+### 3. Interpreting the AST (The "How")
+
+We upgraded our game's core action handler to ac as an AST Interpreter.
+
+- **What:** Enhanced `handleAction` with pattern matching for the `Sequence` node and introduced `handleSequence :: [Action] -> Game String` to recursively evaluate the list of actions.
+- **Why:** To complete the **Interpreter Pattern**. while parser builds the AST (describing "what" to do), the interpreter executes it (defining *how* to do it) by reducing the AST into state mutations. Furthermore, we implemented **Short-Circuit Evaluation**: if the player reaches the goal mid-sequence, the interpreter halts further execution, preventing unnecessary and potentially invalid state transitions.
+- **Demo:** Notice how the interpreter evaluates multiple actions sequentially and aggregates the results:
+  ```hs
+  λ > evalStateT (handleSequence [Forward, Turn South]) testGame
+  "\ESC[32mYou moved forward.\n\ESC[36m\ESC[36mYou see a path in front of you. A wall to the left. A wall to the right.\ESC[m\ESC[m\n\ESC[36mYou now face South.\n\ESC[36mYou see a wall in front of you. A path to the left. A path to the right.\ESC[m\ESC[m"
+  ```
+
+### [Maze Version 7](maze-v7) (Unknown Command Suggestion)
+
+Coming soon....
+
 [maze-v5]: ../day-7/MazeV5.hs
 [maze-v6]: ./MazeV6.hs
+[maze-v7]: ./MazeV7.hs
 [parser-v2]: ./ParserV2.hs
+[parser-v3]: ./ParserV3.hs
