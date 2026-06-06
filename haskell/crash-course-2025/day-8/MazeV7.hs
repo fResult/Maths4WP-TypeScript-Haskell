@@ -392,7 +392,6 @@ handleAction action = case action of
   Help        -> handleHelp
   Sequence xs -> handleSequence xs
 
-
 handleLook :: Game String
 handleLook = lookAroundAction
 
@@ -444,24 +443,12 @@ handleSequence (a: as) = do
       message2 <- handleSequence as
       pure (message1 ++ "\n" ++ message2)
 
--- handleQuit :: IO ()
--- handleQuit = putStrLn $ success colors ++ "Goodbye!"
-
 handleQuit :: Game ()
 handleQuit = liftIO $ putStrLn $ success colors ++ "Goodbye!"
-
--- handleUnknown :: Game ()
--- handleUnknown gameState = do
-  -- putStrLn $ warning colors ++ "Unknown command. Try: forward | turn left | turn right | look | map | help | quit" ++ reset colors
-  -- pure gameState
 
 handleUnknown :: Game ()
 handleUnknown = do
   liftIO $ putStrLn $ warning colors ++ "Unknown command. Try: forward | turn left | turn right | look | map | help | quit" ++ reset colors
-
-handleUnknown' :: Game String
-handleUnknown' = do
-  pure $ warning colors ++ "Unknown command. Try: forward | turn left | turn right | look | map | help | quit" ++ reset colors
 
 helpText :: String
 helpText = unlines
