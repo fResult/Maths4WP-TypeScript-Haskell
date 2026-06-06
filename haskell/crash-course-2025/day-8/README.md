@@ -119,10 +119,35 @@ We upgraded our game's core action handler to ac as an AST Interpreter.
 
 ### [Maze Version 7](maze-v7) (Unknown Command Suggestion)
 
-Coming soon....
+#### Architectural Insight: The Universal Pattern of Decoupling
+
+Before diving into the code, let's look at a larger architectural concept.\
+In traditional synchronous Client-Server architecture, invoking an API immediately triggers computation and database queries, which inherently blocks scalability.\
+To solve this in large-scale Distributed Systems, Engineers often introduce a **Message Queue** in the middle.\
+Technically, this is the concept of **decoupling IO (Accepting the Request) from Computation (Processing the Request)**.
+
+This is *exactly* the same concept as our Parser and Interpreter separation!\
+The Parser acts like the API Gateway accepting the request and putting it into an AST (the Message Queue).\
+The Interpreter then pulls that AST to handle the state transition (the Computation).\
+Functional Architecture naturally guides us toward these highly scalable, decoupled design patterns!
+
+#### 1. Parser Refactoring ([`ParserV4.hs`][parser-v4])
+
+- **What:** Extracted the `satisfy :: (Char -> Bool) -> Parser Char` function and refactored the `char` parser to use it (`char c = satisfy (== c)`).
+- **Why:** To create a foundational, highly reusable combinator that parses characters based on *any* predicate. This is a crucial tool for parsing arbitrary text blocks without writing custom recursive loops.
+
+#### 2. Enhancing the Domain for UX ([`MazeV7.hs`][maze-v7])
+
+- **What:** Added `Unknown String` to the `Action` AST, introduced `parseUnknown` using the new `satisfy` combinator, and updated the interpreter (`handleAction` & `handleUnknown`) to accept this string.
+- **Why:** Instead of discarding invalid input or throwing an immediate error at the parsing stage, we *capture* it into our Domain Model (`Unknown`). In Distributed Systems, this pattern is the equivalent of routing failed messages to a **Dead Letter Queue (DLQ)** to achieve **Graceful Degradation**. It pushes the responsibility to the Interpreter (the Worker), allowing it to inspect the faulty command and provide a tailored user experience instead of a hard crash.\
+For example, we could implement Levenshtein distance later to offer suggestions: `"Did you mean 'forward' instead of 'forwrd'?"`.
+
+> [!NOTE]
+> We will skip the actual *Levenshtein* implementation in this course, but the architectural foundation is now ready for it!)
 
 [maze-v5]: ../day-7/MazeV5.hs
 [maze-v6]: ./MazeV6.hs
 [maze-v7]: ./MazeV7.hs
 [parser-v2]: ./ParserV2.hs
 [parser-v3]: ./ParserV3.hs
+[parser-v4]: ./ParserV4.hs
