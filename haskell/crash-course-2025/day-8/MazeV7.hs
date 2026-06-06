@@ -1,13 +1,18 @@
 module MazeV7 where
 
 import Control.Applicative ((<|>), Alternative (some, many))
-import Data.Char (toUpper, toLower)
+import Data.Char (toUpper, toLower, isSpace)
 import Data.Functor (($>))
 import Data.List (nub)
 import System.Environment (getArgs, getProgName)
 import System.IO (hFlush, stdout)
 
-import ParserV3 ( word, Parser(runParser), parseByLines, runParserUnsafe )
+import ParserV4 ( word
+                , Parser(runParser)
+                , satisfy
+                , parseByLines
+                , runParserUnsafe
+                )
 import Control.Monad.State ( MonadState(get, put)
                            , StateT
                            , MonadIO (liftIO)
@@ -70,7 +75,8 @@ data Action
   | Map
   | Quit
   | Help
-  | Sequence [Action]   -- forward then left then left then forward
+  | Sequence [Action]
+  | Unknown String
   deriving (Show, Eq)
 
 {-------------------------|
@@ -103,6 +109,7 @@ parseAction =
   <|> word "help" $> Help
   <|> word "command" $> Help
   <|> word "quit" $> Quit
+  <|> parseUnknown
 
 parseSequence :: Parser Action
 parseSequence = do
@@ -132,6 +139,11 @@ parseTile =
   <|> word "[_]" $> Empty
   <|> word "[s]" $> Start
   <|> word "[o]" $> Goal
+
+parseUnknown ::  Parser Action
+parseUnknown = do
+  command <- some (satisfy (\c -> not (isSpace c)))
+  pure $ Unknown command
 
 -- TODO: Refactor to return `Maybe` or `Either` to handle missing `Start` tile safely.
 findStart :: Maze -> Position
@@ -350,9 +362,7 @@ gameLoop = do
   liftIO $ hFlush stdout
   command <- liftIO getLine
   case parseInput command of
-    Nothing -> do
-      handleUnknown
-      gameLoop
+    Nothing -> gameLoop
 
     Just Quit -> handleQuit
     Just action -> do
@@ -362,6 +372,19 @@ gameLoop = do
       if arrivedGoal gameState
         then liftIO (putStrLn $ success colors ++ "🎉 You reached the goal! 🎉" ++ reset colors)
         else gameLoop
+
+
+handleSequence :: [Action] -> Game String
+handleSequence []  = pure ""
+handleSequence [a] = handleAction a
+handleSequence (a: as) = do
+  message1 <- handleAction a
+  gameState <- get
+  if arrivedGoal gameState
+    then pure message1
+    else do
+      message2 <- handleSequence as
+      pure (message1 ++ "\n" ++ message2)
 
 handleAction :: Action -> Game String
 handleAction action = case action of
@@ -373,6 +396,7 @@ handleAction action = case action of
   Turn dir    -> handleTurnDirection dir
   Help        -> handleHelp
   Sequence xs -> handleSequence xs
+  Unknown cmd -> handleUnknown cmd
 
 handleLook :: Game String
 handleLook = lookAroundAction
@@ -413,24 +437,16 @@ handleTurnDirection dir = do
 handleHelp :: Game String
 handleHelp = pure helpText
 
-handleSequence :: [Action] -> Game String
-handleSequence []  = pure ""
-handleSequence [a] = handleAction a
-handleSequence (a: as) = do
-  message1 <- handleAction a
-  gameState <- get
-  if arrivedGoal gameState
-    then pure message1
-    else do
-      message2 <- handleSequence as
-      pure (message1 ++ "\n" ++ message2)
-
 handleQuit :: Game ()
 handleQuit = liftIO $ putStrLn $ success colors ++ "Goodbye!"
 
-handleUnknown :: Game ()
-handleUnknown = do
-  liftIO $ putStrLn $ warning colors ++ "Unknown command. Try: forward | turn left | turn right | look | map | help | quit" ++ reset colors
+handleUnknown :: String -> Game String
+handleUnknown command =
+  pure (warning colors
+    ++ "Unknown command: \""
+    ++ command
+    ++ "\". Try: forward | turn left | turn right | look | map | help | quit"
+    ++ reset colors)
 
 helpText :: String
 helpText = unlines
