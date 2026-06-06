@@ -94,6 +94,15 @@ parseInput input = case run input of
   where
     run = runParser parseSequence
 
+parseSequence :: Parser Action
+parseSequence = do
+  first <- parseAction
+  rest  <- many (word "then" *> parseAction)
+  pure $
+    case rest of
+      []  -> first
+      _   -> Sequence (first : rest)
+
 parseAction :: Parser Action
 parseAction =
       word "forward" $> Forward
@@ -110,15 +119,6 @@ parseAction =
   <|> word "command" $> Help
   <|> word "quit" $> Quit
   <|> parseUnknown
-
-parseSequence :: Parser Action
-parseSequence = do
-  first <- parseAction
-  rest  <- many (word "then" *> parseAction)
-  pure $
-    case rest of
-      []  -> first
-      _   -> Sequence (first : rest)
 
 parseDirection :: Parser Direction
 parseDirection =
