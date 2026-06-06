@@ -5,10 +5,11 @@ module ParserV5 ( Parser (runParser)
                 , parseByLines
                 , runParserUnsafe
                 , char
+                , parseInt
                 ) where
 
-import Data.Char (isSpace, toLower, toUpper)
-import Control.Applicative (Alternative (empty, (<|>)), (*>), (<*))
+import Data.Char (isSpace, toLower, toUpper, isDigit)
+import Control.Applicative (Alternative (empty, some, (<|>)), (*>), (<*))
 
 newtype Parser a = Parser { runParser :: String -> Maybe (a, String) }
 
@@ -63,6 +64,9 @@ spaces = Parser $ \input -> Just ((), dropWhile isSpace input)
 
 token :: Parser a -> Parser a
 token parser = spaces *> parser <* spaces
+
+parseInt :: Parser Int
+parseInt = read <$> some (satisfy isDigit)
 
 --
 
