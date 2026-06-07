@@ -207,14 +207,28 @@ Premature abstraction is the root of all evil.
   Just (Repeat 3 (Sequence [Forward, TurnLeft]))
   ```
 
-### 6.4 Syntax Flexibility (Prefix & Postfix)
+### Architectural Insight: Decoupling UX from Core Logic
 
-We expanded the language to support both Prefix and Postfix notations, mapping them to the exact same AST node.
+Zooming out to a macro perspective, supporting multiple syntaxes mirrors **Hexagonal Architecture (Ports and Adapters)**.
 
-- **What:** Implemented `parseRepeatPostfix` (e.g., `forward 3`) and enabled it alongside `parseRepeatPrefix` in the main `parseAction`.
-- **Why:** To improve the ergonomics (UX) of our DSL. Some users prefer Unix-style prefix (`repeat 3 forward`), while others prefer object-like postfix (`forward 3`).
-- **Why (cont.):** Because Parsing is decoupled from Interpretation, both syntaxes map to the *identical* `Repeat Int Action` AST node. We expanded expressiveness without *any* burdening the core interpreter!
-- **Demo:** Notice how postfix syntax elegantly resolves to the same AST:
+Our parsers act as primary Adapters.\
+They translate diverse, messy user inputs into a unified format.
+
+The AST represents our pure Core Domain.\
+It remains blissfully unaware of syntax choices.
+
+By decoupling "How it looks" (Prefix/Postfix) from "What it means" (AST), we scale our UX freely.\
+We avoid bleeding UX complexity into the interpreter.
+
+### 6.4 Parsing Flexible Syntax (Prefix & Postfix)
+
+We expanded the language to support both Prefix and Postfix notations.\
+Both syntaxes seamlessly map to the exact same AST node.
+
+- **What:** Implemented `parseRepeatPostfix` and enabled it alongside `parseRepeatPrefix` in `parseAction`.
+- **Why:** To improve DSL ergonomics. Users can choose Unix-style prefix (`repeat 3 forward`) or object-like postfix (`forward 3`).
+- **Why (cont.):** Since parsing is isolated, mapping diverse syntaxes to the identical `Repeat Int Action` node adds zero burden to the interpreter!
+- **Demo:** Postfix elegantly resolves to our standard AST:
   ```hs
   λ > parseInput "forward 3"
   Just (Repeat 3 Forward)
@@ -222,9 +236,32 @@ We expanded the language to support both Prefix and Postfix notations, mapping t
   Just (Repeat 3 (Sequence [Forward, TurnLeft]))
   ```
 
-### 6.5 Interpreting the Repeat Node *(WIP/Pending)*
+### 6.5 Interpreting the AST: The Accumulator Pattern
 
-*We have parsed the "What", but the Interpreter (`handleAction`) is currently missing the "How" for the `Repeat` node. We need to implement this next!*
+We implemented the loop interpretation logic for the `Repeat` node using a classic Haskell idiom.
+
+- **What:** Added `handleRepeat :: Int -> Action -> Game String` using the Accumulator Pattern with a local recursive `go` function.
+- **Why:** To recursively execute actions `n` times while safely aggregating output messages.
+- **Why (cont.):** The local `go` function provides a clean loop state. It perfectly respects our **Short-Circuit Evaluation**, halting instantly if the goal is reached.
+- **Demo:** Notice the recursive accumulation logic:
+  ```hs
+  λ > :{
+  λ | handleRepeat n action = go n ""
+  λ | where
+  λ |    go 0 message = pure message
+  λ |    go k message = do
+  λ |      newMessage <- handleAction action
+  λ |      -- Evaluates state and accumulates 'newMessage'
+  λ | :}
+  ```
+
+> [!TIP]
+> **Architectural Reflection: The Power of Composability**\
+> Notice how we created many small, focused "unit" functions throughout this journey.\
+> Because they do one thing well, they are inherently easy to isolate and unit test.
+>
+> This makes adding new features incredibly easy.\
+> We simply compose these existing foundational units together into complex behaviors without having to rewrite our core logic!
 
 [maze-v5]: ../day-7/MazeV5.hs
 [maze-v6]: ./MazeV6.hs
