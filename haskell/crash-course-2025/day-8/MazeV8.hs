@@ -425,7 +425,20 @@ handleAction action = case action of
   Turn dir    -> handleTurnDirection dir
   Help        -> handleHelp
   Sequence xs -> handleSequence xs
+  Repeat n a  -> handleRepeat n a
   Unknown cmd -> handleUnknown cmd
+
+handleRepeat :: Int -> Action -> Game String
+handleRepeat n action =
+  go n ""
+  where
+    go 0 message = pure message
+    go k message = do
+      newMessage <- handleAction action
+      gameState <- get
+      if arrivedGoal gameState
+        then pure (message ++ newMessage)
+        else go (k - 1) (message ++ newMessage ++ "\n")
 
 handleLook :: Game String
 handleLook = lookAroundAction
