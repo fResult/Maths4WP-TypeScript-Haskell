@@ -1,9 +1,23 @@
 # Day 8 - Building a DSL with AST and Monadic Parsers
 
+## The Big Picture (TL;DR)
+
+Day 8 is a massive architectural leap.\
+We are transitioning our game from a simple command-driven system into a programmable platform. 
+
+By elevating string inputs into an **Abstract Syntax Tree (AST)**, we successfully decouple the "What" (Parsing) from the "How" (Interpretation).\
+This zoomed-out architectural shift allows us to build a robust **Domain-Specific Language (DSL)**.
+
+**The Journey at a Glance:**
+- **Phase 1 (MazeV6):** Establishing the AST foundation and completing the Interpreter Pattern.
+- **Phase 2 (MazeV7):** Introducing Graceful Degradation to handle invalid states without crashing.
+- **Phase 3 (MazeV8):** Expanding the DSL's expressiveness (loops, flexible syntax) while keeping the core domain pure.
+
+---
+
 ## 1. Architectural Foundations
 
-This section covers key architectural lessons from Day 7.\
-It sets the stage for Day 8, where we build a mini language.
+Before diving into the DSL construction, let's step back and look at the key architectural lessons from Day 7 that make this possible.
 
 ### The "Functional Core, Imperative Shell" Architecture
 
@@ -66,13 +80,13 @@ We must collect domain complexity gradually.
 We will refactor the parser only *after* understanding our DSL's full scope.\
 Premature abstraction is the root of all evil.
 
-## 3. Upgrading the Toolkit
+## 3. Upgrading the Toolkit (The Prerequisites)
 
 Before building our DSL, we need better parsing tools.
 
 ### [ParserV3][parser-v3] (Monadic Parser)
 
-We upgraded our custom `Parser` to be a full Monad.
+To support complex syntax, we upgraded our custom `Parser` to be a full Monad.
 
 - **What:** Implemented the `Monad` type class instance (`>>=`) for our `Parser`.
 - **Why:** To unlock `do` notation. `Applicative` (`<*>`) handles independent parsing, but `Monad` allows context-dependent parsing. It makes complex syntax rules cleaner.
@@ -87,14 +101,15 @@ We upgraded our custom `Parser` to be a full Monad.
 - **What:** Added `parseInt :: Parser Int` and `between :: Parser a -> Parser b -> Parser c -> Parser c`.
 - **Why:** To build reusable primitives. `between` creates scoped syntax boundaries (like parentheses) without cluttering business logic.
 
-## 4. Implementation - AST & Interpreter ([MazeV6][maze-v6])
+## 4. Phase 1: The Foundation - AST & Interpreter ([MazeV6][maze-v6])
 
-We started building our mini language by introducing the first composite node into our Abstract Syntax Tree (AST).
+We begin our DSL journey by introducing the first composite node into our AST.\
+This is where the Interpreter Pattern comes to life.
 
 ### 4.1 Expanding the AST (The Model)
 
 - **What:** Added `Sequence [Action]` to the `Action` data type.
-- **Why:** To elevate our domain model from isolated commands to programmable structures. `Sequence` holds a list of sub-actions to execute in order.
+- **Why:** To elevate our domain model from isolated commands to complex, programmable structures. `Sequence` holds a list of sub-actions to execute in order.
 
 ### 4.2 Parsing the Language Syntax (The "What")
 
@@ -115,7 +130,7 @@ We created a parser that understands how to chain commands together.
 
 ### 4.3 Interpreting the AST (The "How")
 
-We upgraded our game's core action handler to act as an AST Interpreter.
+We upgraded our game's core action handler from a simple switch-case into a recursive AST Interpreter.
 
 - **What:** Enhanced `handleAction` with pattern matching for the `Sequence` node and introduced `handleSequence :: [Action] -> Game String` to recursively evaluate the list of actions.
 - **Why:** To complete the **Interpreter Pattern**. The parser builds the AST, and the interpreter reduces it into pure state mutations.
@@ -126,11 +141,11 @@ We upgraded our game's core action handler to act as an AST Interpreter.
   "\ESC[32mYou moved forward.\n\ESC[36m\ESC[36mYou see a path in front of you. A wall to the left. A wall to the right.\ESC[m\ESC[m\n\ESC[36mYou now face South.\n\ESC[36mYou see a wall in front of you. A path to the left. A path to the right.\ESC[m\ESC[m"
   ```
 
-## 5. Implementation - Graceful Degradation ([MazeV7][maze-v7])
+## 5. Phase 2: Resilience - Graceful Degradation ([MazeV7][maze-v7])
 
 ### Architectural Insight: The Universal Pattern of Decoupling
 
-Before diving into the code, let's look at a larger architectural concept.\
+Zooming out to a macro perspective, let's look at a larger architectural concept.\
 In traditional synchronous Client-Server architecture, invoking an API immediately triggers computation and database queries, which inherently blocks scalability.\
 To solve this in large-scale Distributed Systems, Engineers often introduce a **Message Queue** in the middle.\
 Technically, this is the concept of **decoupling IO (Accepting the Request) from Computation (Processing the Request)**.
@@ -156,11 +171,11 @@ For example, we could implement Levenshtein distance later to offer suggestions:
 > [!NOTE]
 > We will skip the actual *Levenshtein* implementation in this course, but the architectural foundation is now ready for it!)
 
-## 6. Implementation - Advanced AST ([MazeV8][maze-v8])
+## 6. Phase 3: Expressiveness - Advanced AST ([MazeV8][maze-v8])
 
 ### Architectural Philosophy: Managing Parser Complexity
 
-As we introduce more complex syntax (`Sequence`, `Repeat`), our parser logic is becoming slightly *ad-hoc*.\
+As our DSL grows (`Sequence`, `Repeat`), our parser logic naturally becomes slightly *ad-hoc*.\
 However, we are deliberately postponing a full parser revamp.\
 Think of software architecture like moving into a new house.\
 If you build custom shelves before knowing what furniture you'll buy, you'll end up with mismatched spaces.\
