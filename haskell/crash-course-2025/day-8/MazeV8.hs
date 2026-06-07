@@ -100,7 +100,7 @@ parseInput input = case run input of
 parseAction :: Parser Action
 parseAction =
       parseRepeatPrefix
-  -- <|> parseRepeatPostfix
+  <|> parseRepeatPostfix
   <|> parseAtomicAction
   <|> parseUnknown
 
@@ -114,7 +114,11 @@ parseSequence = do
       _   -> Sequence (first : rest)
 
 parseRepeatPostfix :: Parser Action
-parseRepeatPostfix = undefined
+parseRepeatPostfix = do
+  action <- parseParenthesesOrAction
+  n <- parseInt
+  pure (Repeat n action)
+
 
 parseRepeatPrefix :: Parser Action
 parseRepeatPrefix = do

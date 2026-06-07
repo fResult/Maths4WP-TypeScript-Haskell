@@ -181,6 +181,24 @@ Premature abstraction is the root of all evil.
   Just (Repeat 3 (Sequence [Forward, TurnLeft]))
   ```
 
+### 4. Syntax Flexibility (Prefix & Postfix)
+
+We expanded the language to support both Prefix and Postfix notations, mapping them to the exact same AST node.
+
+- **What:** Implemented `parseRepeatPostfix` (e.g., `forward 3`) and enabled it alongside `parseRepeatPrefix` in the main `parseAction`.
+- **Why:** To improve the ergonomics (UX) of our DSL. Some user prefer Unix-style prefix (`repeat 3 forward`), while others prefer object-like postfix (`forward 3`). Crucially, because we decouple Parsing from Interpretation, both syntaxes map to the *identical* `Repeat Int Action` AST node. We expanded the language's expressiveness without adding *any* burden to our core domain model or interpreter!
+- **Demo:** Notice how postfix syntax elegantly resolves to the same AST:
+  ```hs
+  λ > parseInput "forward 3"
+  Just (Repeat 3 Forward)
+  λ > parseInput "(forward then left) 3"
+  Just (Repeat 3 (Sequence [Forward, TurnLeft]))
+  ```
+
+### 4. Interpreting the Repeat Node *(WIP/Pending)*
+
+*We have parsed the "What", but the Interpreter (`handleAction`) is currently missing the "How" for the `Repeat` node. We need to implement this next!*
+
 [maze-v5]: ../day-7/MazeV5.hs
 [maze-v6]: ./MazeV6.hs
 [maze-v7]: ./MazeV7.hs
