@@ -2,7 +2,7 @@
 
 ## Summary of the Day 7 & Day 8 Kick-off
 
-This summary is the key architectural lesson from Day 7  and sets the stage for Day 8, where we will build a mini language for our game.
+This summary is the key architectural lesson from Day 7 and sets the stage for Day 8, where we will build a mini language for our game.
 
 ### The "Functional Core, Imperative Shell" Architecture
 
@@ -32,7 +32,7 @@ When a user types "forward", our `parseAction` function doesn't move the player.
 It creates a data value `Forward :: Action`.\
 This is just a description of the user's intent.
 2. **Interpretation (The "How")**\
-The `handleAction` function then takes this `Forward` value and *interprets* it, running the actual state-changing logic (`moveForwardAction`).
+The `handleAction` function then takes this `Forward` value and *interprets* it, executing the pure state-changing logic (`moveForwardAction`).
 
 This separation allows us to delay or even change how an action is executed.\
 This is the foundation for building more complex, programmable systems, which is our goal for Day 8.
@@ -77,7 +77,7 @@ Let's start by refactoring [MazeV5.hs][maze-v5] into [MazeV6.hs][maze-v6] and be
 We upgraded our custom `Parser` to be a full Monad.
 
 - **What:** Implemented the `Monad` typeclass instance (`>>=`) for our `Parser`.
-- **Why:** To unlock the power of `do` notation. While `Applicative` (`<*>`) is great for independent parsing, a `Monad` allows context-dependent parsing step can depend on the extracted value of the previous step. It makes writing complex syntax rules (like our sequence parser) cleaner.
+- **Why:** To unlock the power of `do` notation. While `Applicative` (`<*>`) is great for independent parsing, a `Monad` allows context-dependent parsing where a step can depend on the extracted value of the previous step. It makes writing complex syntax rules (like our sequence parser) cleaner.
 
 ###  [MazeV6.hs][maze-v6] (AST & Interpreter)
 
@@ -86,7 +86,7 @@ We started building our mini language by introducing the first composite node in
 #### 1. Expanding the AST (The Model)
 
 - **What:** Added `Sequence [Action]` to the `Action` data type.
-- **Why:** to elevate our domain model from single, isolated commands into a programmable structure. `Sequence` acts as an AST node that holds a list of sub-actions to be executed sequentially.
+- **Why:** To elevate our domain model from single, isolated commands into a programmable structure. `Sequence` acts as an AST node that holds a list of sub-actions to be executed sequentially.
 
 ### 2. Parsing the Language Syntax (The "What")
 
@@ -107,10 +107,10 @@ We created a parser that understands how to chain commands together.
 
 ### 3. Interpreting the AST (The "How")
 
-We upgraded our game's core action handler to ac as an AST Interpreter.
+We upgraded our game's core action handler to act as an AST Interpreter.
 
 - **What:** Enhanced `handleAction` with pattern matching for the `Sequence` node and introduced `handleSequence :: [Action] -> Game String` to recursively evaluate the list of actions.
-- **Why:** To complete the **Interpreter Pattern**. while parser builds the AST (describing "what" to do), the interpreter executes it (defining *how* to do it) by reducing the AST into state mutations. Furthermore, we implemented **Short-Circuit Evaluation**: if the player reaches the goal mid-sequence, the interpreter halts further execution, preventing unnecessary and potentially invalid state transitions.
+- **Why:** To complete the **Interpreter Pattern**. While the parser builds the AST (describing *what* to do), the interpreter executes it (defining *how* to do it) by reducing the AST into pure state mutations. Furthermore, we implemented **Short-Circuit Evaluation**: if the player reaches the goal mid-sequence, the interpreter halts further execution, preventing unnecessary and potentially invalid state transitions.
 - **Demo:** Notice how the interpreter evaluates multiple actions sequentially and aggregates the results:
   ```hs
   λ > evalStateT (handleSequence [Forward, Turn South]) testGame
