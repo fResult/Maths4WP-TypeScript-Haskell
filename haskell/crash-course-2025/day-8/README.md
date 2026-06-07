@@ -1,99 +1,107 @@
 # Day 8 - Building a DSL with AST and Monadic Parsers
 
-## Summary of the Day 7 & Day 8 Kick-off
+## 1. Architectural Foundations
 
-This summary is the key architectural lesson from Day 7 and sets the stage for Day 8, where we will build a mini language for our game.
+This section covers key architectural lessons from Day 7.\
+It sets the stage for Day 8, where we build a mini language.
 
 ### The "Functional Core, Imperative Shell" Architecture
 
-The final architecture of our [MazeV5][maze-v5] game is a classic pattern called **Functional Core, Imperative Shell**.\
+The architecture of our [MazeV5][maze-v5] game uses the **Functional Core, Imperative Shell** pattern.\
 This design separates pure logic from side-effects.
 
-- **The Functional Core:** This is our pure domain logic, represented by the `s` in `StateT s m a` (our `GameState`)
-  - All game mechanics (like `moveForwardAction`) are pure functions that only transform this state.
+- **The Functional Core:** This is our pure domain logic (`s` in `StateT s m a`).
+  - Game mechanics (like `moveForwardAction`) are pure functions transforming this state.
   - **Benefit:**\
-    This core is 100% testable isolation.\
-    We can test it in the REPL without needing to mock databases or consoles.\
-    This is often called the "REPL Test" for healthy codebase.
-- **The Imperative Shell:** This is where side-effects happen, represented by the `m` in `StateT s m a` (our `IO` monad).
-  - The `gameLoop` is the main part of our shell.\
-    It uses `liftIO` to handle real-world interactions like `getLine` and `putStrLn`.
+    The core is 100% testable in isolation.\
+    We can test it in the REPL without mocking databases or consoles.
+
+- **The Imperative Shell:** This handles side-effects (`m` in `StateT s m a`, our `IO` monad).
+  - The `gameLoop` is the shell.\
+    It uses `liftIO` for real-world IO like `getLine` and `putStrLn`.
   - **Benefit:**\
-    All the "messy" parts of the program are pushed to the very edge, keeping the core clean and predictable.
+    Messy parts are pushed to the edge, keeping the core predictable.
 
-Haskell's type system naturally guides us toward this clean architecture, whereas other languages often **require more discipline to avoid mixing logic with I/O**.
+Haskell's type system naturally guides us to this clean architecture.\
+Other languages **require extreme discipline to avoid mixing logic with I/O**.
 
-### Separating "what" From "How"
+### Separating "What" From "How"
 
-A key takeaway from our journey is the separation between *describing* an action and *executing* it.
+A key takeaway is separating *describing* an action from *executing* it.
 
 1. **Parsing (The "What"):**\
-When a user types "forward", our `parseAction` function doesn't move the player.\
-It creates a data value `Forward :: Action`.\
-This is just a description of the user's intent.
-2. **Interpretation (The "How")**\
-The `handleAction` function then takes this `Forward` value and *interprets* it, executing the pure state-changing logic (`moveForwardAction`).
+When a user types "forward", `parseAction` does not move the player.\
+It creates a `Forward :: Action` data value describing intent.
 
-This separation allows us to delay or even change how an action is executed.\
-This is the foundation for building more complex, programmable systems, which is our goal for Day 8.
+2. **Interpretation (The "How"):**\
+The `handleAction` function takes this `Forward` value and interprets it.\
+It executes pure state-changing logic (`moveForwardAction`).
 
-### Day 8 Goal: Building a Mini Language (AST)
+This separation lets us delay or modify execution.\
+This is the foundation for programmable systems, our goal for Day 8.
 
-Now that we have a solid architecture, we will upgrade our `Action` data type into an **Abstract Syntax Tree (AST)**.\
-This transforms our simple command parser into an **Interpreter** for a **Domain-Specific Language (DSL)**.
+## 2. Day 8 Goals & Philosophy
 
-By elevating our inputs into a mini-language (non-Turing complete), we apply the **Interpreter Pattern**. This is a practical stepping stone into Programming Language Design, allowing users to script complex behaviors without modifying the core game logic.
+### The Goal: Building a Mini Language (AST)
+
+We will upgrade our `Action` type into an **Abstract Syntax Tree (AST)**.\
+This transforms our parser into an **Interpreter** for a **Domain-Specific Language (DSL)**.
+
+We apply the **Interpreter Pattern** by elevating inputs into a mini-language.\
+This lets users script complex behaviors without changing core game logic.
 
 Our goal is to support commands like:
-
 - **Sequence:** `forward then left then forward`
 - **Repetition:** `repeat 3 forward` or `left 3`
 - **Macros/Aliases:** `alias jump = forward 2` and then `use jump`
 
-This will evolve:
-1. **Expanding the `Action` data type** to include these new structures.
-2. **Enhancing `parseAction`** to understand this new, more complex syntax.
-3. **Upgrading `handleAction`** to recursively interpret the AST.
+### Architectural Philosophy: Managing Parser Complexity
 
-### Future Scope: Parser Revamp (The "House Organization" Analogy)
+As we add features, our parser logic becomes *ad-hoc*. However, we deliberately postpone a full parser revamp.
 
-As we incrementally add features, our parser has become somewhat *ad-hoc*.\
-Continuing to patch it with "duct tape" will eventually lead to spaghetti code.\
-In software architecture, this is like moving into a new empty house.\
-At first, you can place furniture anywhere.\
-Over time, as you buy more items, the house becomes cluttered.\
-The most effective time to reorganize (refactor) is *after* you have lived in it for a while and truly understand your daily usage patterns.
+Think of software architecture like a new house.\
+Building custom shelves before buying furniture leads to wasted space.\
+We must collect domain complexity gradually.
 
-Similarly, we should base our new parser architecture on the actual complexity we encounter.\
-Therefore, we will postpone the parser revamp until we have fully finished implementing the AST and DSL.\
-We must understand the full scope of our domain language before we abstract it.
+We will refactor the parser only *after* understanding our DSL's full scope.\
+Premature abstraction is the root of all evil.
 
-Let's start by refactoring [MazeV5.hs][maze-v5] into [MazeV6.hs][maze-v6] and begin designing our AST.
+## 3. Upgrading the Toolkit
 
-## Refactoring Note
+Before building our DSL, we need better parsing tools.
 
 ### [ParserV3][parser-v3] (Monadic Parser)
 
 We upgraded our custom `Parser` to be a full Monad.
 
-- **What:** Implemented the `Monad` typeclass instance (`>>=`) for our `Parser`.
-- **Why:** To unlock the power of `do` notation. While `Applicative` (`<*>`) is great for independent parsing, a `Monad` allows context-dependent parsing where a step can depend on the extracted value of the previous step. It makes writing complex syntax rules (like our sequence parser) cleaner.
+- **What:** Implemented the `Monad` type class instance (`>>=`) for our `Parser`.
+- **Why:** To unlock `do` notation. `Applicative` (`<*>`) handles independent parsing, but `Monad` allows context-dependent parsing. It makes complex syntax rules cleaner.
 
-###  [MazeV6.hs][maze-v6] (AST & Interpreter)
+### [ParserV4][parser-v4] (Predicate Combinators)
+
+- **What:** Extracted `satisfy :: (Char -> Bool) -> Parser Char` and refactored `char c = satisfy (== c)`.
+- **Why:** To create a reusable combinator that parses characters based on any predicate. This is crucial for parsing arbitrary text.
+
+### [ParserV5][parser-v5] (Foundational Combinators)
+
+- **What:** Added `parseInt :: Parser Int` and `between :: Parser a -> Parser b -> Parser c -> Parser c`.
+- **Why:** To build reusable primitives. `between` creates scoped syntax boundaries (like parentheses) without cluttering business logic.
+
+## 4. Implementation - AST & Interpreter ([MazeV6][maze-v6])
 
 We started building our mini language by introducing the first composite node into our Abstract Syntax Tree (AST).
 
-#### 1. Expanding the AST (The Model)
+### 4.1 Expanding the AST (The Model)
 
 - **What:** Added `Sequence [Action]` to the `Action` data type.
-- **Why:** To elevate our domain model from single, isolated commands into a programmable structure. `Sequence` acts as an AST node that holds a list of sub-actions to be executed sequentially.
+- **Why:** To elevate our domain model from isolated commands to programmable structures. `Sequence` holds a list of sub-actions to execute in order.
 
-### 2. Parsing the Language Syntax (The "What")
+### 4.2 Parsing the Language Syntax (The "What")
 
 We created a parser that understands how to chain commands together.
 
-- **What:** Introduced `parseSequence :: Parser Action` utilizing the `many` combinator and monadic `do` notation.
-- **Why:** To parse a language string (e.g., `"forward then left"`) and transform it into our new `Sequence` AST node. We also updated `parseInput` to use `parseSequence` as the root parser instead of `parseAction`.
+- **What:** Introduced `parseSequence :: Parser Action` using `many` and `do` notation. Updated `parseInput` to use it as the root parser.
+- **Why:** To parse strings (e.g., `"forward then left"`) into a `Sequence` AST node.
 - **Demo:** Notice how it handles both single actions and chained sequences:
   ```hs
   -- Single action still works natively
@@ -105,21 +113,22 @@ We created a parser that understands how to chain commands together.
   Just (Sequence [Forward,TurnLeft,Forward])
   ```
 
-### 3. Interpreting the AST (The "How")
+### 4.3 Interpreting the AST (The "How")
 
 We upgraded our game's core action handler to act as an AST Interpreter.
 
 - **What:** Enhanced `handleAction` with pattern matching for the `Sequence` node and introduced `handleSequence :: [Action] -> Game String` to recursively evaluate the list of actions.
-- **Why:** To complete the **Interpreter Pattern**. While the parser builds the AST (describing *what* to do), the interpreter executes it (defining *how* to do it) by reducing the AST into pure state mutations. Furthermore, we implemented **Short-Circuit Evaluation**: if the player reaches the goal mid-sequence, the interpreter halts further execution, preventing unnecessary and potentially invalid state transitions.
+- **Why:** To complete the **Interpreter Pattern**. The parser builds the AST, and the interpreter reduces it into pure state mutations.
+- **Why (cont.):** We also implemented **Short-Circuit Evaluation**. If the player reaches the goal mid-sequence, execution stops immediately.
 - **Demo:** Notice how the interpreter evaluates multiple actions sequentially and aggregates the results:
   ```hs
   λ > evalStateT (handleSequence [Forward, Turn South]) testGame
   "\ESC[32mYou moved forward.\n\ESC[36m\ESC[36mYou see a path in front of you. A wall to the left. A wall to the right.\ESC[m\ESC[m\n\ESC[36mYou now face South.\n\ESC[36mYou see a wall in front of you. A path to the left. A path to the right.\ESC[m\ESC[m"
   ```
 
-### [Maze Version 7](maze-v7) (Unknown Command Suggestion)
+## 5. Implementation - Graceful Degradation ([MazeV7][maze-v7])
 
-#### Architectural Insight: The Universal Pattern of Decoupling
+### Architectural Insight: The Universal Pattern of Decoupling
 
 Before diving into the code, let's look at a larger architectural concept.\
 In traditional synchronous Client-Server architecture, invoking an API immediately triggers computation and database queries, which inherently blocks scalability.\
@@ -131,23 +140,25 @@ The Parser acts like the API Gateway accepting the request and putting it into a
 The Interpreter then pulls that AST to handle the state transition (the Computation).\
 Functional Architecture naturally guides us toward these highly scalable, decoupled design patterns!
 
-#### 1. Parser Refactoring ([`ParserV4.hs`][parser-v4])
+### 5.1 Parser Refactoring ([`ParserV4.hs`][parser-v4])
 
 - **What:** Extracted the `satisfy :: (Char -> Bool) -> Parser Char` function and refactored the `char` parser to use it (`char c = satisfy (== c)`).
 - **Why:** To create a foundational, highly reusable combinator that parses characters based on *any* predicate. This is a crucial tool for parsing arbitrary text blocks without writing custom recursive loops.
 
-#### 2. Enhancing the Domain for UX ([`MazeV7.hs`][maze-v7])
+### 5.2 Enhancing the Domain for UX ([`MazeV7.hs`][maze-v7])
 
 - **What:** Added `Unknown String` to the `Action` AST, introduced `parseUnknown` using the new `satisfy` combinator, and updated the interpreter (`handleAction` & `handleUnknown`) to accept this string.
-- **Why:** Instead of discarding invalid input or throwing an immediate error at the parsing stage, we *capture* it into our Domain Model (`Unknown`). In Distributed Systems, this pattern is the equivalent of routing failed messages to a **Dead Letter Queue (DLQ)** to achieve **Graceful Degradation**. It pushes the responsibility to the Interpreter (the Worker), allowing it to inspect the faulty command and provide a tailored user experience instead of a hard crash.\
+- **Why:** Instead of discarding invalid input during parsing, we capture it into our Domain Model (`Unknown`). This achieves **Graceful Degradation**.
+- **Why (cont.):** In Distributed Systems, this mirrors routing failed messages to a **Dead Letter Queue (DLQ)**. The Interpreter (Worker) can then inspect the faulty command and provide a tailored UX instead of a hard crash.
+
 For example, we could implement Levenshtein distance later to offer suggestions: `"Did you mean 'forward' instead of 'forwrd'?"`.
 
 > [!NOTE]
 > We will skip the actual *Levenshtein* implementation in this course, but the architectural foundation is now ready for it!)
 
-## [Maze Version 8][maze-v8] (Repeat AST)
+## 6. Implementation - Advanced AST ([MazeV8][maze-v8])
 
-### Architectural Philosophy: Managing Parser Complexity (The Furniture Analogy)
+### Architectural Philosophy: Managing Parser Complexity
 
 As we introduce more complex syntax (`Sequence`, `Repeat`), our parser logic is becoming slightly *ad-hoc*.\
 However, we are deliberately postponing a full parser revamp.\
@@ -156,17 +167,17 @@ If you build custom shelves before knowing what furniture you'll buy, you'll end
 We must collect our domain complexity gradually, understand our usage patterns, and *then* refactor to reduce entropy.\
 Premature abstraction is the root of all evil.
 
-### 1. Foundational Combinators (`ParserV5.hs`)
+### 6.1 Foundational Combinators ([ParserV5][parser-v5])
 
 - **What:** Added `parseInt :: Parser Int` and `between :: Parser a -> Parser b -> Parser c -> Parser c`.
 - **Why:** To build highly reusable parser primitives. `between` is particularly powerful for creating scoped syntax boundaries (like parentheses) without cluttering the business logic.
 
-### 2. Expanding the Language Syntax (`MazeV8.hs`)
+### 6.2 Expanding the Language Syntax ([MazeV8][maze-v8])
 
 - **What:** Added `Repeat Int Action` to the `Action` AST.
-- **Why:** To introduce looping constructs into our DSL. We explicitly chose the **Prefix Notation** (`repeat 3 forward`) over postfix (`forward 3`) to align with standard Unix CLI ergonomics (e.g., `repeat 3 { echo "hello" }`), making the language intuitive for developers.
+- **Why:** To introduce looping constructs into our DSL. We explicitly chose **Prefix Notation** (`repeat 3 forward`) over postfix (`forward 3`) to align with standard Unix CLI ergonomics (e.g., `repeat 3 { echo "hello" }`), making the language intuitive for developers.
 
-### 3. The Composite Parser Refactoring
+### 6.3 The Composite Parser Refactoring
 
 - **What:** Renamed the base `parseAction` to `parseAtomicAction`. Created a new, higher-level `parseAction` that handles composite rules (`parseRepeatPrefix <|> parseAtomicAction <|> parseUnknown`), and introduced `parseParenthesesOrAction`.
 - **Why:** To separate terminal nodes (atomic operations like `Forward`) from composite nodes (like `Repeat` or `Sequence`). This prevents infinite recursion in parsing and enables the evaluation of nested, complex expressions.
@@ -181,12 +192,13 @@ Premature abstraction is the root of all evil.
   Just (Repeat 3 (Sequence [Forward, TurnLeft]))
   ```
 
-### 4. Syntax Flexibility (Prefix & Postfix)
+### 6.4 Syntax Flexibility (Prefix & Postfix)
 
 We expanded the language to support both Prefix and Postfix notations, mapping them to the exact same AST node.
 
 - **What:** Implemented `parseRepeatPostfix` (e.g., `forward 3`) and enabled it alongside `parseRepeatPrefix` in the main `parseAction`.
-- **Why:** To improve the ergonomics (UX) of our DSL. Some user prefer Unix-style prefix (`repeat 3 forward`), while others prefer object-like postfix (`forward 3`). Crucially, because we decouple Parsing from Interpretation, both syntaxes map to the *identical* `Repeat Int Action` AST node. We expanded the language's expressiveness without adding *any* burden to our core domain model or interpreter!
+- **Why:** To improve the ergonomics (UX) of our DSL. Some users prefer Unix-style prefix (`repeat 3 forward`), while others prefer object-like postfix (`forward 3`).
+- **Why (cont.):** Because Parsing is decoupled from Interpretation, both syntaxes map to the *identical* `Repeat Int Action` AST node. We expanded expressiveness without *any* burdening the core interpreter!
 - **Demo:** Notice how postfix syntax elegantly resolves to the same AST:
   ```hs
   λ > parseInput "forward 3"
@@ -195,7 +207,7 @@ We expanded the language to support both Prefix and Postfix notations, mapping t
   Just (Repeat 3 (Sequence [Forward, TurnLeft]))
   ```
 
-### 4. Interpreting the Repeat Node *(WIP/Pending)*
+### 6.5 Interpreting the Repeat Node *(WIP/Pending)*
 
 *We have parsed the "What", but the Interpreter (`handleAction`) is currently missing the "How" for the `Repeat` node. We need to implement this next!*
 

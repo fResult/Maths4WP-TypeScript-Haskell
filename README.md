@@ -48,7 +48,7 @@ We implemented this exact architectural pattern at the code level:
   It pulls the AST (the message) and recursively executes it.\
   It computes pure state transitions (`GameState -> GameState`).
 
-### ️ Resilience & Dead Letter Queue (DLQ)
+### Resilience & Dead Letter Queue (DLQ)
 
 Users will type invalid commands.\
 Instead of crashing or throwing a hard error, our `Parser` captures them into the AST as an `Unknown String` node.\
