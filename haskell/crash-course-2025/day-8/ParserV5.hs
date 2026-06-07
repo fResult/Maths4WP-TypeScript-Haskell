@@ -63,7 +63,7 @@ spaces :: Parser ()
 spaces = Parser $ \input -> Just ((), dropWhile isSpace input)
 
 token :: Parser a -> Parser a
-token parser = spaces *> parser <* spaces
+token parser = between spaces spaces parser
 
 parseInt :: Parser Int
 parseInt = read <$> some (satisfy isDigit)
@@ -75,6 +75,9 @@ satisfy predicate = Parser $ \input ->
   case input of
     (c:cs) | predicate c -> Just (c, cs)
     _                    -> Nothing
+
+between :: Parser a -> Parser b -> Parser c -> Parser c
+between open close parser = open *> parser <* close
 
 --
 
