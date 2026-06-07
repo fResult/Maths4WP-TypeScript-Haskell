@@ -145,9 +145,46 @@ For example, we could implement Levenshtein distance later to offer suggestions:
 > [!NOTE]
 > We will skip the actual *Levenshtein* implementation in this course, but the architectural foundation is now ready for it!)
 
+## [Maze Version 8][maze-v8] (Repeat AST)
+
+### Architectural Philosophy: Managing Parser Complexity (The Furniture Analogy)
+
+As we introduce more complex syntax (`Sequence`, `Repeat`), our parser logic is becoming slightly *ad-hoc*.\
+However, we are deliberately postponing a full parser revamp.\
+Think of software architecture like moving into a new house.\
+If you build custom shelves before knowing what furniture you'll buy, you'll end up with mismatched spaces.\
+We must collect our domain complexity gradually, understand our usage patterns, and *then* refactor to reduce entropy.\
+Premature abstraction is the root of all evil.
+
+### 1. Foundational Combinators (`ParserV5.hs`)
+
+- **What:** Added `parseInt :: Parser Int` and `between :: Parser a -> Parser b -> Parser c -> Parser c`.
+- **Why:** To build highly reusable parser primitives. `between` is particularly powerful for creating scoped syntax boundaries (like parentheses) without cluttering the business logic.
+
+### 2. Expanding the Language Syntax (`MazeV8.hs`)
+
+- **What:** Added `Repeat Int Action` to the `Action` AST.
+- **Why:** To introduce looping constructs into our DSL. We explicitly chose the **Prefix Notation** (`repeat 3 forward`) over postfix (`forward 3`) to align with standard Unix CLI ergonomics (e.g., `repeat 3 { echo "hello" }`), making the language intuitive for developers.
+
+### 3. The Composite Parser Refactoring
+
+- **What:** Renamed the base `parseAction` to `parseAtomicAction`. Created a new, higher-level `parseAction` that handles composite rules (`parseRepeatPrefix <|> parseAtomicAction <|> parseUnknown`), and introduced `parseParenthesesOrAction`.
+- **Why:** To separate terminal nodes (atomic operations like `Forward`) from composite nodes (like `Repeat` or `Sequence`). This prevents infinite recursion in parsing and enables the evaluation of nested, complex expressions.
+- **Demo:** Notice how the AST easily represents nested logic:
+  ```hs
+  -- Flat AST node
+  λ > parseInput "repeat 3 forward"
+  Just (Repeat 3 Forward)
+  
+  -- Nested AST nodes thanks to `parseParenthesesOrAction`
+  λ > parseInput "repeat 3 (forward then left)"
+  Just (Repeat 3 (Sequence [Forward, TurnLeft]))
+  ```
+
 [maze-v5]: ../day-7/MazeV5.hs
 [maze-v6]: ./MazeV6.hs
 [maze-v7]: ./MazeV7.hs
+[maze-v8]: ./MazeV8.hs
 [parser-v2]: ./ParserV2.hs
 [parser-v3]: ./ParserV3.hs
 [parser-v4]: ./ParserV4.hs
