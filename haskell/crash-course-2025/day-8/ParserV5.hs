@@ -6,6 +6,7 @@ module ParserV5 ( Parser (runParser)
                 , runParserUnsafe
                 , char
                 , parseInt
+                , between
                 ) where
 
 import Data.Char (isSpace, toLower, toUpper, isDigit)
@@ -63,7 +64,8 @@ spaces :: Parser ()
 spaces = Parser $ \input -> Just ((), dropWhile isSpace input)
 
 token :: Parser a -> Parser a
-token parser = between spaces spaces parser
+-- token parser = spaces *> parser <* spaces
+token = between spaces spaces
 
 parseInt :: Parser Int
 parseInt = read <$> some (satisfy isDigit)
