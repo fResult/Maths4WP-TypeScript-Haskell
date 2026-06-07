@@ -7,11 +7,13 @@ import Data.List (nub)
 import System.Environment (getArgs, getProgName)
 import System.IO (hFlush, stdout)
 
-import ParserV4 ( word
+import ParserV5 ( word
                 , Parser(runParser)
                 , satisfy
                 , parseByLines
                 , runParserUnsafe
+                , parseInt
+                , between
                 )
 import Control.Monad.State ( MonadState(get, put)
                            , StateT
@@ -76,6 +78,7 @@ data Action
   | Quit
   | Help
   | Sequence [Action]
+  | Repeat Int Action
   | Unknown String
   deriving (Show, Eq)
 
@@ -94,6 +97,13 @@ parseInput input = case run input of
   where
     run = runParser parseSequence
 
+parseAction :: Parser Action
+parseAction =
+      parseRepeatPrefix
+  -- <|> parseRepeatPostfix
+  <|> parseAtomicAction
+  <|> parseUnknown
+
 parseSequence :: Parser Action
 parseSequence = do
   first <- parseAction
@@ -103,8 +113,18 @@ parseSequence = do
       []  -> first
       _   -> Sequence (first : rest)
 
-parseAction :: Parser Action
-parseAction =
+parseRepeatPostfix :: Parser Action
+parseRepeatPostfix = undefined
+
+parseRepeatPrefix :: Parser Action
+parseRepeatPrefix = do
+  word "repeat"
+  n <- parseInt
+  action <- parseParenthesesOrAction
+  pure (Repeat n action)
+
+parseAtomicAction :: Parser Action
+parseAtomicAction =
       word "forward" $> Forward
   <|> word "move" *> word "forward" $> Forward
   <|> word "turn" *> word "left" $> TurnLeft
@@ -119,6 +139,11 @@ parseAction =
   <|> word "command" $> Help
   <|> word "quit" $> Quit
   <|> parseUnknown
+
+parseParenthesesOrAction :: Parser Action
+parseParenthesesOrAction =
+      between (word "(") (word ")") parseSequence
+  <|> parseAtomicAction
 
 parseDirection :: Parser Direction
 parseDirection =
