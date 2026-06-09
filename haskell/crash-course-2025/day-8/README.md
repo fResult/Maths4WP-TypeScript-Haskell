@@ -282,7 +282,37 @@ To make our DSL truly programmable, we introduced the concept of variables/macro
   ```
 
 > [!NOTE]
-> *These parsers are currently standalone. The primary `parseAction` and the Interpreter (`handleAction`) do not yet know how to evaluate them. This is our next target!*
+> *These parsers are currently standalone.\
+> The primary `parseAction` and the Interpreter (`handleAction`) do not yet know how to evaluate them.\
+> This is our next target!*
+
+### 6.7 Interpreting Macros & Semantic Validation (The "How")
+
+We wired the parsers into the Interpreter by implementing `handleAssign` and `handleUse`.
+
+- **What:** Upgraded `handleAction` to evaluate `Assign` and `Use`. Utilized State Monad's `modify` to write to the `AliasEnv` and `gets` to read from it.
+- **Why:** To make the language stateful. `Assign` mutates the environment (saving the macro), while `Use` retrieves the AST and recursively feeds it back into `handleAction` for execution.
+- **What:** Introduced **Semantic Validation** via `isReservedWord` and `containsUnknown`.
+- **Why:** For **System Safety**. `isReservedWord` prevents users from hijacking core commands (e.g., redefining `forward`), avoiding keyword shadowing that could soft-brick the game. `containsUnknown` ensures that malformed AST nodes are strictly blocked from being saved into the Symbol Table, preventing corrupted states and runtime failures.
+- **Demo:** The DSL is now fully functional and structurally safe:
+  ```console
+  # 1. Safe Assignment & Execution
+  ➜ jump = forward 2
+  Alias: "jump" defined.
+
+  ➜ use jump
+  You moved forward...
+
+  # 2. Semantic Validation in Action
+  ➜ forward = turn left
+  error: "forward" is reserved and cannot be redefined.
+  ```
+
+> [!WARNING]
+> **Architectural Tech Debt Reached!**\
+> When we try to define a complex macro that nests other macros (e.g., `backjump = (use backward) then (use jump)`), our ad-hoc parser fails and yields an `Unknown` command.\
+> While our AST and Interpreter are solid, our Parser has reached its breaking point.\
+> It's time to stop patching and do a full **Parser Revamp**.
 
 [maze-v5]: ../day-7/MazeV5.hs
 [maze-v6]: ./MazeV6.hs
