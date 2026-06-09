@@ -263,10 +263,32 @@ We implemented the loop interpretation logic for the `Repeat` node using a class
 > This makes adding new features incredibly easy.\
 > We simply compose these existing foundational units together into complex behaviors without having to rewrite our core logic!
 
+### 6.6 The Symbol Table: Macros & Aliases ([MazeV9][maze-v9])
+
+To make our DSL truly programmable, we introduced the concept of variables/macros. This requires expanding our Interpreter to manage an **Environment** (Symbol Table).
+
+- **What:** Introduced `type Alias = String` and an association list `type AliasEnv = [(Alias, Action)]`. We injected this `aliases :: AliasEnv` into our core `GameState`.
+- **Why:** To support dynamic command binding (`Assign`) and execution (`Use`). We chose a simple Association List over importing a heavy `Data.Map` library. This adheres to the KISS (Keep It Simple, Stupid) principle, keeping our architecture low-entropy and dependency-free while satisfying our current scale requirements.
+- **What:** Expanded the `Action` AST with `Assign Alias Action` and `Use Alias`, along with their standalone parsers (`parseAssign` and `parseUse`).
+- **Demo:** Notice how the parsers elegantly capture the assignment and utilization intent:
+  ```hs
+  -- Parsing an Assignment (Macro definition)
+  λ > runParser parseAssign "jump = forward 2"
+  Just (Assign "jump" (Repeat 2 Forward),"")
+
+  -- Parsing a Utilization (Macro execution)
+  λ > runParser parseUse "use jump"
+  Just (Use "jump","")
+  ```
+
+> [!NOTE]
+> *These parsers are currently standalone. The primary `parseAction` and the Interpreter (`handleAction`) do not yet know how to evaluate them. This is our next target!*
+
 [maze-v5]: ../day-7/MazeV5.hs
 [maze-v6]: ./MazeV6.hs
 [maze-v7]: ./MazeV7.hs
 [maze-v8]: ./MazeV8.hs
+[maze-v9]: ./MazeV9.hs
 [parser-v2]: ./ParserV2.hs
 [parser-v3]: ./ParserV3.hs
 [parser-v4]: ./ParserV4.hs
