@@ -1,7 +1,7 @@
 module MazeV9 where
 
 import Control.Applicative ((<|>), Alternative (some, many))
-import Data.Char (toUpper, toLower, isSpace)
+import Data.Char (toUpper, toLower, isSpace, isAlphaNum)
 import Data.Functor (($>))
 import Data.List (nub)
 import System.Environment (getArgs, getProgName)
@@ -154,6 +154,19 @@ parseParenthesesOrAction :: Parser Action
 parseParenthesesOrAction =
       between (word "(") (word ")") parseSequence
   <|> parseAtomicAction
+
+parseAssign :: Parser Action
+parseAssign = do
+  name <- some (satisfy isAlphaNum)
+  word "="
+  body <- parseSequence
+  pure $ Assign name body
+
+parseUse :: Parser Action
+parseUse = do
+  word "use"
+  name <- some (satisfy isAlphaNum)
+  pure (Use name)
 
 parseDirection :: Parser Direction
 parseDirection =
