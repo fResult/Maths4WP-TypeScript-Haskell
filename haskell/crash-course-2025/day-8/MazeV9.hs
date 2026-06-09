@@ -19,7 +19,7 @@ import Control.Monad.State ( MonadState(get, put)
                            , StateT
                            , MonadIO (liftIO)
                            , gets
-                           , evalStateT
+                           , evalStateT, modify
                            )
 
 data Color = Color
@@ -438,16 +438,61 @@ handleSequence (a: as) = do
 
 handleAction :: Action -> Game String
 handleAction action = case action of
-  Look        -> handleLook
-  Map         -> handleMap
-  Forward     -> handleMoveForward
-  TurnLeft    -> handleTurnLeft
-  TurnRight   -> handleTurnRight
-  Turn dir    -> handleTurnDirection dir
-  Help        -> handleHelp
-  Sequence xs -> handleSequence xs
-  Repeat n a  -> handleRepeat n a
-  Unknown cmd -> handleUnknown cmd
+  Look               -> handleLook
+  Map                -> handleMap
+  Forward            -> handleMoveForward
+  TurnLeft           -> handleTurnLeft
+  TurnRight          -> handleTurnRight
+  Turn dir           -> handleTurnDirection dir
+  Help               -> handleHelp
+  Sequence xs        -> handleSequence xs
+  Repeat n action    -> handleRepeat n action
+  Assign name action -> handleAssign name action
+  Use name           -> handleUse name
+  Unknown cmd        -> handleUnknown cmd
+
+--
+
+handleUse :: Alias -> Game String
+handleUse name = do
+  env <- gets aliases
+  case lookup name env of
+    Nothing     -> pure $ warning colors ++ ("Unknown alias: \"" ++ name ++ "\"") ++ reset colors
+    Just action -> handleAction action
+
+handleAssign :: Alias -> Action -> Game String
+handleAssign name action
+  | isReservedWord name =
+      pure $ danger colors ++ ("error: \"" ++ name ++ "\" is reserved and cannot be redefined.") ++ reset colors
+  | containsUnknown action =
+      pure $ warning colors ++ "Alias contains unknown commands." ++ reset colors
+  | otherwise = do
+      modify (\gs -> gs { aliases = (name, action) : aliases gs })
+      pure $ success colors ++ ("Alias: \"" ++ name ++ "\" defined.") ++ reset colors
+
+reservedWords :: [String]
+reservedWords =
+  [ "forward", "move", "turn", "left", "right"
+  , "north", "east", "south", "west"
+  , "look", "map", "help", "commands"
+  , "quit", "then", "use", "repeat"
+  ]
+
+isReservedWord :: String -> Bool
+isReservedWord word = normalize word `elem` reservedWords
+  where
+    normalize = map toLower
+
+containsUnknown :: Action -> Bool
+containsUnknown action = case action of
+  Unknown _   -> True
+  Sequence xs -> any containsUnknown xs
+  Repeat _ a  -> containsUnknown a
+  Assign {}   -> False
+  Use {}      -> False
+  _           -> False
+
+--
 
 handleRepeat :: Int -> Action -> Game String
 handleRepeat n action =
