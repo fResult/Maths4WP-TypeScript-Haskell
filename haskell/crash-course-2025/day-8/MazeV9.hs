@@ -49,6 +49,9 @@ type MazeRow = [Tile]
 type Index = Int
 type ErrorMessage = String
 
+type Alias = String
+type AliasEnv = [(Alias, Action)]
+
 newtype Maze = Maze
   { layout :: MazeLayout
   -- Future extension (Require changing `newtype` to `data`):
@@ -66,6 +69,7 @@ data GameState = GameState
   , position :: Position
   , direction :: Direction
   , discovered :: [Position]
+  , aliases :: AliasEnv
   } deriving (Show)
 
 data Action
@@ -79,6 +83,8 @@ data Action
   | Help
   | Sequence [Action]
   | Repeat Int Action
+  | Assign Alias Action
+  | Use Alias
   | Unknown String
   deriving (Show, Eq)
 
@@ -186,7 +192,7 @@ newGame :: Maze -> GameState
 newGame maze = updateVision initialState
   where
     startPosition = findStart maze
-    initialState  = GameState maze startPosition East []
+    initialState  = GameState maze startPosition East [] []
 
 {----------------------|
 |--- Gameplay Logic ---|
@@ -198,7 +204,7 @@ moveDelta South = (1, 0)
 moveDelta West  = (0, -1)
 
 moveForward :: GameState -> (Bool, GameState)
-moveForward gs@(GameState maze (rowIdx, colIdx) direction _) =
+moveForward gs@(GameState maze (rowIdx, colIdx) direction _ _) =
   let (deltaRowIdx, deltaColIdx) = moveDelta direction
       newPosition                = ( rowIdx + deltaRowIdx
                                    , colIdx + deltaColIdx
@@ -213,7 +219,7 @@ isWalkable :: Tile -> Bool
 isWalkable tile = tile `elem` [Empty, Start, Goal]
 
 arrivedGoal :: GameState -> Bool
-arrivedGoal (GameState maze position _ _) = tile == Just Goal
+arrivedGoal (GameState maze position _ _ _) = tile == Just Goal
   where
     tile = getTile maze position
 
@@ -248,7 +254,7 @@ lookAround gameState = (desc, revealed)
     revealed = updateVision gameState
 
 describeSurrounding :: GameState -> String
-describeSurrounding (GameState maze (rowIdx, colIdx) direction _) = unwords
+describeSurrounding (GameState maze (rowIdx, colIdx) direction _ _) = unwords
   [ "You see", front, "in front of you."
   , capitalize left, "to the left."
   , capitalize right, "to the right."
@@ -272,7 +278,7 @@ updateVision :: GameState -> GameState
 updateVision gs = reveal gs (visibleAround gs)
 
 visibleAround :: GameState -> [Position]
-visibleAround (GameState maze (rowIdx, colIdx) direction _) =
+visibleAround (GameState maze (rowIdx, colIdx) direction _ _) =
   let directions         = [North, East, South, West]
       deltaPositions     = map moveDelta directions
       neighbors          = [(rowIdx + deltaRowIdx, colIdx + deltaColIdx)
@@ -299,7 +305,7 @@ getTile maze (rowIdx, colIdx)
 |-- Render --|
 |------------}
 renderMap :: GameState -> String
-renderMap gs@(GameState grid pos dir disc) =
+renderMap gs@(GameState grid pos dir disc _) =
   let grid = layout $ maze gs
   in concatMap (renderRow pos dir disc) (zip [0..] grid)
 
