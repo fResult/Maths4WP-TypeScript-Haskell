@@ -105,7 +105,9 @@ parseInput input = case run input of
 
 parseAction :: Parser Action
 parseAction =
-      parseRepeatPrefix
+      parseAssign
+  <|> parseUse
+  <|> parseRepeatPrefix
   <|> parseRepeatPostfix
   <|> parseAtomicAction
   <|> parseUnknown
