@@ -197,7 +197,18 @@ parseAssign = do
 
 -- expression ::= term ("then" term)*
 parseExpression :: Parser Action
-parseExpression = undefined
+parseExpression = do
+  first <- parseTerm
+  rest  <- many (word "then" *> parseTerm)
+  pure $
+    case rest of
+      [] -> first
+      xs -> Sequence (first : xs)
+
+-- term ::= "repeat" n atom/parentheses
+--        | atom/parentheses n?
+parseTerm :: Parser Action
+parseTerm = undefined
 
 --
 
