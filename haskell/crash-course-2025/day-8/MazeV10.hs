@@ -127,14 +127,6 @@ type Game a = StateT GameState IO a
 --   n <- parseInt
 --   pure (Repeat n action)
 
-
--- parseRepeatPrefix :: Parser Action
--- parseRepeatPrefix = do
---   word "repeat"
---   n <- parseInt
---   action <- parseParenthesesOrAction
---   pure (Repeat n action)
-
 -- parseAtomicAction :: Parser Action
 -- parseAtomicAction =
 --       word "forward" $> Forward
@@ -208,7 +200,18 @@ parseExpression = do
 -- term ::= "repeat" n atom/parentheses
 --        | atom/parentheses n?
 parseTerm :: Parser Action
-parseTerm = undefined
+parseTerm =
+      parseRepeatPrefix
+  <|> parsePostfixOrPlain
+
+parsePostfixOrPlain :: Parser Action
+parsePostfixOrPlain = undefined
+
+parseRepeatPrefix :: Parser Action
+parseRepeatPrefix = undefined
+
+parseAtomOrParentheses :: Parser Action
+parseAtomOrParentheses = undefined
 
 --
 
