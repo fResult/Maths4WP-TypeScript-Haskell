@@ -96,79 +96,110 @@ type Game a = StateT GameState IO a
 {--------------------|
 |--- Game Parsers ---|
 |--------------------}
-parseInput :: String -> Maybe Action
-parseInput input = case run input of
-  Just (a, _) -> Just a
-  Nothing     -> Nothing
-  where
-    run = runParser parseSequence
+-- parseInput :: String -> Maybe Action
+-- parseInput input = case run input of
+--   Just (a, _) -> Just a
+--   Nothing     -> Nothing
+--   where
+--     run = runParser parseSequence
 
+-- parseAction :: Parser Action
+-- parseAction =
+--       parseAssign
+--   <|> parseUse
+--   <|> parseRepeatPrefix
+--   <|> parseRepeatPostfix
+--   <|> parseAtomicAction
+--   <|> parseUnknown
+
+-- parseSequence :: Parser Action
+-- parseSequence = do
+--   first <- parseAction
+--   rest  <- many (word "then" *> parseAction)
+--   pure $
+--     case rest of
+--       []  -> first
+--       _   -> Sequence (first : rest)
+
+-- parseRepeatPostfix :: Parser Action
+-- parseRepeatPostfix = do
+--   action <- parseParenthesesOrAction
+--   n <- parseInt
+--   pure (Repeat n action)
+
+
+-- parseRepeatPrefix :: Parser Action
+-- parseRepeatPrefix = do
+--   word "repeat"
+--   n <- parseInt
+--   action <- parseParenthesesOrAction
+--   pure (Repeat n action)
+
+-- parseAtomicAction :: Parser Action
+-- parseAtomicAction =
+--       word "forward" $> Forward
+--   <|> word "move" *> word "forward" $> Forward
+--   <|> word "turn" *> word "left" $> TurnLeft
+--   <|> word "turn" *> word "right" $> TurnRight
+--   <|> word "left" $> TurnLeft
+--   <|> word "right" $> TurnRight
+--   <|> word "turn" *> (Turn <$> parseDirection)
+--   <|> Turn <$> parseDirection
+--   <|> word "look" $> Look
+--   <|> word "map" $> Map
+--   <|> word "help" $> Help
+--   <|> word "command" $> Help
+--   <|> word "quit" $> Quit
+--   <|> parseUnknown
+
+-- parseParenthesesOrAction :: Parser Action
+-- parseParenthesesOrAction =
+--       between (word "(") (word ")") parseSequence
+--   <|> parseAtomicAction
+
+-- parseUse :: Parser Action
+-- parseUse = do
+--   word "use"
+--   name <- some (satisfy isAlphaNum)
+--   pure (Use name)
+
+-- parseMap :: Parser Maze
+-- parseMap = Maze <$> parseByLines parseRow
+
+-- parseRow :: Parser MazeRow -- Parser [Tile]
+-- parseRow = some parseTile
+
+-- parseTile :: Parser Tile
+-- parseTile =
+--       word "[x]" $> Wall
+--   <|> word "[_]" $> Empty
+--   <|> word "[s]" $> Start
+--   <|> word "[o]" $> Goal
+
+-- parseUnknown ::  Parser Action
+-- parseUnknown = do
+--   command <- some (satisfy (\c -> not (isSpace c)))
+--   pure $ Unknown command
+
+-- Top level: either assignment or expression
 parseAction :: Parser Action
 parseAction =
       parseAssign
-  <|> parseUse
-  <|> parseRepeatPrefix
-  <|> parseRepeatPostfix
-  <|> parseAtomicAction
-  <|> parseUnknown
+  <|> parseExpression
 
-parseSequence :: Parser Action
-parseSequence = do
-  first <- parseAction
-  rest  <- many (word "then" *> parseAction)
-  pure $
-    case rest of
-      []  -> first
-      _   -> Sequence (first : rest)
-
-parseRepeatPostfix :: Parser Action
-parseRepeatPostfix = do
-  action <- parseParenthesesOrAction
-  n <- parseInt
-  pure (Repeat n action)
-
-
-parseRepeatPrefix :: Parser Action
-parseRepeatPrefix = do
-  word "repeat"
-  n <- parseInt
-  action <- parseParenthesesOrAction
-  pure (Repeat n action)
-
-parseAtomicAction :: Parser Action
-parseAtomicAction =
-      word "forward" $> Forward
-  <|> word "move" *> word "forward" $> Forward
-  <|> word "turn" *> word "left" $> TurnLeft
-  <|> word "turn" *> word "right" $> TurnRight
-  <|> word "left" $> TurnLeft
-  <|> word "right" $> TurnRight
-  <|> word "turn" *> (Turn <$> parseDirection)
-  <|> Turn <$> parseDirection
-  <|> word "look" $> Look
-  <|> word "map" $> Map
-  <|> word "help" $> Help
-  <|> word "command" $> Help
-  <|> word "quit" $> Quit
-  <|> parseUnknown
-
-parseParenthesesOrAction :: Parser Action
-parseParenthesesOrAction =
-      between (word "(") (word ")") parseSequence
-  <|> parseAtomicAction
-
+-- name ::= expression
 parseAssign :: Parser Action
 parseAssign = do
   name <- some (satisfy isAlphaNum)
   word "="
-  body <- parseSequence
+  body <- parseExpression
   pure $ Assign name body
 
-parseUse :: Parser Action
-parseUse = do
-  word "use"
-  name <- some (satisfy isAlphaNum)
-  pure (Use name)
+-- expression ::= term ("then" term)*
+parseExpression :: Parser Action
+parseExpression = undefined
+
+--
 
 parseDirection :: Parser Direction
 parseDirection =
@@ -177,23 +208,7 @@ parseDirection =
   <|> word "south" $> South
   <|> word "west"  $> West
 
-parseMap :: Parser Maze
-parseMap = Maze <$> parseByLines parseRow
-
-parseRow :: Parser MazeRow -- Parser [Tile]
-parseRow = some parseTile
-
-parseTile :: Parser Tile
-parseTile =
-      word "[x]" $> Wall
-  <|> word "[_]" $> Empty
-  <|> word "[s]" $> Start
-  <|> word "[o]" $> Goal
-
-parseUnknown ::  Parser Action
-parseUnknown = do
-  command <- some (satisfy (\c -> not (isSpace c)))
-  pure $ Unknown command
+--
 
 -- TODO: Refactor to return `Maybe` or `Either` to handle missing `Start` tile safely.
 findStart :: Maze -> Position
