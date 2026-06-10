@@ -314,11 +314,67 @@ We wired the parsers into the Interpreter by implementing `handleAssign` and `ha
 > While our AST and Interpreter are solid, our Parser has reached its breaking point.\
 > It's time to stop patching and do a full **Parser Revamp**.
 
+### 6.8 The Parser Revamp: Top-Down Design ([MazeV10][maze-v10])
+
+### Architectural Philosophy: Bottom-Up Discovery, Top-Down Execution
+
+As we added features iteratively up to [MazeV9][maze-v9], our parser grew organically (bottom-up) until it became a tangled, ad-hoc mess.\
+We piled combinators on top of each other until the entropy became unmanageable, making it fragile to modify.
+
+> *"Everything should be built **top-down**, except the first time."*\
+> — Alan Perlis
+
+Another related quote:
+> *"You cannot teach beginners **top-down** programming, because they don't know which end is up"*\
+> — Alan Perlis
+
+We built it bottom-up the first time to discover our domain requirements.\
+Now that we understand the full scope of our DSL, it is time to step back and re-architect it **top-down** using Formal Grammar principles.
+
+We refactored the entire parser from the top-down, modeling it after a formal language grammar.\
+This resolves the ambiguity and fragility of the previous ad-hoc approach.
+
+- **What:** Re-architected the parser into a **Recursive Descent** structure based on these grammar rules:
+    - **`action ::= statement | expression`**: The top-level input is either a statement (like an assignment) or an expression (something that evaluates to an action).
+    - **`statement ::= name "=" expression`**: A statement is defined as a name, an equals sign, and any valid expression.
+    - **`expression ::= term ("then" term)*`**: An expression is one or more `term`s chained together by `then`.
+- **Why:** This formal structure eliminates ambiguity. It creates a clear hierarchy where complex structures (`expression`) are built from simpler ones (`term`), preventing the infinite recursion and parsing conflicts we faced in `MazeV9`. It makes the parser predictable and easy to extend.
+- **Demo:** The new implementation directly mirrors the grammar rules, making the code self-documenting.
+  ```hs
+  -- Top level: action ::= statement | expression
+  parseAction :: Parser Action
+  parseAction =
+        parseAssign
+    <|> parseExpression
+  
+  -- Statement: name ::= expression
+  parseAssign :: Parser Action
+  parseAssign = do
+    name <- some (satisfy isAlphaNum)
+    word "="
+    body <- parseExpression -- Crucially, the body is now ANY valid expression
+    pure $ Assign name body
+  
+  -- Expression: term ("then" term)*
+  parseExpression :: Parser Action
+  parseExpression = do
+    first <- parseTerm
+    rest  <- many (word "then" *> parseTerm)
+    pure $ case rest of
+      [] -> first
+      xs -> Sequence (first : xs)
+  ```
+
+> [!NOTE]
+> *We introduced `parseTerm` as the next layer down the tree, but it is currently `undefined` (WIP). Our next step is to implement `parseTerm` to handle core logic like `Repeat`, `Use`, and `Atomic` actions!*
+
+
 [maze-v5]: ../day-7/MazeV5.hs
 [maze-v6]: ./MazeV6.hs
 [maze-v7]: ./MazeV7.hs
 [maze-v8]: ./MazeV8.hs
 [maze-v9]: ./MazeV9.hs
+[maze-v10]: ./MazeV10.hs
 [parser-v2]: ./ParserV2.hs
 [parser-v3]: ./ParserV3.hs
 [parser-v4]: ./ParserV4.hs
