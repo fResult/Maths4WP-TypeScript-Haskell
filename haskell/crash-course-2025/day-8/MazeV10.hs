@@ -208,7 +208,11 @@ parsePostfixOrPlain :: Parser Action
 parsePostfixOrPlain = undefined
 
 parseRepeatPrefix :: Parser Action
-parseRepeatPrefix = undefined
+parseRepeatPrefix = do
+  word "repeat"
+  n <- parseInt
+  action <- parseAtomOrParentheses
+  pure (Repeat n action)
 
 parseAtomOrParentheses :: Parser Action
 parseAtomOrParentheses = undefined
