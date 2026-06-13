@@ -96,13 +96,6 @@ type Game a = StateT GameState IO a
 {--------------------|
 |--- Game Parsers ---|
 |--------------------}
--- parseInput :: String -> Maybe Action
--- parseInput input = case run input of
---   Just (a, _) -> Just a
---   Nothing     -> Nothing
---   where
---     run = runParser parseSequence
-
 -- parseAction :: Parser Action
 -- parseAction =
 --       parseAssign
@@ -127,51 +120,17 @@ type Game a = StateT GameState IO a
 --   n <- parseInt
 --   pure (Repeat n action)
 
--- parseAtomicAction :: Parser Action
--- parseAtomicAction =
---       word "forward" $> Forward
---   <|> word "move" *> word "forward" $> Forward
---   <|> word "turn" *> word "left" $> TurnLeft
---   <|> word "turn" *> word "right" $> TurnRight
---   <|> word "left" $> TurnLeft
---   <|> word "right" $> TurnRight
---   <|> word "turn" *> (Turn <$> parseDirection)
---   <|> Turn <$> parseDirection
---   <|> word "look" $> Look
---   <|> word "map" $> Map
---   <|> word "help" $> Help
---   <|> word "command" $> Help
---   <|> word "quit" $> Quit
---   <|> parseUnknown
-
 -- parseParenthesesOrAction :: Parser Action
 -- parseParenthesesOrAction =
 --       between (word "(") (word ")") parseSequence
 --   <|> parseAtomicAction
 
--- parseUse :: Parser Action
--- parseUse = do
---   word "use"
---   name <- some (satisfy isAlphaNum)
---   pure (Use name)
-
--- parseMap :: Parser Maze
--- parseMap = Maze <$> parseByLines parseRow
-
--- parseRow :: Parser MazeRow -- Parser [Tile]
--- parseRow = some parseTile
-
--- parseTile :: Parser Tile
--- parseTile =
---       word "[x]" $> Wall
---   <|> word "[_]" $> Empty
---   <|> word "[s]" $> Start
---   <|> word "[o]" $> Goal
-
--- parseUnknown ::  Parser Action
--- parseUnknown = do
---   command <- some (satisfy (\c -> not (isSpace c)))
---   pure $ Unknown command
+parseInput :: String -> Maybe Action
+parseInput input = case run input of
+  Just (a, _) -> Just a
+  Nothing     -> Nothing
+  where
+    run = runParser parseAction
 
 -- Top level: either assignment or expression
 parseAction :: Parser Action
@@ -229,13 +188,45 @@ parseTerm =
   <|> parsePostfixOrPlain
 
 parseUse :: Parser Action
-parseUse = undefined
+parseUse = do
+  word "use"
+  name <- some (satisfy isAlphaNum)
+  pure (Use name)
 
 parseAtomicAction :: Parser Action
-parseAtomicAction = undefined
+parseAtomicAction =
+      word "forward" $> Forward
+  <|> word "move" *> word "forward" $> Forward
+  <|> word "turn" *> word "left" $> TurnLeft
+  <|> word "turn" *> word "right" $> TurnRight
+  <|> word "left" $> TurnLeft
+  <|> word "right" $> TurnRight
+  <|> word "turn" *> (Turn <$> parseDirection)
+  <|> Turn <$> parseDirection
+  <|> word "look" $> Look
+  <|> word "map" $> Map
+  <|> word "help" $> Help
+  <|> word "command" $> Help
+  <|> word "quit" $> Quit
+  <|> parseUnknown
 
 parseUnknown ::  Parser Action
-parseUnknown = undefined
+parseUnknown = do
+  command <- some (satisfy (not . isSpace))
+  pure $ Unknown command
+
+parseMap :: Parser Maze
+parseMap = Maze <$> parseByLines parseRow
+
+parseRow :: Parser MazeRow -- Parser [Tile]
+parseRow = some parseTile
+
+parseTile :: Parser Tile
+parseTile =
+      word "[x]" $> Wall
+  <|> word "[_]" $> Empty
+  <|> word "[s]" $> Start
+  <|> word "[o]" $> Goal
 
 parseDirection :: Parser Direction
 parseDirection =
