@@ -398,7 +398,21 @@ At the very bottom of our parser tree, we need to handle raw commands and their 
       Just n  -> Repeat n action
   ```
 
+### 6.11 The Terminal Nodes & Mutual Recursion
 
+At the absolute bottom of our grammar, we define the terminal nodes (Atoms) and the mechanism to loop back to the top of the tree.
+
+- **What:** Implemented `parseAtomOrParentheses` to handle parenthesized expressions, macro utilizations (`parseUse`), core atomic commands (`parseAtomicAction`), and safe fallbacks (`parseUnknown`). 
+- **Why:** This is where **Mutual Recursion** happens safely. By allowing `parseAtomOrParentheses` to call the top-level `parseExpression` *only* when it is successfully wrapped `between "(" ")"` tokens, we guarantee that the parser consumes input before recursing. This permanently breaks the infinite loop trap while allowing infinitely nested logic (e.g., `repeat 3 (use jump then (forward 2))`).
+- **Demo:** The implementation elegantly routes terminal commands or safely recurses back up the syntax tree:
+  ```hs
+  parseAtomOrParentheses :: Parser Action
+  parseAtomOrParentheses = do
+    between (word "(") (word ")") parseExpression
+    <|> parseUse
+    <|> parseAtomicAction
+    <|> parseUnknown
+  ```
 
 [maze-v5]: ../day-7/MazeV5.hs
 [maze-v6]: ./MazeV6.hs
