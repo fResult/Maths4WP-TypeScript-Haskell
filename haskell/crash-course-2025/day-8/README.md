@@ -381,11 +381,23 @@ Next, we descended one level deeper from `expression` into `term`.
     <|> parsePostfixOrPlain
   ```
 
-> [!NOTE]
-> *The deepest conceptual layers (`parsePostfixOrPlain`, `parseAtomOrParentheses`, and `parseRepeatPrefix`) are currently `undefined`.\
-> Implementing these foundational combinators is our final step to completing the parser revamp!*
+### 6.10 The Deepest Layer: Atoms and Optional Modifiers
 
-We will never get infinity recursion from the top-down to lower-level after refactoring from the bottom-up parser.
+At the very bottom of our parser tree, we need to handle raw commands and their potential postfix modifiers (e.g., `forward` vs `forward 3`).
+
+- **What:** Implemented `parsePostfixOrPlain` utilizing the `optional Applicative` combinator from `Control.Applicative`.
+- **Why:** To eliminate redundant backtracking and parser ambiguity. In the old bottom-up approach ([MazeV9][maze-v9]), having separate `<|>` branches for postfix and plain actions created fragile evaluation paths. By parsing the base `parseAtomOrParentheses` once, and then looking for an `optional parseInt`, we guarantee a deterministic, single-pass decision path. If n exists, it elevates the action to a `Repeat` node; if not, it returns the plain action. Pure mathematical elegance.
+- **Demo:** Notice how it gracefully folds both paths into a single unified logic block:
+  ```hs
+  parsePostfixOrPlain :: Parser Action
+  parsePostfixOrPlain = do
+    action <- parseAtomOrParentheses
+    optN   <- optional parseInt
+    pure $ case optN of
+      Nothing -> action
+      Just n  -> Repeat n action
+  ```
+
 
 
 [maze-v5]: ../day-7/MazeV5.hs
