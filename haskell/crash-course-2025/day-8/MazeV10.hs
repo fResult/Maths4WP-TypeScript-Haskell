@@ -205,7 +205,11 @@ parsePostfixOrPlain = do
     Just n  -> Repeat n action
 
 parseAtomOrParentheses :: Parser Action
-parseAtomOrParentheses = undefined
+parseAtomOrParentheses =
+      between (word "(") (word ")") parseExpression
+  <|> parseUse
+  <|> parseAtomicAction
+  <|> parseUnknown
 
 -- expression ::= term ("then" term)*
 parseExpression :: Parser Action
@@ -224,6 +228,14 @@ parseTerm =
       parseRepeatPrefix
   <|> parsePostfixOrPlain
 
+parseUse :: Parser Action
+parseUse = undefined
+
+parseAtomicAction :: Parser Action
+parseAtomicAction = undefined
+
+parseUnknown ::  Parser Action
+parseUnknown = undefined
 
 parseDirection :: Parser Direction
 parseDirection =
