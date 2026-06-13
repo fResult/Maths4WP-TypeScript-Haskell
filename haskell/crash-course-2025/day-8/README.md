@@ -365,8 +365,27 @@ This resolves the ambiguity and fragility of the previous ad-hoc approach.
       xs -> Sequence (first : xs)
   ```
 
+### 6.9 Handling Precedence & Ambiguity: The Term Layer
+
+Next, we descended one level deeper from `expression` into `term`.
+
+- **What:** Implemented `parseTerm` to elegantly resolve Prefix (`repeat n action`) and Postfix/Plain (`action n?`) parsing.
+- **Why:** To mathematically isolate syntax ambiguity. By pushing the prefix/postfix evaluation down to the `term` layer, our `parseExpression` (the layer above) remains blissfully ignorant of these details. It only cares about chaining `term`s together. This demonstrates how Formal Grammar naturally manages **Operator Precedence** and separates concerns.
+- **Demo:** The implementation is strikingly simple and maps directly to our grammar rules:
+  ```hs
+  -- term ::= "repeat" n atom/parentheses
+  --        | atom/parentheses n?
+  parseTerm :: Parser Action
+  parseTerm =
+        parseRepeatPrefix
+    <|> parsePostfixOrPlain
+  ```
+
 > [!NOTE]
-> *We introduced `parseTerm` as the next layer down the tree, but it is currently `undefined` (WIP). Our next step is to implement `parseTerm` to handle core logic like `Repeat`, `Use`, and `Atomic` actions!*
+> *The deepest conceptual layers (`parsePostfixOrPlain`, `parseAtomOrParentheses`, and `parseRepeatPrefix`) are currently `undefined`.\
+> Implementing these foundational combinators is our final step to completing the parser revamp!*
+
+We will never get infinity recursion from the top-down to lower-level after refactoring from the bottom-up parser.
 
 
 [maze-v5]: ../day-7/MazeV5.hs
