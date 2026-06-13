@@ -187,6 +187,21 @@ parseAssign = do
   body <- parseExpression
   pure $ Assign name body
 
+-- repeat 3 forward, OR repeat 2 (use jump)
+parseRepeatPrefix :: Parser Action
+parseRepeatPrefix = do
+  word "repeat"
+  n      <- parseInt
+  action <- parseAtomOrParentheses
+  pure (Repeat n action)
+
+-- forward 2, (use jump) 3, forward, OR use jump
+parsePostfixOrPlain :: Parser Action
+parsePostfixOrPlain = undefined
+
+parseAtomOrParentheses :: Parser Action
+parseAtomOrParentheses = undefined
+
 -- expression ::= term ("then" term)*
 parseExpression :: Parser Action
 parseExpression = do
@@ -197,27 +212,13 @@ parseExpression = do
       [] -> first
       xs -> Sequence (first : xs)
 
--- term ::= "repeat" n atom/parentheses
---        | atom/parentheses n?
+{-- term ::= "repeat" n atom/parentheses ---
+---        | atom/parentheses n?         --}
 parseTerm :: Parser Action
 parseTerm =
       parseRepeatPrefix
   <|> parsePostfixOrPlain
 
-parsePostfixOrPlain :: Parser Action
-parsePostfixOrPlain = undefined
-
-parseRepeatPrefix :: Parser Action
-parseRepeatPrefix = do
-  word "repeat"
-  n <- parseInt
-  action <- parseAtomOrParentheses
-  pure (Repeat n action)
-
-parseAtomOrParentheses :: Parser Action
-parseAtomOrParentheses = undefined
-
---
 
 parseDirection :: Parser Direction
 parseDirection =
