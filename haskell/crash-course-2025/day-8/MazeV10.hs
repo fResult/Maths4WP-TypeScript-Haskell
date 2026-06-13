@@ -1,6 +1,6 @@
 module MazeV10 where
 
-import Control.Applicative ((<|>), Alternative (some, many))
+import Control.Applicative ((<|>), optional, Alternative (some, many))
 import Data.Char (toUpper, toLower, isSpace, isAlphaNum)
 import Data.Functor (($>))
 import Data.List (nub)
@@ -197,7 +197,12 @@ parseRepeatPrefix = do
 
 -- forward 2, (use jump) 3, forward, OR use jump
 parsePostfixOrPlain :: Parser Action
-parsePostfixOrPlain = undefined
+parsePostfixOrPlain = do
+  action <- parseAtomOrParentheses
+  optN   <- optional parseInt
+  pure $ case optN of
+    Nothing -> action
+    Just n  -> Repeat n action
 
 parseAtomOrParentheses :: Parser Action
 parseAtomOrParentheses = undefined
