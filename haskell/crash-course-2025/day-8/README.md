@@ -414,6 +414,33 @@ At the absolute bottom of our grammar, we define the terminal nodes (Atoms) and 
     <|> parseUnknown
   ```
 
+> [!TIP]
+> **The Ultimate Benefit of Top-Down Grammar**\
+> Because we re-designed the parsers structurally from the top (`parseAction` -> `parseExpression` -> `parseTerm` -> `parseAtom`), we **permanently eliminated the risk of Infinite Recursion** that plagued our ad-hoc bottom-up parsers.\
+> Consequently, we updated our root execution in `parseInput` from `runParser parseSequence` to `runParser parseAction`, officially transitioning our DSL to this new, robust engine.
+
+### 6.12 The Final Wiring: Activating the New Engine
+
+With all terminal nodes (`parseUse`, `parseAtomicAction`, `parseUnknown`) implemented, the Top-Down parser tree is fully connected.\
+The final step was to wire this new engine into the game's entry point.
+
+- **What:** Replaced `parseSequence` with `parseAction` inside the main `parseInput` execution block.
+- **Why:** To officially switch the game's DSL engine from the old, fragile bottom-up parser to the new, robust top-down parser. Because our new `parseAction` natively handles expressions, statements, and sequences through its grammar rules, it serves as the perfect universal entry point.
+  ```diff
+    parseInput :: String -> Maybe Action
+    parseInput input = case run input of
+      Just (a, _) -> Just a
+      Nothing     -> Nothing
+      where
+  -     run = runParser parseSequence  <-- Old Bottom-Up Engine
+  +     run = runParser parseAction       <-- New Top-Down Engine
+  ```
+
+### Architecture Achieved: The Formal DSL
+
+By completing this parser revamp, we have successfully transformed an ad-hoc collection of string matching functions into a **Formal Domain-Specific Language**.\
+Our parser now behaves exactly like a real compiler's front-end: it strictly follows formal grammar rules, isolates syntax ambiguities at the lowest levels, and safely allows infinite composability without risking stack overflows or infinite recursions.
+
 [maze-v5]: ../day-7/MazeV5.hs
 [maze-v6]: ./MazeV6.hs
 [maze-v7]: ./MazeV7.hs
@@ -423,3 +450,4 @@ At the absolute bottom of our grammar, we define the terminal nodes (Atoms) and 
 [parser-v2]: ./ParserV2.hs
 [parser-v3]: ./ParserV3.hs
 [parser-v4]: ./ParserV4.hs
+[parser-v5]: ./ParserV5.hs
