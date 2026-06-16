@@ -441,6 +441,39 @@ The final step was to wire this new engine into the game's entry point.
 By completing this parser revamp, we have successfully transformed an ad-hoc collection of string matching functions into a **Formal Domain-Specific Language**.\
 Our parser now behaves exactly like a real compiler's front-end: it strictly follows formal grammar rules, isolates syntax ambiguities at the lowest levels, and safely allows infinite composability without risking stack overflows or infinite recursions.
 
+**The Ultimate Demo: Nested Macro Expansion**
+
+To prove the power of our new engine, let's look back at the exact command that broke our old ad-hoc parser in `MazeV9`.\
+Because our AST now natively supports infinite composability via Mutual Recursion, we can safely define and execute deeply nested macros:
+
+```console
+# 1. Define foundational macros
+➜ backward = left then left
+Alias: "backward" defined.
+
+# 2. Define a complex macro that inherently re-uses other macros!
+➜ backjump = (use backward) then (use jump) then (use backward)
+Alias: "backjump" defined.
+
+# 3. The state before execution
+➜ map
+...
+[S][_][>][_][?][?][?][?]
+...
+
+# 4. Execute the nested macro tree
+➜ use backjump
+You turned left.
+... (Interpreter recursively unfolds the AST and applies state mutations) ...
+You turned left.
+
+-- 5. The state after execution
+➜ map
+...
+[>][_][_][_][?][?][?][?]
+...
+```
+
 [maze-v5]: ../day-7/MazeV5.hs
 [maze-v6]: ./MazeV6.hs
 [maze-v7]: ./MazeV7.hs
