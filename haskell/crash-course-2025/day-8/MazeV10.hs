@@ -85,6 +85,7 @@ data Action
   | Repeat Int Action
   | Assign Alias Action
   | Use Alias
+  | Reset
   | Unknown String
   deriving (Show, Eq)
 
@@ -207,6 +208,7 @@ parseAtomicAction =
   <|> word "map" $> Map
   <|> word "help" $> Help
   <|> word "command" $> Help
+  <|> word "reset" $> Reset
   <|> word "quit" $> Quit
   <|> parseUnknown
 
@@ -491,9 +493,19 @@ handleAction action = case action of
   Repeat n action    -> handleRepeat n action
   Assign name action -> handleAssign name action
   Use name           -> handleUse name
+  Reset              -> handleReset
   Unknown cmd        -> handleUnknown cmd
 
 --
+
+handleReset :: Game String
+handleReset = do
+  gameState <- get
+  let savedAliases = aliases gameState
+      currentMaze = maze gameState
+  let newGameState = newGame currentMaze
+  put newGameState { aliases = savedAliases }
+  pure "Maze has been reset."
 
 handleUse :: Alias -> Game String
 handleUse name = do
