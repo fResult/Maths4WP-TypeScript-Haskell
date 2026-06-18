@@ -12,6 +12,8 @@ This zoomed-out architectural shift allows us to build a robust **Domain-Specifi
 - **Phase 1 (MazeV6):** Establishing the AST foundation and completing the Interpreter Pattern.
 - **Phase 2 (MazeV7):** Introducing Graceful Degradation to handle invalid states without crashing.
 - **Phase 3 (MazeV8):** Expanding the DSL's expressiveness (loops, flexible syntax) while keeping the core domain pure.
+- **Phase 4 (MazeV9):** Programmability & Stateful Environment (Macros & Symbol Table).
+- **Phase 5 (MazeV10):** Top-Down Parser Revamp & Formal Grammar.
 
 ---
 
@@ -263,7 +265,9 @@ We implemented the loop interpretation logic for the `Repeat` node using a class
 > This makes adding new features incredibly easy.\
 > We simply compose these existing foundational units together into complex behaviors without having to rewrite our core logic!
 
-### 6.6 The Symbol Table: Macros & Aliases ([MazeV9][maze-v9])
+## 7. Phase 4: Programmability & Symbol Table ([MazeV9][maze-v9])
+
+### 7.1 The Symbol Table: Macros & Aliases
 
 To make our DSL truly programmable, we introduced the concept of variables/macros. This requires expanding our Interpreter to manage an **Environment** (Symbol Table).
 
@@ -286,7 +290,7 @@ To make our DSL truly programmable, we introduced the concept of variables/macro
 > The primary `parseAction` and the Interpreter (`handleAction`) do not yet know how to evaluate them.\
 > This is our next target!*
 
-### 6.7 Interpreting Macros & Semantic Validation (The "How")
+### 7.2 Interpreting Macros & Semantic Validation (The "How")
 
 We wired the parsers into the Interpreter by implementing `handleAssign` and `handleUse`.
 
@@ -314,7 +318,9 @@ We wired the parsers into the Interpreter by implementing `handleAssign` and `ha
 > While our AST and Interpreter are solid, our Parser has reached its breaking point.\
 > It's time to stop patching and do a full **Parser Revamp**.
 
-### 6.8 The Parser Revamp: Top-Down Design ([MazeV10][maze-v10])
+## 8. Phase 5: The Parser Revamp & Formal Grammar ([MazeV10][maze-v10])
+
+### 8.1 The Parser Revamp: Top-Down Design
 
 ### Architectural Philosophy: Bottom-Up Discovery, Top-Down Execution
 
@@ -365,7 +371,7 @@ This resolves the ambiguity and fragility of the previous ad-hoc approach.
       xs -> Sequence (first : xs)
   ```
 
-### 6.9 Handling Precedence & Ambiguity: The Term Layer
+### 8.2 Handling Precedence & Ambiguity: The Term Layer
 
 Next, we descended one level deeper from `expression` into `term`.
 
@@ -381,7 +387,7 @@ Next, we descended one level deeper from `expression` into `term`.
     <|> parsePostfixOrPlain
   ```
 
-### 6.10 The Deepest Layer: Atoms and Optional Modifiers
+### 8.3 The Deepest Layer: Atoms and Optional Modifiers
 
 At the very bottom of our parser tree, we need to handle raw commands and their potential postfix modifiers (e.g., `forward` vs `forward 3`).
 
@@ -398,7 +404,7 @@ At the very bottom of our parser tree, we need to handle raw commands and their 
       Just n  -> Repeat n action
   ```
 
-### 6.11 The Terminal Nodes & Mutual Recursion
+### 8.4 The Terminal Nodes & Mutual Recursion
 
 At the absolute bottom of our grammar, we define the terminal nodes (Atoms) and the mechanism to loop back to the top of the tree.
 
@@ -419,7 +425,7 @@ At the absolute bottom of our grammar, we define the terminal nodes (Atoms) and 
 > Because we re-designed the parsers structurally from the top (`parseAction` -> `parseExpression` -> `parseTerm` -> `parseAtom`), we **permanently eliminated the risk of Infinite Recursion** that plagued our ad-hoc bottom-up parsers.\
 > Consequently, we updated our root execution in `parseInput` from `runParser parseSequence` to `runParser parseAction`, officially transitioning our DSL to this new, robust engine.
 
-### 6.12 The Final Wiring: Activating the New Engine
+### 8.5 The Final Wiring: Activating the New Engine
 
 With all terminal nodes (`parseUse`, `parseAtomicAction`, `parseUnknown`) implemented, the Top-Down parser tree is fully connected.\
 The final step was to wire this new engine into the game's entry point.
