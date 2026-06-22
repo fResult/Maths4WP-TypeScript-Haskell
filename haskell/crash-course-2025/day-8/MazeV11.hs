@@ -86,6 +86,7 @@ data Action
   | Assign Alias Action
   | Use Alias
   | Reset
+  | ClearAliases
   | Unknown String
   deriving (Show, Eq)
 
@@ -180,6 +181,7 @@ parseAtomicAction =
   <|> word "help" $> Help
   <|> word "command" $> Help
   <|> word "reset" $> Reset
+  <|> word "clear alias" $> ClearAliases
   <|> word "quit" $> Quit
   <|> parseUnknown
 
@@ -465,18 +467,24 @@ handleAction action = case action of
   Assign name action -> handleAssign name action
   Use name           -> handleUse name
   Reset              -> handleReset
+  ClearAliases       -> handleClearAliases
   Unknown cmd        -> handleUnknown cmd
 
 --
+
+handleClearAliases :: Game String
+handleClearAliases = do
+  modify (\gs -> gs { aliases = [] })
+  pure (success colors ++ "All aliases cleared." ++ reset colors)
 
 handleReset :: Game String
 handleReset = do
   gameState <- get
   let savedAliases = aliases gameState
-      currentMaze = maze gameState
+      currentMaze  = maze gameState
   let newGameState = newGame currentMaze
   put newGameState { aliases = savedAliases }
-  pure "Maze has been reset."
+  pure (success colors ++ "Maze has been reset."++ reset colors)
 
 handleUse :: Alias -> Game String
 handleUse name = do
