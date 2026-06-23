@@ -356,7 +356,7 @@ renderMap gs@(GameState grid pos dir disc _) =
         isDiscoveredPosition = currentPosition `elem` disc
 
     renderRoomWith :: Char -> String
-    renderRoomWith c = "[" ++ colorizeTile [c] ++ "]"
+    renderRoomWith c = reset colors ++ "[" ++ colorizeTile [c] ++ reset colors ++ "]"
 
     colorizeTile :: String -> String
     colorizeTile [c]
