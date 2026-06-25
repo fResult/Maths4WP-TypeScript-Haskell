@@ -38,6 +38,13 @@ colors = Color
   , reset   = "\ESC[m"
   }
 
+aqua, green, yellow, red, grey :: String -> String
+aqua s = info colors ++ s ++ reset colors
+green s = success colors ++ s ++ reset colors
+yellow s = warning colors ++ s ++ reset colors
+red s = danger colors ++ s ++ reset colors
+grey s = "\x1b[90m" ++ s ++ reset colors
+
 {-------------------|
 |--- Data Models ---|
 |-------------------}
@@ -282,7 +289,7 @@ inBounds maze (rowIdx, colIdx) = rowIdxValid && colIdxValid
 lookAround :: GameState -> (String, GameState)
 lookAround gameState = (desc, revealed)
   where
-    desc = info colors ++ (describeSurrounding gameState) ++ reset colors
+    desc = aqua (describeSurrounding gameState)
     revealed = updateVision gameState
 
 describeSurrounding :: GameState -> String
@@ -360,9 +367,10 @@ renderMap gs@(GameState grid pos dir disc _) =
 
     colorizeTile :: String -> String
     colorizeTile [c]
-      | c `elem` directions = success colors ++ [c] ++ reset colors
-      | c `elem` portals    = info colors ++ [c] ++ reset colors
-      | c == '#'            = danger colors ++ [c] ++ reset colors
+      | c `elem` directions = green [c]
+      | c `elem` portals    = aqua [c]
+      | c == '#'            = red [c]
+      | c == '?'            = grey [c]
       | otherwise           = [c]
       where
         directions = ("^>v<_" :: String)
@@ -425,7 +433,7 @@ renderMapAction = gets renderMap
 |---------------}
 gameLoop :: Game ()
 gameLoop = do
-  liftIO $ putStr $ danger colors ++ "➜ \ESC[34m"
+  liftIO $ putStr $ red "➜ \ESC[34m"
   liftIO $ hFlush stdout
   command <- liftIO getLine
   case parseInput command of
@@ -437,7 +445,7 @@ gameLoop = do
       liftIO $ putStrLn message
       gameState <- get
       if arrivedGoal gameState
-        then liftIO (putStrLn $ success colors ++ "🎉 You reached the goal! 🎉" ++ reset colors)
+        then liftIO (putStrLn $ green "🎉 You reached the goal! 🎉")
         else gameLoop
 
 
@@ -475,7 +483,7 @@ handleAction action = case action of
 handleClearAliases :: Game String
 handleClearAliases = do
   modify (\gs -> gs { aliases = [] })
-  pure (success colors ++ "All aliases cleared." ++ reset colors)
+  pure (green "All aliases cleared.")
 
 handleReset :: Game String
 handleReset = do
@@ -484,24 +492,24 @@ handleReset = do
       currentMaze  = maze gameState
   let newGameState = newGame currentMaze
   put newGameState { aliases = savedAliases }
-  pure (success colors ++ "Maze has been reset."++ reset colors)
+  pure (green "Maze has been reset.")
 
 handleUse :: Alias -> Game String
 handleUse name = do
   env <- gets aliases
   case lookup name env of
-    Nothing     -> pure $ warning colors ++ ("Unknown alias: \"" ++ name ++ "\"") ++ reset colors
+    Nothing     -> pure $ yellow ("Unknown alias: \"" ++ name ++ "\"")
     Just action -> handleAction action
 
 handleAssign :: Alias -> Action -> Game String
 handleAssign name action
   | isReservedWord name =
-      pure $ danger colors ++ ("error: \"" ++ name ++ "\" is reserved and cannot be redefined.") ++ reset colors
+      pure $ red ("error: \"" ++ name ++ "\" is reserved and cannot be redefined.")
   | containsUnknown action =
-      pure $ warning colors ++ "Alias contains unknown commands." ++ reset colors
+      pure $ yellow "Alias contains unknown commands."
   | otherwise = do
       modify (\gs -> gs { aliases = (name, action) : aliases gs })
-      pure $ success colors ++ ("Alias: \"" ++ name ++ "\" defined.") ++ reset colors
+      pure $ green ("Alias: \"" ++ name ++ "\" defined.")
 
 reservedWords :: [String]
 reservedWords =
@@ -551,43 +559,40 @@ handleMoveForward = do
   if isWalkable
     then do
       description <- lookAroundAction
-      pure $ success colors ++ "You moved forward.\n" ++
-        info colors ++ description ++ reset colors
+      pure $ green "You moved forward.\n" ++
+        aqua description
     else
-      pure $ danger colors ++ "You hit the wall." ++ reset colors
+      pure $ red "You hit the wall."
 
 handleTurnLeft :: Game String
 handleTurnLeft = do
   turnLeftAction
   description <- lookAroundAction
-  pure $ info colors ++ "You turned left.\n" ++ description ++ reset colors
+  pure $ aqua "You turned left.\n" 
 
 handleTurnRight :: Game String
 handleTurnRight = do
   turnRightAction
   description <- lookAroundAction
-  pure $ info colors ++ "You turn right.\n" ++ description ++ reset colors
+  pure $ aqua "You turn right.\n" ++ description
 
 handleTurnDirection :: Direction -> Game String
 handleTurnDirection dir = do
   turnDirectionAction dir
   description <- lookAroundAction
-  pure $ info colors ++ "You now face " ++ show dir ++ ".\n"
-    ++ description ++ reset colors
+  pure $ aqua "You now face " ++ show dir ++ ".\n" ++ description
 
 handleHelp :: Game String
 handleHelp = pure helpText
 
 handleQuit :: Game ()
-handleQuit = liftIO $ putStrLn $ success colors ++ "Goodbye!"
+handleQuit = liftIO $ putStrLn $ green "Goodbye!"
 
 handleUnknown :: String -> Game String
 handleUnknown command =
-  pure (warning colors
-    ++ "Unknown command: \""
+  pure $ yellow ("Unknown command: \""
     ++ command
-    ++ "\". Try: forward | turn left | turn right | look | map | help | quit"
-    ++ reset colors)
+    ++ "\". Try: forward | turn left | turn right | look | map | help | quit")
 
 helpText :: String
 helpText = unlines
