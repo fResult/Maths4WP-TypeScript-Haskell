@@ -480,12 +480,60 @@ You turned left.
 ...
 ```
 
+## 9. Post-Revamp Refinements ([MazeV11][maze-v11])
+
+With our formal DSL engine solidified in MazeV10, this version focuses on minor extensions and housekeeping — no architectural shifts, just practical polish.
+
+### 9.1 New Command: `ClearAliases`
+
+In MazeV9-V10, we introduced `Assign` to define aliases and `Reset` to restart the maze while preserving aliases.\
+However, there was no way to *clear* unwanted aliases — if a user defined a broken macro, it persisted forever.
+
+- **What:** Added `ClearAliases` constructor to the `Action` AST, wired `word "clear alias" $> ClearAliases` into `parseAtomicAction`, and implemented `handleClearAliases` in the interpreter.
+- **Why:** To provide environmental hygiene. In any system with mutable state (our `AliasEnv`), users need a way to clean up. This complements `Reset` (which resets the *maze state* but preserves aliases) by targeting the *symbol table* specifically.
+- **Demo:**
+  ```hs
+  -- 1. AST: New constructor
+  data Action = ... | ClearAliases | ...
+
+  -- 2. Parser: New atomic command
+  parseAtomicAction =
+    ...
+    <|> word "clear alias" $> ClearAliases
+    ...
+
+  -- 3. Interpreter: Wipe the symbol table
+  handleClearAliases :: Game String
+  handleClearAliases = do
+    modify (\gs -> gs { aliases = [] })
+    pure (success colors ++ "All aliases cleared." ++ reset colors)
+  ```
+- **Demo (Console):**
+  ```console
+  ➜ jump = forward 2
+  Alias: "jump" defined.
+
+  ➜ clear alias
+  All aliases cleared.
+
+  ➜ use jump
+  Unknown alias: "jump"
+  ```
+
+---
+
+## What's Next?
+
+With a robust, formally structured DSL in place, our game is no longer just a sequence of string commands. It is a programmable engine.\
+Next, we will introduce the ultimate I/O upgrade: **Haskeline**. We'll replace the basic `getLine` loop with a rich, interactive REPL shell — complete with command history, arrow-key navigation, and an immersive user experience fit for a real terminal application!
+
 [maze-v5]: ../day-7/MazeV5.hs
 [maze-v6]: ./MazeV6.hs
 [maze-v7]: ./MazeV7.hs
 [maze-v8]: ./MazeV8.hs
 [maze-v9]: ./MazeV9.hs
 [maze-v10]: ./MazeV10.hs
+[maze-v11]: ./MazeV11.hs
 [parser-v2]: ./ParserV2.hs
 [parser-v3]: ./ParserV3.hs
 [parser-v4]: ./ParserV4.hs
